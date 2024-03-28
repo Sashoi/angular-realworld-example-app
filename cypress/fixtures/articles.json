@@ -1,0 +1,39 @@
+{
+  "articles": [
+    {
+      "slug": "BLA-245228",
+      "title": "Title 1",
+      "description": "BLA",
+      "body": "BLA",
+      "tagList": [],
+      "createdAt": "2023-11-17T12:09:09.323Z",
+      "updatedAt": "2023-11-17T12:09:09.323Z",
+      "favorited": false,
+      "favoritesCount": 1,
+      "author": {
+        "username": "CyTestUser",
+        "bio": null,
+        "image": "https://api.realworld.io/images/smiley-cyrus.jpeg",
+        "following": false
+      }
+    },
+    {
+      "slug": "Test-245228",
+      "title": "Title 2",
+      "description": "This is a description",
+      "body": "This is a body of the article",
+      "tagList": [],
+      "createdAt": "2023-11-16T19:24:48.013Z",
+      "updatedAt": "2023-11-16T19:24:48.013Z",
+      "favorited": false,
+      "favoritesCount": 5,
+      "author": {
+        "username": "CyTestUser",
+        "bio": null,
+        "image": "https://api.realworld.io/images/smiley-cyrus.jpeg",
+        "following": false
+      }
+    }
+  ],
+  "articlesCount": 2
+}

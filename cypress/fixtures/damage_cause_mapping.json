@@ -1,0 +1,75 @@
+{
+  "mapping": [
+    {
+      "iBoxDamageCause": "collisionsingle",
+      "claimType": ["01", "51", "51IV", "02", "52", "52IV"],
+      "damageCause": ["1100", "1110", "1120", "1600", "5100"]
+    },
+    {
+      "iBoxDamageCause": "collisionsolidobjects",
+      "claimType": ["02", "52", "52IV", "10", "10IV", "10HG", "10B"],
+      "damageCause": ["5600", "11", "12"]
+    },
+    {
+      "iBoxDamageCause": "collisionbikerpedestrian",
+      "claimType": [
+        "01",
+        "51",
+        "51IV",
+        "02",
+        "52",
+        "52IV",
+        "10",
+        "10IV",
+        "10HG",
+        "10B"
+      ],
+      "damageCause": ["1100", "1110", "1120", "1600", "5100", "11", "12"]
+    },
+    {
+      "iBoxDamageCause": "collisionanimal",
+      "claimType": ["02", "52", "52IV", "03", "53", "53IV", "10TH", "101IV"],
+      "damageCause": ["7700", "11", "12"]
+    },
+    {
+      "iBoxDamageCause": "lightning",
+      "claimType": ["02", "52", "52IV", "03", "53", "53IV"],
+      "damageCause": ["8500"]
+    },
+    {
+      "iBoxDamageCause": "theft",
+      "claimType": ["02", "52", "52IV", "03", "53", "53IV"],
+      "damageCause": ["7200", "7900"]
+    },
+    {
+      "iBoxDamageCause": "glass",
+      "claimType": ["02", "52", "52IV", "03", "53", "53IV"],
+      "damageCause": ["7200", "7400", "7500", "7900"]
+    },
+    {
+      "iBoxDamageCause": "hail",
+      "claimType": ["02", "52", "52IV", "03", "53", "53IV"],
+      "damageCause": ["7500"]
+    },
+    {
+      "iBoxDamageCause": "marten",
+      "claimType": ["02", "52", "52IV", "03", "53", "53IV"],
+      "damageCause": ["8900"]
+    },
+    {
+      "iBoxDamageCause": "parking",
+      "claimType": ["01", "51", "51IV", "02", "52", "52IV"],
+      "damageCause": ["1600", "1601", "5100", "5600"]
+    },
+    {
+      "iBoxDamageCause": "storm",
+      "claimType": ["02", "52", "52IV", "03", "53", "53IV"],
+      "damageCause": ["8500"]
+    },
+    {
+      "iBoxDamageCause": "vandalism",
+      "claimType": ["02", "52", "52IV", "03", "53", "53IV"],
+      "damageCause": ["5600"]
+    }
+  ]
+}

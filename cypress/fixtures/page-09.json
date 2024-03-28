@@ -1,0 +1,189 @@
+{
+  "pageTitle": "",
+  "webPageTitle": null,
+  "pageType": "question",
+  "progress": {
+    "steps": [
+      {
+        "order": 0,
+        "label": "page-01",
+        "href": "https://dev03.spearhead-ag.ch:443/questionnaire/dNeP7x9keIF7o7BnpTrSU/page/page-01"
+      },
+      {
+        "order": 1,
+        "label": "page-02",
+        "href": "https://dev03.spearhead-ag.ch:443/questionnaire/dNeP7x9keIF7o7BnpTrSU/page/page-02"
+      },
+      {
+        "order": 4,
+        "label": "page-05",
+        "href": "https://dev03.spearhead-ag.ch:443/questionnaire/dNeP7x9keIF7o7BnpTrSU/page/page-05"
+      },
+      {
+        "order": 5,
+        "label": "page-06",
+        "href": "https://dev03.spearhead-ag.ch:443/questionnaire/dNeP7x9keIF7o7BnpTrSU/page/page-06"
+      },
+      {
+        "order": 6,
+        "label": "page-07",
+        "href": "https://dev03.spearhead-ag.ch:443/questionnaire/dNeP7x9keIF7o7BnpTrSU/page/page-07"
+      },
+      {
+        "order": 7,
+        "label": "page-08",
+        "href": "https://dev03.spearhead-ag.ch:443/questionnaire/dNeP7x9keIF7o7BnpTrSU/page/page-08"
+      },
+      {
+        "order": 8,
+        "label": "page-09",
+        "href": "https://dev03.spearhead-ag.ch:443/questionnaire/dNeP7x9keIF7o7BnpTrSU/page/page-09"
+      },
+      {
+        "order": 9,
+        "label": "page-10",
+        "href": "https://dev03.spearhead-ag.ch:443/questionnaire/dNeP7x9keIF7o7BnpTrSU/page/page-10"
+      },
+      {
+        "order": 10,
+        "label": "page-11",
+        "href": "https://dev03.spearhead-ag.ch:443/questionnaire/dNeP7x9keIF7o7BnpTrSU/page/page-11"
+      },
+      {
+        "order": 11,
+        "label": "page-12",
+        "href": "https://dev03.spearhead-ag.ch:443/questionnaire/dNeP7x9keIF7o7BnpTrSU/page/page-12"
+      },
+      {
+        "order": 13,
+        "label": "page-14",
+        "href": "https://dev03.spearhead-ag.ch:443/questionnaire/dNeP7x9keIF7o7BnpTrSU/page/page-14"
+      },
+      {
+        "order": 14,
+        "label": "summary-page",
+        "href": "https://dev03.spearhead-ag.ch:443/questionnaire/dNeP7x9keIF7o7BnpTrSU/page/summary-page"
+      }
+    ],
+    "currentStep": 8
+  },
+  "links": {
+    "previous": "https://dev03.spearhead-ag.ch:443/questionnaire/dNeP7x9keIF7o7BnpTrSU/page/page-09?navigateTo=previous",
+    "next": "https://dev03.spearhead-ag.ch:443/questionnaire/dNeP7x9keIF7o7BnpTrSU/page/page-09?navigateTo=next",
+    "complete": null,
+    "cancel": null,
+    "exit": null
+  },
+  "elements": [
+    {
+      "id": "photo-upload-privacy-rules-page-09",
+      "label": {
+        "content": "<b>Aus Datenschutzgründen achten Sie bitte darauf, dass auf den Bildern keine Personen erkennbar sind.</b>",
+        "description": "",
+        "summary": ""
+      },
+      "readOnly": null,
+      "readOnlyCriteria": null,
+      "optional": null,
+      "type": "label"
+    },
+    {
+      "id": "vehicle-interior-front-photo-upload",
+      "answer": {
+        "value": {},
+        "fileUploaded": false
+      },
+      "label": {
+        "content": "Bitte laden Sie ein Bild des Fahrzeuginnenraums hoch, auf dem mindestens ein Sitz, die Mittelkonsole mit Schalthebel und das Armaturenbrett inkl. Handschuhfach ersichtlich ist. Achten Sie dabei darauf, dass Sie Ihr Mobiltelefon und den Kamerabereich entsprechend der Beispielgraphik ausrichten bzw. bestmöglich ausfüllen.",
+        "description": "Bitte achten Sie darauf, dass die Dateigröße pro Bild 10 MB nicht überschreitet.",
+        "summary": "Fahrzeuginnenraum"
+      },
+      "readOnly": null,
+      "readOnlyCriteria": null,
+      "optional": null,
+      "documentUrlPrefix": "https://dev03.spearhead-ag.ch:443/questionnaire/dNeP7x9keIF7o7BnpTrSU/attachment/answer/vehicle-interior-front-photo-upload/index-",
+      "imageAnalyticsConfigurationId": "huk-interior",
+      "maxNumberOfFiles": 1,
+      "contentType": ["image/jpeg", "image/png", "application/pdf"],
+      "fileUploaded": false,
+      "sampleImageUrl": "https://dev03.spearhead-ag.ch:443/questionnaire/generic_elements/attachment/interior_passenger_side_example_with_mask",
+      "relatedUploadQuestion": null,
+      "imageAnalyticsConfiguration": null,
+      "type": "multipleUpload"
+    },
+    {
+      "id": "vehicle-dashboard-odometer-photo-upload",
+      "answer": {
+        "value": {},
+        "fileUploaded": false
+      },
+      "label": {
+        "content": "Bitte laden Sie ein Bild des Armaturenbretts hoch, auf dem der aktuelle Kilometerstand und mögliche Warnleuchten gut erkennbar sind. Achten Sie dabei darauf, dass Sie Ihr Mobiltelefon und den Kamerabereich entsprechend der Beispielgraphik ausrichten bzw. bestmöglich ausfüllen.",
+        "description": "Bitte achten Sie darauf, dass die Dateigröße pro Bild 10 MB nicht überschreitet.",
+        "summary": "Armaturenbrett und Kilometerstand"
+      },
+      "readOnly": null,
+      "readOnlyCriteria": null,
+      "optional": null,
+      "documentUrlPrefix": "https://dev03.spearhead-ag.ch:443/questionnaire/dNeP7x9keIF7o7BnpTrSU/attachment/answer/vehicle-dashboard-odometer-photo-upload/index-",
+      "imageAnalyticsConfigurationId": "huk-odometer",
+      "maxNumberOfFiles": 1,
+      "contentType": ["image/jpeg", "image/png", "application/pdf"],
+      "fileUploaded": false,
+      "sampleImageUrl": "https://dev03.spearhead-ag.ch:443/questionnaire/generic_elements/attachment/dashboard_example_with_mask",
+      "relatedUploadQuestion": null,
+      "imageAnalyticsConfiguration": null,
+      "type": "multipleUpload"
+    },
+    {
+      "id": "vehicle-mileage",
+      "answer": {
+        "unit": "km",
+        "value": 123456,
+        "fileUploaded": "false"
+      },
+      "label": {
+        "content": "Bitte geben Sie den aktuellen Kilometerstand Ihres Fahrzeuges an:",
+        "description": "",
+        "summary": "Kilometerstand"
+      },
+      "readOnly": null,
+      "readOnlyCriteria": null,
+      "optional": null,
+      "picture": null,
+      "fileUploaded": false,
+      "type": "vehicleMileage"
+    }
+  ],
+  "settings": {
+    "webTrackingURL": "/webtracking/matomo.php",
+    "baseUrlForServices": "https://dev03.spearhead-ag.ch:443/questionnaire/",
+    "questionExpressionEnabled": "true"
+  },
+  "uiBlocks": [
+    {
+      "id": "vehicle-interior-photo-upload-block",
+      "label": {
+        "content": "Bilder des Fahrzeuginnenraums",
+        "description": "",
+        "summary": ""
+      },
+      "elements": {
+        "rootQuestions": [
+          "photo-upload-privacy-rules-page-09",
+          "vehicle-interior-front-photo-upload",
+          "vehicle-dashboard-odometer-photo-upload",
+          "vehicle-mileage"
+        ],
+        "sections": null
+      },
+      "highlight": null,
+      "columnSpan": null
+    }
+  ],
+  "pageId": "page-09",
+  "previousButtonLabel": null,
+  "nextButtonLabel": null,
+  "cancelButtonLabel": null,
+  "templateId": "huk_comprehensive_self_service_vehicle_zones"
+}
