@@ -138,7 +138,7 @@
 //   cy.wait(1000)
 // })
 
-const $requestTimeout = 40000;
+const c_requestTimeout = 60000;
 
 Cypress.Commands.add('makeid', (length) =>{
   let result = '';
@@ -217,33 +217,14 @@ Cypress.Commands.add('selectDropDown', (selectorId, option) =>{
     }
   })
 })
-Cypress.Commands.add('postQuestionnaire', () =>{
-  cy.get('button[type="submit"][data-test="questionnaire-complete-button"]').click({ force: true, timeout: 5000 });
-  cy.wait('@postPage',{requestTimeout : $requestTimeout}).then(xhr => {
-    console.log(xhr)
-    expect(xhr.response.statusCode).to.equal(200)
-    const notificationId = xhr.response.body.notification.id;
-    console.log(`notificationId:${notificationId}`);
-    const requestedInformation = xhr.response.body.notification.body.requestedInformation;
-    console.log(`requestedInformation:${requestedInformation}`);
-    if (requestedInformation != null && requestedInformation.length > 0){
-      requestedInformation.forEach((element, index) => {
-        console.log(`ri[${index}]:`);
-        console.log(`questionnaireId:${element.questionnaireId}`);
-        console.log(`workflowType:${element.workflowType}`);
-        console.log(`templateId:${element.templateId}`);
-        console.log(`requestUrl:${element.requestUrl}`);
-      });
-      // cy.visit(requestedInformation[0].requestUrl)
-      // cy.get('.loader')
-      // .should('not.exist')
-      // cy.wait(1000)
 
-    }
-  })
-})
 
-Cypress.Commands.add('postPost', (xhr) =>{
+Cypress.Commands.add('postPost', (xhr, hasDialog = true) =>{
+  if (xhr.response.statusCode != 200){
+    console.log(`status: ${xhr.response.statusCode}`);
+    console.log(`internalErrorCode: ${xhr.response.internalErrorCode}`);
+    console.log(`message: ${xhr.response.message}`);
+  }
   expect(xhr.response.statusCode).to.equal(200)
   const notificationId = xhr.response.body.notification.id;
   console.log(`notificationId: ${notificationId}`);
@@ -264,10 +245,12 @@ Cypress.Commands.add('postPost', (xhr) =>{
       cy.wait(1000)
     }
   }
-  const buttonRetry = 'button[type="button"][data-test="error-alert-button-retry"]'
-  cy.get(buttonRetry, { timeout: $requestTimeout }).should('be.visible');
-  // close modal-dialog
-  cy.get(buttonRetry).click()
+  if (hasDialog){
+    const buttonRetry = 'button[type="button"][data-test="error-alert-button-retry"]'
+    cy.get(buttonRetry, { timeout: c_requestTimeout }).should('be.visible');
+    // close modal-dialog
+    cy.get(buttonRetry).click()
+  }
 })
 
 

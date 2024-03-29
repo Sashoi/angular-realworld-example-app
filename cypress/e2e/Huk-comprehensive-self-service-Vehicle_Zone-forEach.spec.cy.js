@@ -1,16 +1,25 @@
 
 /// <reference types="cypress" />
 
+import file from '../fixtures/vinsArray.json'
+
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: ''  }
+const logFilename = 'cypress/fixtures/hukVehicleZone.log'
 
 describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
+
+  before('clear log file', () => {
+    cy.writeFile(logFilename, '')
+  })
+
   beforeEach('Login to the app', () =>{
     //cy.loginToApplication()
     console.clear()
     cy.intercept('GET', `/questionnaire/*/picture/vehicleZones?colour=007d40&areas=&locale=de`).as('vehicleZones')
     cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
+    cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPage')
     cy.intercept('GET',  `/questionnaire/*/currentPage?offset=120&locale=de`).as('currentPage')
     cy.intercept('GET', `/questionnaire/*//picture/clickableCar*`).as('clickableCar')
     cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
@@ -21,7 +30,6 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
       }
     })
     cy.intercept('POST', `/member/oauth/token`).as('token')
-    cy.intercept('POST', `/b2b/integration/zurich/zurichStandalone`).as('zurichStandalone')
     cy.wrap(goingPage).its('pageId').as('goingPageId')
     cy.wrap(goingPage).its('elements').as('goingPageElements')
     cy.wrap(questionnaire).its('Id').as('questionnaireId')
@@ -32,7 +40,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
   const $requestTimeout = 40000;
-  const executePost = false
+  const executePost = true
 
   function makeid(length) {
     let result = '';
@@ -98,23 +106,51 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
     _waitFor('@currentPage')
   }
 
-  const $vins = [ 'VF3VEAHXKLZ080921',  // MiniBusMidPanel Peugeot Expert 09/2020
-                   '6FPPXXMJ2PCD55635',  // Ford Ranger double cabine, Pick-up
-                   '6FPGXXMJ2GEL59891',  // Ford Ranger single cabine, Pick-up
-                   'WDB1704351F077666',  // MER SLK Cabrio
-                   'WBAUB310X0VN69014',  // BMW 1 Series Hatch3
-                   'WVWZZZ6RZGY304402',  // Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)
-                   'VF7SA5FS0BW550414',  // CIT DS3 Hatch3
-                   'WAUZZZ4B73N015435',  // AUD A6/S6/RS6 Sedan
-                   'WDB2083441T069719',  // MER CLK Coupe (partial identification, build period to be defined manually)
-                   'W0L0XCR975E026845',  // OPE Tigra Cabrio
-                   'WAUZZZ8V3HA101912 ', // AUD A3/S3/RS3 Hatch5
-                   'WVWZZZ7NZDV041367', //11 VW Sharan MPV
-                   'SALYL2RV8JA741831']; //12 Land Rover, SUV
+  function getBodyType($car) {
+    cy.get('@authorization').then(function (token) {
+      cy.get('@questionnaireId').then(function (questionnaireId) {
+        const options = {
+          method: 'GET',
+          url: `${baseUrl_lp}questionnaire/${questionnaireId}`,
+          headers:  {
+            'Accept': '*/*',
+            'Accept-Encoding':'gzip, deflate, br',
+            'Content-Type': 'application/json',
+            token,
+            'timeout' : 50000
+          }
+        };
+        cy.request(options).then(
+          (response) => {
+          expect(response.status).to.eq(200) // true
+          const bodyType = response.body.supportInformation.bodyType
+          console.log(`supportInformation.bodyType: ${bodyType}.`)
+          cy.then(function () {
+            questionnaire.bodyType = bodyType
+          })
+          cy.readFile(logFilename).then((text) => {
+            const addRow = `vin: ${$car[0]} expected: ${$car[1].padStart(18, ' ')} real: ${bodyType.padStart(18, ' ')} desc: ${$car[3]} \n`
+            text += addRow
+            cy.writeFile(logFilename, text)
+          })
+        }) //request(options)
+      }) //get('@questionnaireId'
+    }) //get('@authorization'
+  }
 
-  const $vins1 = ['VF3VEAHXKLZ080921']
-  $vins.forEach($vin => {
-    it(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$vin}`, () =>{
+  const file1 = [
+    [
+      "VF3VEAHXKLZ080921",
+      "MiniBusMidPanel",
+      "01.01.2017",
+      "Peugeot Expert 09/2020"
+    ]
+  ]
+  file.forEach($car => {
+    it(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
+
+      const $vin = $car[0]
+
       const userCredentials =  {
         "password": Cypress.env("passwordHukS"),
         "remoteUser": "",
@@ -127,16 +163,21 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
       let ran3 =  getRandomInt(100000,999999)
 
 
-      console.log(`vin:${$vin}`);
+      console.log(`vin: ${$vin}`);
       const licenseplate = `SOF ${getRandomInt(1000,9999)}`
-      console.log(`licenseplate:${licenseplate}`);
+      console.log(`licenseplate: ${licenseplate}`);
 
       const $equipment_2_loading_doors = true
 
     cy.request('POST',`${baseUrl_lp}member/authenticate`,userCredentials)
     .its('body').then(body => {
-        const token = body.accessToken
+
+      const token = body.accessToken
+        cy.then(function () {
+          questionnaire.authorization = `Bearer ${token}`
+        })
         const claimNumber = ran1 + "-13-"+ ran2 + "/" + ran3 + "-Z";
+        console.log(`claimNumber: ${claimNumber}`);
 
         const b2bBody =  {
             "qas": [
@@ -245,7 +286,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
           (response) => {
           expect(response.status).to.eq(200)
           const questionnaireId = response.body.questionnaireId;
-          console.log(questionnaireId);
+          //console.log(questionnaireId);
           const options1 = {
             method: 'GET',
             url: `${baseUrl_lp}questionnaire/${questionnaireId}`,
@@ -255,7 +296,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
           cy.request(options1).then(
             (response) => {
             const damageNotificationId = response.body.supportInformation.damageNotificationId;
-            console.log(`damageNotificationId:${damageNotificationId}`);
+            console.log(`damageNotificationId: ${damageNotificationId}`);
             const options2 = {
                         method: 'GET',
                         url: `${baseUrl_lp}damage/notification/${damageNotificationId}`,
@@ -266,8 +307,11 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               (response) => {
               const requestUrl = response.body.body.requestedInformation[0].requestUrl;
               const questionnaireId2 = response.body.body.requestedInformation[0].questionnaireId;
-              console.log(`requestUrl:${requestUrl}`);
-              console.log(`questionnaireId2:${questionnaireId2}`);
+              console.log(`requestUrl: ${requestUrl}`);
+              console.log(`Real questionnaireId: ${questionnaireId2}`)
+              cy.then(function () {
+                questionnaire.Id = questionnaireId2
+              })
 
               cy.visit(requestUrl);
               cy.get('.loader').should('not.exist');
@@ -297,6 +341,8 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                   nextBtn()
                 }
               })
+
+              getBodyType($car)
 
               //"page-04"
               cy.get('@goingPageId').then(function (aliasValue) {
@@ -467,28 +513,9 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                     //cy.postQuestionnaire() does not work
                     cy.get('button[type="submit"][data-test="questionnaire-complete-button"]').click({ force: true, timeout: 5000 });
 
-                    cy.wait('@postPage',{requestTimeout : $requestTimeout}).then(xhr => {
-                      console.log(xhr)
-                      expect(xhr.response.statusCode).to.equal(200)
-                      const notificationId = xhr.response.body.notification.id;
-                      console.log(`notificationId:${notificationId}`);
-                      const requestedInformation = xhr.response.body.notification.body.requestedInformation;
-                      console.log(`requestedInformation:${requestedInformation}`);
-                      if (requestedInformation != null && requestedInformation.length > 0){
-                        requestedInformation.forEach((element, index) => {
-                          console.log(`ri[${index}]:`);
-                          console.log(`questionnaireId:${element.questionnaireId}`);
-                          console.log(`workflowType:${element.workflowType}`);
-                          console.log(`templateId:${element.templateId}`);
-                          console.log(`requestUrl:${element.requestUrl}`);
-                        });
-                        // cy.visit(requestedInformation[0].requestUrl)
-                        // cy.get('.loader')
-                        // .should('not.exist')
-                        // cy.wait(1000)
-
-                      }
-                    })
+                    cy.wait('@postPage',{requestTimeout : $requestTimeout, responseTimeout: $requestTimeout}).then(xhr => {
+                      cy.postPost(xhr,false)
+                    }) //cy
                   }
                 }
               })

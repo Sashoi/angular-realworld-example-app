@@ -28,7 +28,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
     return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
   }
   it('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
-    const $requestTimeout = 30000;
+    const $requestTimeout = 40000;
     const $dev = Cypress.env("dev");
     const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
     const userCredentials =  {

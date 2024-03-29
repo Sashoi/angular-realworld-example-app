@@ -82,8 +82,17 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
         cy.then(function () {
           goingPage.pageId = gPage
         })
-        if (waitFor == '@currentPage'){
-          
+        if (false && waitFor == '@currentPage'){
+          const nextUrl = xhr.response.body.links.next
+          //"https://dev02.spearhead-ag.ch:443/questionnaire/7uRjDM92M9eWEhZVkBrSr/page/page-01?navigateTo=next"
+          const startStr = '/questionnaire/'
+          const endStr = '/page/page'
+          const pos = nextUrl.indexOf(startStr) + startStr.length;
+          const questionnaireId =  nextUrl.substring(pos, nextUrl.indexOf(endStr, pos));
+          cy.then(function () {
+            questionnaire.Id = questionnaireId
+          })
+          console.log(`questionnaireId: ${questionnaireId}`)
         }
     })
   }
@@ -114,7 +123,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
           (response) => {
           expect(response.status).to.eq(200) // true
           const bodyType = response.body.supportInformation.bodyType
-          console.log(`supportInformation.bodyType : ${bodyType}.`)
+          console.log(`supportInformation.bodyType: ${bodyType}.`)
           cy.then(function () {
             questionnaire.bodyType = bodyType
           })
@@ -129,7 +138,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
   }
 
   const file1 = [
-    ["VF3VEAHXKLZ080921","MiniBusMidPanel",     "01.01.2017","Peugeot Expert 09/2020"]
+    ["VF7SA5FS0BW550414", "Hatch3", "01.01.2014", "CIT DS3 Hatch3"]
   ]
 
   file1.forEach($car => {
@@ -148,13 +157,13 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
       let claim2 = getRandomInt(10000,99999)
 
       let claimNumber = claim1 + claim2  // "21PFQ017602MR" works for reopen
-      let licenseplate = `MRW ${getRandomInt(1,9)}-${getRandomInt(100,999)}`
+      let licenseplate = `HDI ${getRandomInt(1,9)}-${getRandomInt(100,999)}`
 
       const photos_available = false;
       const selectAllParts = false;
       const $equipment_2_loading_doors = true
 
-      console.log(`vin:${vin}`);
+      console.log(`vin: ${vin}`);
 
       cy.request('POST',`${baseUrl_lp}/member/authenticate`,userCredentials)
           .its('body').then(body => {
@@ -328,9 +337,12 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
               expect(response.status).to.eq(200) // true
 
               const questionnaireId = response.body.questionnaireId;
-              console.log(`questionnaireId:${questionnaireId}`);
+              cy.then(function () {
+                questionnaire.Id = questionnaireId
+              })
+              console.log(`questionnaireId: ${questionnaireId}`)
               const uiUrl = response.body.uiUrl;
-              console.log(`uiUrl:${uiUrl}`);
+              console.log(`uiUrl: ${uiUrl}`);
 
               cy.visit(uiUrl)
               //cy.get('.loader').should('not.exist')
@@ -344,30 +356,27 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
 
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-01'){
-
                   getBodyType($car)
+                  cy.get('@bodyType').then(function (bodyType) {
+                    if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
+                      cy.wait(2000)
+                      cy.selectSingleList('equipment-slide-door',1)
+                      cy.selectSingleList('equipment-2-loading-doors',Number($equipment_2_loading_doors))
+                      cy.selectSingleList('equipment-length',0)
+                      cy.selectSingleList('equipment-height',0)
+                      cy.selectSingleList('equipment-vehicle-rear-glassed',0)
+                      cy.selectSingleList('vehicle-customized-interior',0)
+                    }
+                    if (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine'){
+                      cy.wait(2000)
+                      cy.selectSingleList('equipment-loading-area-cover-type',1)
+                    }
+                  })
+                  cy.selectDropDown('select_buildPeriod',1)
+                  cy.wait(1000)
+                  nextBtn()
                 }
               })
-
-              cy.get('@bodyType').then(function (bodyType) {
-                if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
-                  cy.wait(2000)
-                  cy.selectSingleList('equipment-slide-door',1)
-                  cy.selectSingleList('equipment-2-loading-doors',Number($equipment_2_loading_doors))
-                  cy.selectSingleList('equipment-length',0)
-                  cy.selectSingleList('equipment-height',0)
-                  cy.selectSingleList('equipment-vehicle-rear-glassed',0)
-                  cy.selectSingleList('vehicle-customized-interior',0)
-                }
-                if (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine'){
-                  cy.wait(2000)
-                  cy.selectSingleList('equipment-loading-area-cover-type',1)
-                }
-              })
-              cy.selectDropDown('select_buildPeriod',1)
-              cy.wait(1000)
-              nextBtn()
-
 
               //pageId: "page-02"
               cy.get('@goingPageId').then(function (aliasValue) {
@@ -700,8 +709,6 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
                 }
               })
 
-
-
               //pageId: "page-04"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-04'){
@@ -711,10 +718,9 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
                 }
               })
 
-
               //pageId: "page-05"
               cy.get('@goingPageId').then(function (aliasValue) {
-                if (aliasValue == 'page-04'){
+                if (aliasValue == 'page-05'){
                   if (photos_available){
                     cy.selectSingleList('photos-available', 0)
                     cy.selectSingleList('receive-upload-link-by', 0)
@@ -728,22 +734,19 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
                 }
               })
 
-
-            cy.get('@goingPageId').then(function (aliasValue) {
-              if (aliasValue == 'summary-page'){
-                cy.get('@questionnaireId').then(function (Id) {
-                  console.log(`from summary-page, saved questionnaireId: ${Id}`);
-                })
-                if (executePost) {
-                  cy.get('button[type="submit"]').contains('Senden').click()
-                  cy.wait('@postPost').then(xhr => {
-                    cy.postPost(xhr)
+              cy.get('@goingPageId').then(function (aliasValue) {
+                if (aliasValue == 'summary-page'){
+                  cy.get('@questionnaireId').then(function (Id) {
+                    console.log(`from summary-page, saved questionnaireId: ${Id}`);
                   })
+                  if (executePost) {
+                    cy.get('button[type="submit"]').contains('Senden').click()
+                    cy.wait('@postPost').then(xhr => {
+                      cy.postPost(xhr,false)
+                    })
+                  }
                 }
-              }
-            })
-
-
+              })
         })
       })
     })

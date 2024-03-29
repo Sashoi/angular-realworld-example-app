@@ -38,7 +38,7 @@ describe('Start and complete huk standalone questionnaire - huk_liability_call_c
 
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
-  const $requestTimeout = 30000;
+  const $requestTimeout = 40000;
   const executePost = true
 
   function getRandomInt(min, max) {

@@ -2,12 +2,20 @@
 
 //const cypress = require("cypress");
 
+import file from '../fixtures/vinsArray.json'
+
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: ''  }
+const logFilename = 'cypress/fixtures/hdiLiabilitySS.log'
 
 describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
-  beforeEach('Login to the app', () =>{
-    //cy.loginToApplication()
+
+  before('clear log file', () => {
+    cy.writeFile(logFilename, '')
+  })
+
+  beforeEach('Setting up integrations and common variables', () =>{
+    //cy.loginToHukStandalone()
     console.clear()
     cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
@@ -79,51 +87,98 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
     cy.get(`form#${selectorId}`).find(`img[alt="${fileName}"]`).invoke('attr', 'alt').should('eq', fileName)
   }
 
-
-  function nextBtn() {
-    cy.get('@nextBtn').click({ force: true, log : false })
-    cy.wait('@nextPage',{requestTimeout : $requestTimeout}).then(xhr => {
-      expect(xhr.response.statusCode).to.equal(200)
-      const gPage = xhr.response.body.pageId
-      //console.log(`Comming page 0 ${gPage} - ${xhr.response.body.uiBlocks[0].elements.sections[0].label.content}.`)
-      let title = xhr.response.body.pageTitle
-      if ((title.length <= 2)){
-        title = xhr.response.body.uiBlocks[0].label.content
+  function _waitFor(waitFor) {
+    if (waitFor == '@nextPage'){
+      cy.get('@nextBtn').click({ force: true })
+    }
+    cy.wait(waitFor,{requestTimeout : $requestTimeout}).then(xhr => {
+        expect(xhr.response.statusCode).to.equal(200)
+        const gPage = xhr.response.body.pageId
+        let title = xhr.response.body.pageTitle
         if ((title.length <= 2)){
-          title = xhr.response.body.uiBlocks[0].elements.sections[0].label.content
+          title = xhr.response.body.uiBlocks[0].label.content
+          if ((title.length <= 2)){
+            if (title = xhr.response.body.uiBlocks[0].elements.sections.length > 0){
+              title = xhr.response.body.uiBlocks[0].elements.sections[0].label.content
+            }
+          }
         }
-      }
-      console.log(`Comming page ${gPage} - ${title}.`)
-      cy.then(function () {
-        goingPage.elements = []
-      })
-      //printQuestionnaireIds(xhr.response.body.elements)
-      cy.then(function () {
-        goingPage.pageId = gPage
-      })
+        console.log(`Comming page ${gPage} - ${title}.`)
+        cy.then(function () {
+          goingPage.elements = []
+        })
+        //printQuestionnaireIds(xhr.response.body.elements)
+        cy.then(function () {
+          goingPage.pageId = gPage
+        })
+        if (false && waitFor == '@currentPage'){
+          const nextUrl = xhr.response.body.links.next
+          //"https://dev02.spearhead-ag.ch:443/questionnaire/7uRjDM92M9eWEhZVkBrSr/page/page-01?navigateTo=next"
+          const startStr = '/questionnaire/'
+          const endStr = '/page/page'
+          const pos = nextUrl.indexOf(startStr) + startStr.length;
+          const questionnaireId =  nextUrl.substring(pos, nextUrl.indexOf(endStr, pos));
+          cy.then(function () {
+            questionnaire.Id = questionnaireId
+          })
+          console.log(`questionnaireId: ${questionnaireId}`)
+        }
     })
   }
 
-  const $vins = [ 'VF3VEAHXKLZ080921',  // MiniBusMidPanel Peugeot Expert 09/2020
-                   '6FPPXXMJ2PCD55635',  // Ford Ranger double cabine, Pick-up
-                   '6FPGXXMJ2GEL59891',  // Ford Ranger single cabine, Pick-up
-                   'WDB1704351F077666',  // MER SLK Cabrio
-                   'WBAUB310X0VN69014',  // BMW 1 Series Hatch3
-                   'WVWZZZ6RZGY304402',  // Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)
-                   'VF7SA5FS0BW550414',  // CIT DS3 Hatch3
-                   'WAUZZZ4B73N015435',  // AUD A6/S6/RS6 Sedan
-                   'WDB2083441T069719',  // MER CLK Coupe (partial identification, build period to be defined manually)
-                   'W0L0XCR975E026845',  // OPE Tigra Cabrio
-                   'WAUZZZ8V3HA101912 ', // AUD A3/S3/RS3 Hatch5
-                   'WVWZZZ7NZDV041367',  // VW Sharan MPV
-                   'WF0KXXTTRKMC81361',  // Ford Transit 06/2021 VanMidPanel
-                   'SALYL2RV8JA741831']; //13 Land Rover, SUV
-  //const $vins = ["WF0KXXTTRKMC81361"]
+  function nextBtn() {
+    _waitFor('@nextPage')
+  }
+
+  function currentPage() {
+    _waitFor('@currentPage')
+  }
+
+  function getBodyType($car) {
+    cy.get('@authorization').then(function (token) {
+      cy.get('@questionnaireId').then(function (questionnaireId) {
+        const options = {
+          method: 'GET',
+          url: `${baseUrl_lp}questionnaire/${questionnaireId}`,
+          headers:  {
+            'Accept': '*/*',
+            'Accept-Encoding':'gzip, deflate, br',
+            'Content-Type': 'application/json',
+            token,
+            'timeout' : 50000
+          }
+        };
+        cy.request(options).then(
+          (response) => {
+          expect(response.status).to.eq(200) // true
+          const bodyType = response.body.supportInformation.bodyType
+          console.log(`supportInformation.bodyType: ${bodyType}.`)
+          cy.then(function () {
+            questionnaire.bodyType = bodyType
+          })
+          cy.readFile(logFilename).then((text) => {
+            const addRow = `vin: ${$car[0]} expected: ${$car[1].padStart(18, ' ')} real: ${bodyType.padStart(18, ' ')} desc: ${$car[3]} \n`
+            text += addRow
+            cy.writeFile(logFilename, text)
+          })
+        }) //request(options)
+      }) //get('@questionnaireId'
+    }) //get('@authorization'
+  }
+
+
+  const file1 = [
+    ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
+    ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
+  ]
   const $equipment_2_loading_doors = false
   const selectAllParts = false
+  const eMail = 'sivanchevski@soft2run.com'
 
-  $vins.forEach(vin => {
-    it(`Execute b2b/integration/toni-digital/hdiLiabilitySelfService for vin: ${vin}`, () =>{
+  file1.forEach($car => {
+    it(`Execute b2b/integration/toni-digital/hdiLiabilitySelfService for vin: ${$car[0]}`, () =>{
+
+      const vin = $car[0]
 
       const userCredentials =  {
         "password": Cypress.env("passwordHukS"),
@@ -136,10 +191,10 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
       const claim2 = getRandomInt(10000,99999)
 
 
-      const licensePlate = `AA ${getRandomInt(100,999)}`
+      const licensePlate = `HDI ${getRandomInt(100,999)}`
 
       const claimNumber = claim1 + claim2  // "21PFQ017602MR" works for reopen
-      console.log(`vin:${vin}`);
+      console.log(`vin: ${vin}`);
 
       cy.request('POST',`https://${$dev}.spearhead-ag.ch/member/authenticate`,userCredentials)
           .its('body').then(body => {
@@ -183,7 +238,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                 {
                     "questionId": "eMail-insurance-client",
                     "answer": [
-                        "sivanchevski@soft2run.com"
+                      eMail
                     ]
                 },
                 {
@@ -284,7 +339,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                 },
                 {
                     "questionId": "incident-reporter-email",
-                    "answer": "sivanchevski@soft2run.com"
+                    "answer": eMail
                 }
             ],
             "supportInformation": {
@@ -314,62 +369,22 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
               cy.then(function () {
                 questionnaire.Id = questionnaireId
               })
-              console.log(`questionnaireId:${questionnaireId}`);
+              console.log(`questionnaireId: ${questionnaireId}`);
               const uiUrl = response.body.uiUrl;
-              console.log(`uiUrl:${uiUrl}`);
+              console.log(`uiUrl: ${uiUrl}`);
 
               cy.visit(uiUrl)
-              cy.get('.loader').should('not.exist')
-              //loading pageId: "page-01"
-              cy.wait('@currentPage',{requestTimeout : $requestTimeout}).then(xhr => {
-                expect(xhr.response.statusCode).to.equal(200)
-                const gPage = xhr.response.body.pageId
-                let title = xhr.response.body.pageTitle
-                  if ((title.length <= 2)){
-                    title = xhr.response.body.uiBlocks[0].label.content
-                    if ((title.length <= 2)){
-                      title = xhr.response.body.uiBlocks[0].elements.sections[0].label.content
-                    }
-                  }
-                console.log(`Comming page ${gPage} - ${title}.`)
-                cy.then(function () {
-                  goingPage.elements = []
-                })
-                printQuestionnaireIds(xhr.response.body.elements)
-                cy.then(function () {
-                  goingPage.pageId = gPage
-                })
-                //printUiBlocks(xhr.response.body.uiBlocks)
-              })
+              //cy.get('.loader').should('not.exist')
 
               const nextButtonLabel ='Weiter'
               const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
               cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
 
-              //pageId: "page-01"
-              cy.get('@authorization').then(function (authorization) {
-                const options = {
-                  method: 'GET',
-                  url: `${baseUrl_lp}questionnaire/${questionnaireId}`,
-                  headers:  {
-                    'Accept': '*/*',
-                    'Accept-Encoding':'gzip, deflate, br',
-                    'Content-Type': 'application/json',
-                    authorization,
-                  }
-                };
-                cy.request(options).then(
-                  (response) => {
-                    expect(response.status).to.eq(200) // true
-                    const bodyType = response.body.supportInformation.bodyType
-                    console.log(`supportInformation.bodyType :  ${bodyType}.`)
-                    cy.then(function () {
-                      questionnaire.bodyType = bodyType
-                    })
-                })
-              })
+              currentPage()
+
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-01'){
+                  getBodyType($car)
                   cy.get('@bodyType').then(function (bodyType) {
                     if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
                       cy.wait(2000)
@@ -417,7 +432,6 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                 }
               })
 
-
               //pageId: "page-03"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-03'){
@@ -460,7 +474,6 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                 }
               })
 
-
               const PathTo ='D://Projects/Cypress/bondar-artem/angular-realworld-example-app/cypress/fixtures/'
 
               //pageId: "page-05"
@@ -471,7 +484,6 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                   nextBtn()
                 }
               })
-
 
               //pageId: "page-06"
               cy.get('@goingPageId').then(function (aliasValue) {
@@ -510,19 +522,19 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                   }
                   cy.get('@goingPageElements').then(function (elements) {
                     elements.forEach(element => {
-                      console.log(`id : ${element}`)
+                      console.log(`id: ${element}`)
                     })
                   })
                   const file7_1 ="airbag.jpg"
                   cy.elementExists('form#damage-photo-upload-overview-tailgate').then(($element) => {
-                    console.log(`$element : ` + $element)
+                    console.log(`$element: ` + $element)
                     uploadImage('damage-photo-upload-overview-tailgate',PathTo,file7_1)
                   })
                   cy.elementExists('form#damage-photo-upload-detail-tailgate').then(($element) => {
                     uploadImage('damage-photo-upload-detail-tailgate',PathTo,file7_1)
                   })
                   // cy.elementExists('form#damage-photo-upload-overview-left-load-door').then(($element) => {
-                  //   console.log(`$element : ` + JSON.stringify($element))
+                  //   console.log(`$element: ` + JSON.stringify($element))
                   //   uploadImage('damage-photo-upload-overview-left-load-door',PathTo,file7_1)
                   // })
                   // cy.elementExists('form#damage-photo-upload-detail-left-load-door').then(($element) => {
@@ -552,44 +564,20 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                 }
               })
 
-
               //pageId:"summary-page"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'summary-page'){
                   cy.get('textarea#summary-message-from-client-textarea').type('Hier können Sie eine persönliche Mitteilung für das Schadenteam eintragen.')
                   cy.selectSingleList('receive-confirmation-by',0)
+                  cy.get('input#claimant-email-for-confirmation-link-input').type(eMail)
                   cy.selectMultipleList('summary-confirmation-acknowledgement',0)
                   cy.get('@questionnaireId').then(function (Id) {
                     console.log(`from summary-page, questionnaireId:${Id}`);
                   })
-
                   if (executePost) {
-                    //pageId: "summary-page"
-
                     cy.get('button[type="submit"]').contains('Senden').click()
-
                     cy.wait('@postPost').then(xhr => {
-                      console.log(xhr)
-                      expect(xhr.response.statusCode).to.equal(200)
-                      const notificationId = xhr.response.body.notification.id;
-                      console.log(`notificationId:${notificationId}`);
-                      const requestedInformation = xhr.response.body.notification.body.requestedInformation;
-                      console.log(`requestedInformation:${requestedInformation}`);
-                      if (requestedInformation != null && requestedInformation.length > 0){
-                        requestedInformation.forEach((element, index) => {
-                          console.log(`requestedInformation[${index}]:`);
-                          console.log(`questionnaireId:${element.questionnaireId}`);
-                          console.log(`workflowType:${element.workflowType}`);
-                          console.log(`templateId:${element.templateId}`);
-                          console.log(`requestUrl:${element.requestUrl}`);
-                        });
-                        if (false) {
-                          cy.visit(requestedInformation[0].requestUrl)
-                          cy.get('.loader')
-                          .should('not.exist')
-                          cy.wait(1000)
-                        }
-                      }
+                      cy.postPost(xhr,false)
                     })
                   }
                 }
