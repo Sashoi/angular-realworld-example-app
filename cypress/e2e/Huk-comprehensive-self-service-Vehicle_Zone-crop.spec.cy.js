@@ -19,8 +19,8 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
     //cy.loginToApplication()
     console.clear()
     cy.intercept('GET', `/questionnaire/*/picture/vehicleZones?colour=007d40&areas=&locale=de`).as('vehicleZones')
-    cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
-    cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
+    //cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
+    //cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPage')
     cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
     cy.intercept('GET', `/questionnaire/*//picture/clickableCar*`).as('clickableCar')
@@ -65,49 +65,57 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   function uploadImage(selectorId,toPath,fileName){
+    cy.intercept('POST', `/questionnaire/*/attachment/answer/${selectorId}/index-*?locale=de`).as(`attachmentAnswer-${selectorId}`)
     cy.get(`form#${selectorId}`).find('button').selectFile(`${toPath}${fileName}`, {
       action: 'drag-drop',
     })
-    cy.wait(['@attachmentAnswer'],{requestTimeout : $requestTimeout}).then(xhr => {
+    cy.wait([`@attachmentAnswer-${selectorId}`],{log : false, timeout : $requestTimeout}).then(xhr => {
       expect(xhr.response.statusCode).to.equal(200)
     })
-    cy.wait('@savePage',{requestTimeout : $requestTimeout}).then(xhr => {
+    cy.wait('@savePage',{timeout : $requestTimeout}).then(xhr => {
       expect(xhr.response.statusCode).to.equal(200)
     })
     cy.get(`form#${selectorId}`).find(`img[alt="${fileName}"]`).invoke('attr', 'alt').should('eq', fileName)
+    cy.get(`form#${selectorId}`).find(`img[alt="${fileName}"]`).should('exist')
   }
 
   function selectCropImage(selectorId,cropSelectorId,fileName){
+    cy.intercept('GET', `/questionnaire/*/attachment/answer/${selectorId}/index-*`).as(`cropOrigin-${selectorId}`)
+    cy.intercept('POST', `/questionnaire/*/attachment/answer/${cropSelectorId}/index-*?locale=de`).as(`attachmentAnswer-${cropSelectorId}`)
     cy.get(`form#${selectorId}`)
     .find('.crop-button-container')
     .find('button').click({ force: true,timeout : $requestTimeout });
-    
-    cy.get('div.popup-background')
-    .find('div.popup-damage-types')
-    .children('label.checkbox-label').then(labels =>{
-      cy.wrap(labels).first().click({ force: true })
-      cy.wrap(labels).last().click({ force: true })
-    })
 
-    cy.get('div.popup-background')
-    .find('button').contains('Beschädigung speichern')
-    .click({ force: true, timeout:  $requestTimeout })
-
-    cy.wait(['@attachmentAnswer'],{requestTimeout : $requestTimeout}).then(xhr => {
+    cy.wait(`@cropOrigin-${selectorId}`,{log : false, timeout : $requestTimeout}).then(xhr => {
       expect(xhr.response.statusCode).to.equal(200)
-    })
-    cy.wait('@savePage',{requestTimeout : $requestTimeout}).then(xhr => {
-      expect(xhr.response.statusCode).to.equal(200)
-    })
+      cy.get('div.popup-background')
+      .find('div.popup-damage-types')
+      .children('label.checkbox-label').then(labels =>{
+        cy.wrap(labels).first().click({ force: true })
+        cy.wrap(labels).last().click({ force: true })
+      })
 
-    cy.get(`form#${cropSelectorId}`).find(`img[alt="${fileName}"]`).invoke('attr', 'alt').should('eq', fileName)
+      cy.get('div.popup-background')
+      .find('button').contains('Beschädigung speichern')
+      .click('center',{ force: true, timeout:  $requestTimeout })
+
+      cy.wait([`@attachmentAnswer-${cropSelectorId}`],{log : false, timeout : $requestTimeout}).then(xhr => {
+        expect(xhr.response.statusCode).to.equal(200)
+      })
+      cy.wait('@savePage',{timeout : $requestTimeout}).then(xhr => {
+        expect(xhr.response.statusCode).to.equal(200)
+      })
+
+      cy.get(`form#${cropSelectorId}`).find(`img[alt="${fileName}"]`).invoke('attr', 'alt').should('eq', fileName)
+      cy.get(`form#${cropSelectorId}`).find(`img[alt="${fileName}"]`).should('exist')
+    })
   }
 
   function _waitFor(waitFor) {
     if (waitFor == '@nextPage'){
       cy.get('@nextBtn').click({ force: true })
     }
-    cy.wait(waitFor,{requestTimeout : $requestTimeout}).then(xhr => {
+    cy.wait(waitFor,{timeout : $requestTimeout}).then(xhr => {
         expect(xhr.response.statusCode).to.equal(200)
         const gPage = xhr.response.body.pageId
         let title = xhr.response.body.pageTitle
@@ -169,12 +177,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   const file1 = [
-    [
-      "VF3VEAHXKLZ080921",
-      "MiniBusMidPanel",
-      "01.01.2017",
-      "Peugeot Expert 09/2020"
-    ]
+    ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"]
   ]
   file1.forEach($car => {
     it(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
@@ -403,9 +406,8 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-05"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-05'){
-                  cy.wait('@vehicleZones',{requestTimeout : $requestTimeout}).then(xhr => {
+                  cy.wait('@vehicleZones',{timeout : $requestTimeout}).then(xhr => {
                     expect(xhr.response.statusCode).to.equal(200)
-                    //cy.selectSVG_VZ('roof')
                     cy.selectSVG_VZ('windshield')
                     nextBtn()
                   })
@@ -447,13 +449,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-09'){
                   cy.selectSingleList('unrepaired-pre-damages',1)  // Nein
-                  // cy.wait('@vehicleZones',{requestTimeout : $requestTimeout}).then(xhr => {
-                  //   expect(xhr.response.statusCode).to.equal(200)
-                  //   cy.selectSVG_VZ('front-left')
-                  //   cy.selectSVG_VZ('front-center')
-                  //   cy.selectSVG_VZ('front-right')
-                  //   nextBtn()
-                  // })
+
                   nextBtn()
                 }
               })
@@ -483,10 +479,6 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                 if (aliasValue == 'page-12'){
                   uploadImage('damage-photo-upload-overview-vehicle-front-left-top-side',PathTo,`airbag1.jpg`)
                   uploadImage('damage-photo-upload-overview-vehicle-front-right-top-side',PathTo,`airbag2.jpg`)
-                  //uploadImage('damage-photo-upload-overview-roof-front-left-top-side',PathTo,`airbag3.jpg`)
-                  //uploadImage('damage-photo-upload-overview-roof-front-right-top-side',PathTo,`airbag4.jpg`)
-                  //uploadImage('damage-photo-upload-overview-roof-rear-right-top-side',PathTo,`airbag5.jpg`)
-                  //uploadImage('damage-photo-upload-overview-roof-rear-left-top-side',PathTo,`airbag6.jpg`)
                   nextBtn()
                 }
               })
@@ -498,31 +490,6 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                   selectCropImage('damage-photo-upload-overview-windshield',
                                   'damage-photo-upload-detail-windshield',
                                   `“Windschutzscheibe” - Nahaufnahme der Beschädigung`)
-                  // cy.get('form#damage-photo-upload-overview-windshield')
-                  // .find('.crop-button-container')
-                  // .find('button').click({ force: true });
-                  // cy.get('div.popup-background')
-                  // .find('div.popup-damage-types')
-                  // .children('label.checkbox-label').then(labels =>{
-                  //   cy.wrap(labels).first().click({ force: true })
-                  //   cy.wrap(labels).last().click({ force: true })
-                  // })
-
-                  // //.find('div.d-flex.justify-content-between.mw-50').find('button.btn.btn-primary')
-                  // cy.get('div.popup-background')
-                  // .find('button').contains('Beschädigung speichern')
-                  // .click({ force: true, timeout:  $requestTimeout })
-
-                  // cy.wait(['@attachmentAnswer'],{requestTimeout : $requestTimeout}).then(xhr => {
-                  //   expect(xhr.response.statusCode).to.equal(200)
-                  // })
-                  // cy.wait('@savePage',{requestTimeout : $requestTimeout}).then(xhr => {
-                  //   expect(xhr.response.statusCode).to.equal(200)
-                  // })
-                  // const fileName =`“Windschutzscheibe” - Nahaufnahme der Beschädigung`
-                  // const detailSelectorId = 'damage-photo-upload-detail-windshield'
-                  // cy.get(`form#${detailSelectorId}`).find(`img[alt="${fileName}"]`).invoke('attr', 'alt').should('eq', fileName)
-
                   nextBtn()
                 }
               })
@@ -539,8 +506,6 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-15'){
                   uploadImage('unrepaired-pre-damages-photo-upload',PathTo,`hood-npu1.jpg`)
-                  //uploadImage('unrepaired-pre-damages-photo-upload',PathTo,`hood-npu2.jpg`)
-                  //uploadImage('unrepaired-pre-damages-photo-upload',PathTo,`hood-npu3.jpg`)
                   nextBtn()
                 }
               })
@@ -550,8 +515,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                 if (aliasValue == 'page-16'){
                   uploadImage('police-ranger-report-photo-upload',PathTo,`police-ranger-report-photo-upload.png`)
                   uploadImage('incident-location-photo-upload',PathTo,`incident-location-photo-upload-1.jpg`)
-                  //uploadImage('incident-location-photo-upload',PathTo,`incident-location-photo-upload-2.jpg`)
-                  //uploadImage('incident-location-photo-upload',PathTo,`incident-location-photo-upload-3.jpg`)
+
                   nextBtn()
                 }
               })
@@ -571,7 +535,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                     //cy.postQuestionnaire() does not work
                     cy.get('button[type="submit"][data-test="questionnaire-complete-button"]').click({ force: true, timeout: 5000 });
 
-                    cy.wait('@postPage',{requestTimeout : $requestTimeout, responseTimeout: $requestTimeout}).then(xhr => {
+                    cy.wait('@postPage',{timeout : $requestTimeout}).then(xhr => {
                       cy.postPost(xhr,false)
                       if (generatePdfCondition){
                         let pdf_template = 'dekra_schadenbilder'
@@ -587,6 +551,6 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
           })
         })
       })
-    })
-  })
-})
+    }) //it Huk
+  }) //forEach
+})  //describe

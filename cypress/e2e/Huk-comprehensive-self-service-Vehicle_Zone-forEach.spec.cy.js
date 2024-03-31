@@ -19,7 +19,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
     console.clear()
     cy.intercept('GET', `/questionnaire/*/picture/vehicleZones?colour=007d40&areas=&locale=de`).as('vehicleZones')
     cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
-    cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
+    //cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPage')
     cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
     cy.intercept('GET', `/questionnaire/*//picture/clickableCar*`).as('clickableCar')

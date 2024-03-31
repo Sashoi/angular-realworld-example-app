@@ -253,6 +253,70 @@ Cypress.Commands.add('postPost', (xhr, hasDialog = true) =>{
   }
 })
 
+Cypress.Commands.add('generatePdf', function (baseUrl_lp, pdfPath, pdf_template) {
+  cy.get('@authorization').then(function (authorization) {
+    cy.get('@notificationId').then(function (notificationId) {
+      console.log(`baseUrl_lp: ${baseUrl_lp}`)
+      console.log(`pdfPath: ${pdfPath}`)
+      console.log(`pdf_template: ${pdf_template}`)
+      console.log(`authorization: ${authorization}`)
+      console.log(`notificationId: ${notificationId}`)
+      const options = {
+        method: 'GET',
+        encoding : 'base64',
+        url: `${baseUrl_lp}damage/notification/${notificationId}/pdf/${pdf_template}`,
+
+        //responseTimeout: 60000,
+        headers: {
+          'Accept': '*/*',
+          'Accept-Encoding':'gzip, deflate, br',
+          'Content-Type': 'application/json',
+          authorization
+          //'Content-Type': 'application/pdf',
+          //"contentType": ["image/jpeg", "image/png", "application/pdf"],
+
+        }
+      }
+      cy.request(options).then(
+        (response) => {
+        expect(response.status).to.eq(200)
+        const filePath = `${pdfPath}${pdf_template}_${notificationId}.pdf`;
+        cy.writeFile(filePath, response.body, 'base64')
+      })
+    }) //get('@notificationId'
+  }) //get('@authorization'
+})
+
+Cypress.Commands.add('generatePdf2', function (baseUrl_lp, pdfPath, pdf_template) {
+  cy.get('@authorization').then(function (authorization) {
+    cy.get('@notificationId').then(function (notificationId) {
+      const headers_1 = {
+        'Accept': '*/*',
+        'Accept-Encoding':'gzip, deflate, br',
+        'Content-Type': 'application/json',
+        authorization,
+      }
+
+      const options3 = {
+        method: 'GET',
+        url: `${baseUrl_lp}damage/notification/${notificationId}`,
+        headers: headers_1
+      }
+      cy.request(options3).then(
+        (response3) => {
+        expect(response3.status).to.eq(200) // true
+        const vin = response3.body.body.vehicleIdentification.vin;
+        console.log(`vin: ${vin}`)
+        cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
+      })
+    }) //get('@notificationId'
+  }) //get('@authorization'
+})
+
+
+
+
+
 
 
 

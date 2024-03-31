@@ -3,8 +3,9 @@
 import file from '../fixtures/vinsArray.json'
 
 const goingPage = { pageId: '', elements: []}
-const questionnaire = { Id:'', authorization : '', bodyType: ''  }
+const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
 const logFilename = 'cypress/fixtures/hukClickableCar.log'
+const pdfPath = 'cypress/fixtures/Pdf/'
 
 describe('Huk_comprehensive_self_service_clickable_car', () =>{
 
@@ -17,7 +18,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
     console.clear()
     cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPage')
-    cy.intercept('GET', `/questionnaire/*/currentPage?offset=120&locale=de`).as('currentPage')
+    cy.intercept('GET', `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
     cy.intercept('GET', `/questionnaire/*//picture/clickableCar*`).as('clickableCar')
     cy.intercept('GET', `/questionnaire/generic_elements/attachment/*-example*`).as('generic_elements')
     cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
@@ -33,12 +34,14 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
     cy.wrap(questionnaire).its('Id').as('questionnaireId')
     cy.wrap(questionnaire).its('authorization').as('authorization')
     cy.wrap(questionnaire).its('bodyType').as('bodyType')
+    cy.wrap(questionnaire).its('notificationId').as('notificationId')
   })
 
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
   const executePost = true
+  const generatePdfCondition = true
 
   function makeid(length) {
     let result = '';
@@ -136,11 +139,36 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
     }) //get('@authorization'
   }
 
+  function generatePdf1(pdf_template) {
+    cy.get('@authorization').then(function (authorization) {
+      cy.get('@notificationId').then(function (notificationId) {
+        const options = {
+          method: 'GET',
+          encoding : 'base64',
+          url: `${baseUrl_lp}damage/notification/${notificationId}/pdf/${pdf_template}`,
+          responseTimeout: 60000,
+          headers: {
+            'Accept': '*/*',
+            'Accept-Encoding':'gzip, deflate, br',
+            'Content-Type': 'application/json',
+            authorization
+          }
+        }
+        cy.request(options).then(
+          (response) => {
+          expect(response.status).to.eq(200) // true
+          const filePath = pdfPath + pdf_template +'_' + notificationId + '.pdf';
+          cy.writeFile(filePath, response.body, 'base64')
+        })
+      }) //get('@notificationId'
+    }) //get('@authorization'
+  }
+
   const file1 = [
     ["6FPGXXMJ2GEL59891","PickUpSingleCabine",  "01.01.2012","Ford Ranger single cabine, Pick-up"]
   ]
 
-  file.forEach($car => {
+  file1.forEach($car => {
     it(`Execute {{baseUrl}}/b2b/integration/huk/huk-comprehensive-self-service-init ${$car[0]}`, function () {
 
       const vin = $car[0]
@@ -267,7 +295,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
           "readOnlyQuestions": null
         }
 
-        const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
+        //const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
         const authorization = `Bearer ${token}`;
         const headers_1 = {
           'Accept': '*/*',
@@ -299,6 +327,9 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
             expect(response2.status).to.eq(200) // true
             console.log('supportInformation: '+JSON.stringify(response2.body.supportInformation))
             const damageNotificationId = response2.body.supportInformation.damageNotificationId
+            cy.then(function () {
+              questionnaire.notificationId = damageNotificationId
+            })
 
             const options3 = {
               method: 'GET',
@@ -340,7 +371,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
               //pageId: "page-03"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-03'){
-                  cy.wait(['@generic_elements','@generic_elements','@generic_elements','@generic_elements','@generic_elements',
+                  cy.wait(['@','@generic_elements','@generic_elements','@generic_elements','@generic_elements',
                   '@generic_elements','@generic_elements','@generic_elements','@generic_elements','@generic_elements','@generic_elements'],
                   {requestTimeout : $requestTimeout}).then(xhr => {
                     cy.get('div[title="VAN"]').find('g#Layer_4').click({ force: true })
@@ -700,6 +731,14 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
                     cy.wait('@postPage',{requestTimeout : $requestTimeout, responseTimeout: $requestTimeout}).then(xhr => {
                       cy.postPost(xhr,false)
                     })
+                    if (generatePdfCondition){
+                      let pdf_template = 'dekra_schadenbilder'
+                      generatePdf1(pdf_template)
+                      //cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
+                      pdf_template = 'dekra_abschlussbericht'
+                      generatePdf1(pdf_template)
+                      //cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
+                    }
                   }
                 }
               })
