@@ -4,8 +4,9 @@
 import file from '../fixtures/vinsArray.json'
 
 const goingPage = { pageId: '', elements: []}
-const questionnaire = { Id:'', authorization : '', bodyType: ''  }
+const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
 const logFilename = 'cypress/fixtures/hukVehicleZone.log'
+const pdfPath = 'cypress/fixtures/Pdf/'
 
 describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
 
@@ -20,7 +21,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
     cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPage')
-    cy.intercept('GET',  `/questionnaire/*/currentPage?offset=120&locale=de`).as('currentPage')
+    cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
     cy.intercept('GET', `/questionnaire/*//picture/clickableCar*`).as('clickableCar')
     cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
       if (req.url.includes('navigateTo')) {
@@ -35,12 +36,14 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
     cy.wrap(questionnaire).its('Id').as('questionnaireId')
     cy.wrap(questionnaire).its('authorization').as('authorization')
     cy.wrap(questionnaire).its('bodyType').as('bodyType')
+    cy.wrap(questionnaire).its('notificationId').as('notificationId')
   })
 
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
-  const $requestTimeout = 40000;
+  const $requestTimeout = 60000;
   const executePost = true
+  const generatePdfCondition = true
 
   function makeid(length) {
     let result = '';
@@ -146,7 +149,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
       "Peugeot Expert 09/2020"
     ]
   ]
-  file.forEach($car => {
+  file1.forEach($car => {
     it(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
 
       const $vin = $car[0]
@@ -296,6 +299,9 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
           cy.request(options1).then(
             (response) => {
             const damageNotificationId = response.body.supportInformation.damageNotificationId;
+            cy.then(function () {
+              questionnaire.notificationId = damageNotificationId
+            })
             console.log(`damageNotificationId: ${damageNotificationId}`);
             const options2 = {
                         method: 'GET',
@@ -515,6 +521,12 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
 
                     cy.wait('@postPage',{requestTimeout : $requestTimeout, responseTimeout: $requestTimeout}).then(xhr => {
                       cy.postPost(xhr,false)
+                      if (generatePdfCondition){
+                        let pdf_template = 'dekra_schadenbilder'
+                        cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
+                        pdf_template = 'dekra_abschlussbericht'
+                        cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
+                      } //if
                     }) //cy
                   }
                 }
