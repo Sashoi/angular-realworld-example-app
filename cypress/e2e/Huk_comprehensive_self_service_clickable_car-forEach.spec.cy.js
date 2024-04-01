@@ -139,37 +139,14 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
     }) //get('@authorization'
   }
 
-  function generatePdf1(pdf_template) {
-    cy.get('@authorization').then(function (authorization) {
-      cy.get('@notificationId').then(function (notificationId) {
-        const options = {
-          method: 'GET',
-          encoding : 'base64',
-          url: `${baseUrl_lp}damage/notification/${notificationId}/pdf/${pdf_template}`,
-          responseTimeout: 60000,
-          headers: {
-            'Accept': '*/*',
-            'Accept-Encoding':'gzip, deflate, br',
-            'Content-Type': 'application/json',
-            authorization
-          }
-        }
-        cy.request(options).then(
-          (response) => {
-          expect(response.status).to.eq(200) // true
-          const filePath = pdfPath + pdf_template +'_' + notificationId + '.pdf';
-          cy.writeFile(filePath, response.body, 'base64')
-        })
-      }) //get('@notificationId'
-    }) //get('@authorization'
-  }
+
 
   const file1 = [
     ["6FPGXXMJ2GEL59891","PickUpSingleCabine",  "01.01.2012","Ford Ranger single cabine, Pick-up"]
   ]
 
-  file1.forEach($car => {
-    it(`Execute {{baseUrl}}/b2b/integration/huk/huk-comprehensive-self-service-init ${$car[0]}`, function () {
+  file.forEach($car => {
+    it(`Huk-comprehensive-self-service-clickable-car vin :  ${$car[0]}`, function () {
 
       const vin = $car[0]
 
@@ -330,6 +307,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
             cy.then(function () {
               questionnaire.notificationId = damageNotificationId
             })
+            Cypress.env('notificationId', damageNotificationId)
 
             const options3 = {
               method: 'GET',
@@ -654,10 +632,10 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
               //"page-10"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-10'){
-                  uploadImage('damage-photo-upload-overview-exhaust',PathTo,'airbag.jpg')
-                  uploadImage('damage-photo-upload-detail-exhaust',PathTo,'airbag.jpg')
-                  uploadImage('damage-photo-upload-overview-right-taillight',PathTo,'airbag.jpg')
-                  uploadImage('damage-photo-upload-detail-right-taillight',PathTo,'airbag.jpg')
+                  uploadImage('damage-photo-upload-overview-exhaust',PathTo,'broken exhaust_1.jpg')
+                  uploadImage('damage-photo-upload-detail-exhaust',PathTo,'broken exhaust_2.jpg')
+                  uploadImage('damage-photo-upload-overview-right-taillight',PathTo,'right-taillight-o.jpg')
+                  uploadImage('damage-photo-upload-detail-right-taillight',PathTo,'right-taillight-d.jpg')
 
                   uploadImage('damage-photo-upload-overview-hood',PathTo,'hood.jpg')
                   uploadImage('damage-photo-upload-detail-hood',PathTo,'hood-d.jpg')
@@ -732,12 +710,11 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
                       cy.postPost(xhr,false)
                     })
                     if (generatePdfCondition){
-                      let pdf_template = 'dekra_schadenbilder'
-                      generatePdf1(pdf_template)
-                      //cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
-                      pdf_template = 'dekra_abschlussbericht'
-                      generatePdf1(pdf_template)
-                      //cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
+                      console.log(`Cypress.env('notificationId') = ${Cypress.env('notificationId')}`)
+                      // let pdf_template = 'dekra_schadenbilder'
+                      // cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
+                      // pdf_template = 'dekra_abschlussbericht'
+                      // cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
                     }
                   }
                 }
@@ -746,6 +723,54 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
           })
         })
       })
-    }) //it
+    }) //it Huk
+
+    it(`Generate PDFs for ${$car[0]}`, function () {
+
+      const userCredentials =  {
+        "password": Cypress.env("passwordHukS"),
+        "remoteUser": "",
+        "sessionLanguage": "en",
+        "userName": Cypress.env("usernameHukS")
+      }
+
+      cy.request('POST',`https://${$dev}.spearhead-ag.ch/member/authenticate`,userCredentials)
+      .its('body').then(body => {
+
+        const token = body.accessToken
+        const authorization = `Bearer ${token}`;
+        cy.then(function () {
+          questionnaire.authorization = authorization
+        })
+
+        const headers_1 = {
+          'Accept': '*/*',
+          'Accept-Encoding':'gzip, deflate, br',
+          'Content-Type': 'application/json',
+          authorization,
+        }
+
+        const damageNotificationId = Cypress.env('notificationId')
+        cy.then(function () {
+          questionnaire.notificationId = damageNotificationId
+        })
+
+        const options3 = {
+          method: 'GET',
+          url: `${baseUrl_lp}damage/notification/${damageNotificationId}`,
+          headers: headers_1
+        }
+        cy.request(options3).then(
+          (response3) => {
+          expect(response3.status).to.eq(200) // true
+          const vin = response3.body.body.vehicleIdentification.vin;
+          console.log(`vin: ${vin}`)
+          let pdf_template = 'dekra_schadenbilder'
+          cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
+          pdf_template = 'dekra_abschlussbericht'
+          cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
+        })
+      })
+    }) //it PDF
  }) //forEach
 })  //describe

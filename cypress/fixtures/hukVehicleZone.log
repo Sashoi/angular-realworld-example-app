@@ -1,1 +1,16 @@
 vin: VF3VEAHXKLZ080921 expected:    MiniBusMidPanel real:        VanMidPanel desc: Peugeot Expert 09/2020 
+vin: W1V44760313930767 expected:                Van real:            MiniBus desc: Mercedes Vito 09/2021 
+vin: WF03XXTTG3MG53806 expected:            Minibus real:        VanMidPanel desc: Ford Tourneo 08/2021 
+vin: WF0KXXTTRKMC81361 expected:        VanMidPanel real:        VanMidPanel desc: Ford Transit 06/2021 
+vin: 6FPPXXMJ2PCD55635 expected: PickUpDoubleCabine real: PickUpDoubleCabine desc: Ford Ranger double cabine, Pick-up 
+vin: 6FPGXXMJ2GEL59891 expected: PickUpSingleCabine real: PickUpSingleCabine desc: Ford Ranger single cabine, Pick-up 
+vin: WDB1704351F077666 expected:             Cabrio real:             Cabrio desc: MER SLK Cabrio 
+vin: WBAUB310X0VN69014 expected:             Hatch3 real:             Hatch3 desc: BMW 1 Series Hatch3 
+vin: WVWZZZ6RZGY304402 expected:             Hatch5 real:             Hatch5 desc: Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list) 
+vin: VF7SA5FS0BW550414 expected:             Hatch3 real:             Hatch3 desc: CIT DS3 Hatch3 
+vin: WAUZZZ4B73N015435 expected:              Sedan real:              Sedan desc: AUD A6/S6/RS6 Sedan 
+vin: WDB2083441T069719 expected:              Coupe real:              Coupe desc: MER CLK Coupe (partial identification, build period to be defined manually) 
+vin: W0L0XCR975E026845 expected:             Cabrio real:             Cabrio desc: OPE Tigra Cabrio 
+vin: WAUZZZ8V3HA101912 expected:             Hatch5 real:             Hatch5 desc: AUD A3/S3/RS3 Hatch5 
+vin: WVWZZZ7NZDV041367 expected:                MPV real:                MPV desc: VW Sharan MPV 
+vin: SALYL2RV8JA741831 expected:                SUV real:                SUV desc: Land Rover, SUV 

@@ -18,7 +18,6 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
     console.clear()
     cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPage')
-    cy.intercept('GET', `/questionnaire/*/currentPage?offset=120&locale=de`).as('currentPage')
     cy.intercept('GET', `/questionnaire/*//picture/clickableCar*`).as('clickableCar')
     cy.intercept('GET', `/questionnaire/generic_elements/attachment/*-example*`).as('generic_elements')
     cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {

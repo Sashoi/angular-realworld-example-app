@@ -142,14 +142,10 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   const file1 = [
-    [
-      "VF3VEAHXKLZ080921",
-      "MiniBusMidPanel",
-      "01.01.2017",
-      "Peugeot Expert 09/2020"
-    ]
+    ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"],
+    ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
   ]
-  file1.forEach($car => {
+  file.forEach($car => {
     it(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
 
       const $vin = $car[0]
@@ -302,6 +298,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
             cy.then(function () {
               questionnaire.notificationId = damageNotificationId
             })
+            Cypress.env('notificationId', damageNotificationId)
             console.log(`damageNotificationId: ${damageNotificationId}`);
             const options2 = {
                         method: 'GET',
@@ -522,10 +519,11 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                     cy.wait('@postPage',{requestTimeout : $requestTimeout, responseTimeout: $requestTimeout}).then(xhr => {
                       cy.postPost(xhr,false)
                       if (generatePdfCondition){
-                        let pdf_template = 'dekra_schadenbilder'
-                        cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
-                        pdf_template = 'dekra_abschlussbericht'
-                        cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
+                        console.log(`Cypress.env('notificationId') = ${Cypress.env('notificationId')}`)
+                        // let pdf_template = 'dekra_schadenbilder'
+                        // cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
+                        // pdf_template = 'dekra_abschlussbericht'
+                        // cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
                       } //if
                     }) //cy
                   }
@@ -535,6 +533,55 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
           })
         })
       })
-    })
-  })
-})
+    }) // it Huk
+
+    it(`Generate PDFs for ${$car[0]}`, function () {
+
+      const userCredentials =  {
+        "password": Cypress.env("passwordHukS"),
+        "remoteUser": "",
+        "sessionLanguage": "en",
+        "userName": Cypress.env("usernameHukS")
+      }
+
+      cy.request('POST',`https://${$dev}.spearhead-ag.ch/member/authenticate`,userCredentials)
+      .its('body').then(body => {
+
+        const token = body.accessToken
+        const authorization = `Bearer ${token}`;
+        cy.then(function () {
+          questionnaire.authorization = authorization
+        })
+
+        const headers_1 = {
+          'Accept': '*/*',
+          'Accept-Encoding':'gzip, deflate, br',
+          'Content-Type': 'application/json',
+          authorization,
+        }
+
+        const damageNotificationId = Cypress.env('notificationId')
+        cy.then(function () {
+          questionnaire.notificationId = damageNotificationId
+        })
+
+        const options3 = {
+          method: 'GET',
+          url: `${baseUrl_lp}damage/notification/${damageNotificationId}`,
+          headers: headers_1
+        }
+        cy.request(options3).then(
+          (response3) => {
+          expect(response3.status).to.eq(200) // true
+          const vin = response3.body.body.vehicleIdentification.vin;
+          console.log(`vin: ${vin}`)
+          let pdf_template = 'dekra_schadenbilder'
+          cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
+          pdf_template = 'dekra_abschlussbericht'
+          cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
+        })
+      })
+    }) //it PDF
+
+  })  //forEach
+})  //describe

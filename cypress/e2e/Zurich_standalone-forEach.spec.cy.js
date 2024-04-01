@@ -18,7 +18,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
     console.clear()
     cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
-    cy.intercept('GET',  `/questionnaire/*/currentPage?offset=120&locale=de`).as('currentPage')
+    cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
     cy.intercept('GET', `/questionnaire/*//picture/clickableCar*`).as('clickableCar')
     cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
       if (req.url.includes('navigateTo')) {
@@ -124,7 +124,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
   const file1 = [
     ["6FPGXXMJ2GEL59891","PickUpSingleCabine",  "01.01.2012","Ford Ranger single cabine, Pick-up"]
   ]
-  file1.forEach($car => {
+  file.forEach($car => {
     it(`zurich standalone questionnaire - zurich_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
@@ -413,12 +413,9 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
             console.log(`from summary-page, saved questionnaireId: ${Id}`);
           })
           if (executePost) {
-            //pageId: "summary-page"
-
-            //cy.get('button[type="submit"][data-test="questionnaire-complete-button-standalone"]').click()
             cy.get('button[type="submit"]').contains('Schadenaufnahme beenden').click()
             cy.wait('@postPost').then(xhr => {
-              cy.postPost(xhr)
+              //cy.postPost(xhr)
             })
           }
         }
