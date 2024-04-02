@@ -1,5 +1,5 @@
 /// <reference types="cypress" />
-
+import { getRandomInt } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 
 const goingPage = { pageId: '', elements: []}
@@ -43,37 +43,6 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   const executePost = true
   const generatePdfCondition = true
 
-  function makeid(length) {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    let counter = 0;
-    while (counter < length) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-      counter += 1;
-    }
-    return result;
-  }
-
-  function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
-  }
-
-  function uploadImage(selectorId,toPath,fileName){
-    cy.get(`form#${selectorId}`).find('button').selectFile(`${toPath}${fileName}`, {
-      action: 'drag-drop',
-    })
-    cy.wait(['@attachmentAnswer'],{requestTimeout : $requestTimeout}).then(xhr => {
-      expect(xhr.response.statusCode).to.equal(200)
-    })
-    cy.wait('@savePage',{requestTimeout : $requestTimeout}).then(xhr => {
-      expect(xhr.response.statusCode).to.equal(200)
-    })
-    cy.get(`form#${selectorId}`).find(`img[alt="${fileName}"]`).invoke('attr', 'alt').should('eq', fileName)
-  }
-
   function _waitFor(waitFor) {
     if (waitFor == '@nextPage'){
       cy.get('@nextBtn').click({ force: true })
@@ -85,7 +54,9 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
         if ((title.length <= 2)){
           title = xhr.response.body.uiBlocks[0].label.content
           if ((title.length <= 2)){
-            title = xhr.response.body.uiBlocks[0].elements.sections[0].label.content
+            if (title = xhr.response.body.uiBlocks[0].elements.sections.length > 0){
+              title = xhr.response.body.uiBlocks[0].elements.sections[0].label.content
+            }
           }
         }
         console.log(`Comming page ${gPage} - ${title}.`)
@@ -96,6 +67,18 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
         cy.then(function () {
           goingPage.pageId = gPage
         })
+        if (false && waitFor == '@currentPage'){
+          const nextUrl = xhr.response.body.links.next
+          //"https://dev02.spearhead-ag.ch:443/questionnaire/7uRjDM92M9eWEhZVkBrSr/page/page-01?navigateTo=next"
+          const startStr = '/questionnaire/'
+          const endStr = '/page/page'
+          const pos = nextUrl.indexOf(startStr) + startStr.length;
+          const questionnaireId =  nextUrl.substring(pos, nextUrl.indexOf(endStr, pos));
+          cy.then(function () {
+            questionnaire.Id = questionnaireId
+          })
+          console.log(`questionnaireId: ${questionnaireId}`)
+        }
     })
   }
 
@@ -145,7 +128,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
     ["6FPGXXMJ2GEL59891","PickUpSingleCabine",  "01.01.2012","Ford Ranger single cabine, Pick-up"]
   ]
 
-  file.forEach($car => {
+  file1.forEach($car => {
     it(`Huk-comprehensive-self-service-clickable-car vin :  ${$car[0]}`, function () {
 
       const vin = $car[0]
@@ -596,7 +579,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
               //"page-06"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-06'){
-                  uploadImage('vehicle-registration-part-1-photo-upload',PathTo,'registration-part-1.jpg')
+                  cy.uploadImage('vehicle-registration-part-1-photo-upload',PathTo,'registration-part-1.jpg')
                   nextBtn()
                   cy.wait(1000)
                 }
@@ -605,8 +588,8 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
               //"page-07"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-07'){
-                  uploadImage('vehicle-interior-front-photo-upload',PathTo,'interior-front.jpg')
-                  uploadImage('vehicle-dashboard-odometer-photo-upload',PathTo,'image dashboard-odometer.jpg')
+                  cy.uploadImage('vehicle-interior-front-photo-upload',PathTo,'interior-front.jpg')
+                  cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathTo,'image dashboard-odometer.jpg')
                   cy.get('div#vehicle-mileage').find('input#vehicle-mileage-input').type('123321')
                   nextBtn()
                 }
@@ -615,8 +598,8 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
               //"page-08"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-08'){
-                  uploadImage('vehicle-right-front-photo-upload',PathTo,'vehicle-right-front-photo.jpg')
-                  uploadImage('vehicle-left-rear-photo-upload',PathTo,'vehicle-left-rear-photo1.jpg')
+                  cy.uploadImage('vehicle-right-front-photo-upload',PathTo,'vehicle-right-front-photo.jpg')
+                  cy.uploadImage('vehicle-left-rear-photo-upload',PathTo,'vehicle-left-rear-photo1.jpg')
                   nextBtn()
                 }
               })
@@ -632,19 +615,19 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
               //"page-10"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-10'){
-                  uploadImage('damage-photo-upload-overview-exhaust',PathTo,'broken exhaust_1.jpg')
-                  uploadImage('damage-photo-upload-detail-exhaust',PathTo,'broken exhaust_2.jpg')
-                  uploadImage('damage-photo-upload-overview-right-taillight',PathTo,'right-taillight-o.jpg')
-                  uploadImage('damage-photo-upload-detail-right-taillight',PathTo,'right-taillight-d.jpg')
+                  cy.uploadImage('damage-photo-upload-overview-exhaust',PathTo,'broken exhaust_1.jpg')
+                  cy.uploadImage('damage-photo-upload-detail-exhaust',PathTo,'broken exhaust_2.jpg')
+                  cy.uploadImage('damage-photo-upload-overview-right-taillight',PathTo,'right-taillight-o.jpg')
+                  cy.uploadImage('damage-photo-upload-detail-right-taillight',PathTo,'right-taillight-d.jpg')
 
-                  uploadImage('damage-photo-upload-overview-hood',PathTo,'hood.jpg')
-                  uploadImage('damage-photo-upload-detail-hood',PathTo,'hood-d.jpg')
+                  cy.uploadImage('damage-photo-upload-overview-hood',PathTo,'hood.jpg')
+                  cy.uploadImage('damage-photo-upload-detail-hood',PathTo,'hood-d.jpg')
 
-                  uploadImage('damage-photo-upload-overview-roof',PathTo,'roof.jpg')
-                  uploadImage('damage-photo-upload-detail-roof',PathTo,'roof-d.jpg')
+                  cy.uploadImage('damage-photo-upload-overview-roof',PathTo,'roof.jpg')
+                  cy.uploadImage('damage-photo-upload-detail-roof',PathTo,'roof-d.jpg')
 
-                  uploadImage('damage-photo-upload-overview-windshield',PathTo,'broken front window_2.jpg')
-                  uploadImage('damage-photo-upload-detail-windshield',PathTo,'broken front window_1.jpg')
+                  cy.uploadImage('damage-photo-upload-overview-windshield',PathTo,'broken front window_2.jpg')
+                  cy.uploadImage('damage-photo-upload-detail-windshield',PathTo,'broken front window_1.jpg')
 
                   nextBtn()
                 }
@@ -682,9 +665,9 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
               //"page-13"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-13'){
-                  uploadImage('unrepaired-pre-damages-photo-upload',PathTo,'hood-npu1.jpg')
-                  uploadImage('unrepaired-pre-damages-photo-upload',PathTo,'hood-npu2.jpg')
-                  uploadImage('unrepaired-pre-damages-photo-upload',PathTo,'hood-npu3.jpg')
+                  cy.uploadImage('unrepaired-pre-damages-photo-upload',PathTo,'hood-npu1.jpg')
+                  cy.uploadImage('unrepaired-pre-damages-photo-upload',PathTo,'hood-npu2.jpg')
+                  cy.uploadImage('unrepaired-pre-damages-photo-upload',PathTo,'hood-npu3.jpg')
                   nextBtn()
                 }
               })
@@ -692,11 +675,11 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
               //"page-14"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-14'){
-                  uploadImage('police-ranger-report-photo-upload',PathTo,'police-ranger-report-photo-upload.png')
+                  cy.uploadImage('police-ranger-report-photo-upload',PathTo,'police-ranger-report-photo-upload.png')
 
-                  uploadImage('incident-location-photo-upload',PathTo,'incident-location-photo-upload-1.jpg')
-                  uploadImage('incident-location-photo-upload',PathTo,'incident-location-photo-upload-2.jpg')
-                  uploadImage('incident-location-photo-upload',PathTo,'incident-location-photo-upload-3.jpg')
+                  cy.uploadImage('incident-location-photo-upload',PathTo,'incident-location-photo-upload-1.jpg')
+                  cy.uploadImage('incident-location-photo-upload',PathTo,'incident-location-photo-upload-2.jpg')
+                  cy.uploadImage('incident-location-photo-upload',PathTo,'incident-location-photo-upload-3.jpg')
                   nextBtn()
                 }
               })

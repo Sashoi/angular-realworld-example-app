@@ -2,6 +2,8 @@
 
 //const cypress = require("cypress");
 
+import { getRandomInt } from "../support/utils/common.js";
+import { makeid } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 
 const goingPage = { pageId: '', elements: []}
@@ -14,7 +16,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
     cy.writeFile(logFilename, '')
   })
 
-  beforeEach('Setting up integrations and common variables', () =>{
+  beforeEach('Setting up intercepts and common variables', () =>{
     //cy.loginToHukStandalone()
     console.clear()
     cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
@@ -56,25 +58,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
     }
   }
 
-  function makeid(length) {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    let counter = 0;
-    while (counter < length) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-      counter += 1;
-    }
-    return result;
-  }
-
-  function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
-  }
-
-  function uploadImage(selectorId,toPath,fileName){
+  function uploadImage1(selectorId,toPath,fileName){
     cy.get(`form#${selectorId}`).find('button').selectFile(`${toPath}${fileName}`, {
       action: 'drag-drop',
     })
@@ -168,7 +152,6 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
 
 
   const file1 = [
-    ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
     ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
   ]
   const $equipment_2_loading_doors = false
@@ -474,13 +457,13 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                 }
               })
 
-              const PathTo ='D://Projects/Cypress/bondar-artem/angular-realworld-example-app/cypress/fixtures/'
+              const PathTo ='../angular-realworld-example-app/cypress/fixtures/'
 
               //pageId: "page-05"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-05'){
                   const file5_1 ="registration-part-1.jpg"
-                  uploadImage('vehicle-registration-part-1-photo-upload',PathTo,file5_1)
+                  cy.uploadImage('vehicle-registration-part-1-photo-upload',PathTo,file5_1)
                   nextBtn()
                 }
               })
@@ -489,10 +472,10 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-06'){
                   const file6_1 ="vehicle-right-front-photo.jpg"
-                  uploadImage('vehicle-right-front-photo-upload',PathTo,file6_1)
+                  cy.uploadImage('vehicle-right-front-photo-upload',PathTo,file6_1)
 
                   const file6_2 ="vehicle-left-rear-photo1.jpg"
-                  uploadImage('vehicle-left-rear-photo-upload',PathTo,file6_2)
+                  cy.uploadImage('vehicle-left-rear-photo-upload',PathTo,file6_2)
                   nextBtn()
                 }
               })
@@ -528,38 +511,37 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                   const file7_1 ="airbag.jpg"
                   cy.elementExists('form#damage-photo-upload-overview-tailgate').then(($element) => {
                     console.log(`$element: ` + $element)
-                    uploadImage('damage-photo-upload-overview-tailgate',PathTo,file7_1)
+                    cy.uploadImage('damage-photo-upload-overview-tailgate',PathTo,file7_1)
                   })
                   cy.elementExists('form#damage-photo-upload-detail-tailgate').then(($element) => {
-                    uploadImage('damage-photo-upload-detail-tailgate',PathTo,file7_1)
+                    cy.uploadImage('damage-photo-upload-detail-tailgate',PathTo,file7_1)
                   })
                   // cy.elementExists('form#damage-photo-upload-overview-left-load-door').then(($element) => {
                   //   console.log(`$element: ` + JSON.stringify($element))
-                  //   uploadImage('damage-photo-upload-overview-left-load-door',PathTo,file7_1)
+                  //   cy.uploadImage('damage-photo-upload-overview-left-load-door',PathTo,file7_1)
                   // })
                   // cy.elementExists('form#damage-photo-upload-detail-left-load-door').then(($element) => {
-                  //   uploadImage('damage-photo-upload-detail-left-load-door',PathTo,file7_1)
+                    cy.//   uploadImage('damage-photo-upload-detail-left-load-door',PathTo,file7_1)
                   // })
                   // cy.elementExists('form#damage-photo-upload-overview-right-load-door').then(($element) => {
-                  //   uploadImage('damage-photo-upload-overview-right-load-door',PathTo,file7_1)
+                  //   cy.uploadImage('damage-photo-upload-overview-right-load-door',PathTo,file7_1)
                   // })
                   // cy.elementExists('form#damage-photo-upload-detail-right-load-door').then(($element) => {
-                  //   uploadImage('damage-photo-upload-detail-right-load-door',PathTo,file7_1)
+                  //   cy.uploadImage('damage-photo-upload-detail-right-load-door',PathTo,file7_1)
                   // })
 
-
-                  uploadImage('damage-photo-upload-overview-hood',PathTo,'hood.jpg')
-                  uploadImage('damage-photo-upload-detail-hood',PathTo,'hood-d.jpg')
-                  uploadImage('damage-photo-upload-overview-front-bumper',PathTo,file7_1)
-                  uploadImage('damage-photo-upload-detail-front-bumper',PathTo,file7_1)
-                  uploadImage('damage-photo-upload-overview-grill',PathTo,file7_1)
-                  uploadImage('damage-photo-upload-detail-grill',PathTo,file7_1)
+                  uploadImage1('damage-photo-upload-overview-hood',PathTo,'hood.jpg')
+                  cy.uploadImage('damage-photo-upload-detail-hood',PathTo,'hood-d.jpg')
+                  cy.uploadImage('damage-photo-upload-overview-front-bumper',PathTo,file7_1)
+                  cy.uploadImage('damage-photo-upload-detail-front-bumper',PathTo,file7_1)
+                  cy.uploadImage('damage-photo-upload-overview-grill',PathTo,file7_1)
+                  cy.uploadImage('damage-photo-upload-detail-grill',PathTo,file7_1)
                   //uploadImage('damage-photo-upload-overview-towing-hook',PathTo,file7_1)
                   //uploadImage('damage-photo-upload-detail-towing-hook',PathTo,file7_1)
-                  uploadImage('damage-photo-upload-overview-exhaust',PathTo,file7_1)
-                  uploadImage('damage-photo-upload-detail-exhaust',PathTo,file7_1)
-                  uploadImage('damage-photo-upload-overview-airbag',PathTo,file7_1)
-                  uploadImage('damage-photo-upload-detail-airbag',PathTo,file7_1)
+                  cy.uploadImage('damage-photo-upload-overview-exhaust',PathTo,file7_1)
+                  cy.uploadImage('damage-photo-upload-detail-exhaust',PathTo,file7_1)
+                  cy.uploadImage('damage-photo-upload-overview-airbag',PathTo,file7_1)
+                  cy.uploadImage('damage-photo-upload-detail-airbag',PathTo,file7_1)
                   nextBtn()
                 }
               })

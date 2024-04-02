@@ -140,18 +140,6 @@
 
 const c_requestTimeout = 60000;
 
-Cypress.Commands.add('makeid', (length) =>{
-  let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const charactersLength = characters.length;
-  let counter = 0;
-  while (counter < length) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    counter += 1;
-  }
-  return result;
-})
-
 
 Cypress.Commands.add('elementExists', (selector) =>{
   cy.get('body').then(($body) => {
@@ -213,6 +201,21 @@ Cypress.Commands.add('selectDropDown', (selectorId, option) =>{
   })
 })
 
+Cypress.Commands.add('uploadImage', (selectorId,toPath,fileName) =>{
+  cy.intercept('POST', `/questionnaire/*/attachment/answer/${selectorId}/index-*?locale=de`).as(`attachmentAnswer-${selectorId}`)
+  cy.get(`form#${selectorId}`).find('button').selectFile(`${toPath}${fileName}`, {
+    action: 'drag-drop',
+  })
+  cy.wait([`@attachmentAnswer-${selectorId}`],{log : false, timeout : c_requestTimeout}).then(xhr => {
+    expect(xhr.response.statusCode).to.equal(200)
+  })
+  cy.wait('@savePage',{timeout : c_requestTimeout}).then(xhr => {
+    expect(xhr.response.statusCode).to.equal(200)
+  })
+  cy.get(`form#${selectorId}`).find(`img[alt="${fileName}"]`).invoke('attr', 'alt').should('eq', fileName)
+  cy.get(`form#${selectorId}`).find(`img[alt="${fileName}"]`).should('exist')
+})
+
 
 Cypress.Commands.add('postPost', (xhr, hasDialog = true) =>{
   if (xhr.response.statusCode != 200){
@@ -268,9 +271,6 @@ Cypress.Commands.add('generatePdf', function (baseUrl_lp, pdfPath, pdf_template)
           'Content-Type': 'application/json',
           'Connection' : 'keep-alive',
           authorization
-          //'Content-Type': 'application/pdf',
-          //"contentType": ["image/jpeg", "image/png", "application/pdf"],
-
         }
       }
       cy.request(options).then(

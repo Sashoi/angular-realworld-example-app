@@ -43,25 +43,6 @@ describe('Start and complete vlv standalone questionnaire', () => {
   const executePost = true
   const interceptZurichStandalone = true
 
-  function getRandomInt1(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
-  }
-
-  function uploadImage(selectorId,toPath,fileName){
-    cy.get(`form#${selectorId}`).find('button').selectFile(`${toPath}${fileName}`, {
-      action: 'drag-drop',
-    })
-    cy.wait(['@attachmentAnswer'],{requestTimeout : $requestTimeout}).then(xhr => {
-      expect(xhr.response.statusCode).to.equal(200)
-    })
-    cy.wait('@savePage',{requestTimeout : $requestTimeout}).then(xhr => {
-      expect(xhr.response.statusCode).to.equal(200)
-    })
-    cy.get(`form#${selectorId}`).find(`img[alt="${fileName}"]`).invoke('attr', 'alt').should('eq', fileName)
-  }
-
   function _waitFor(waitFor) {
     if (waitFor == '@nextPage'){
       cy.get('@nextBtn').click({ force: true })
@@ -276,16 +257,16 @@ describe('Start and complete vlv standalone questionnaire', () => {
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-04'){
-          uploadImage('vehicle-registration-part-1-photo-upload',PathTo,'registration-part-1.jpg')
-          uploadImage('vehicle-right-front-photo-upload',PathTo,'vehicle-right-front-photo.jpg')
-          uploadImage('vehicle-left-rear-photo-upload',PathTo,'vehicle-left-rear-photo1.jpg')
-          uploadImage('vehicle-interior-front-photo-upload',PathTo,'interior-front.jpg')
-          uploadImage('vehicle-dashboard-odometer-photo-upload',PathTo,'image dashboard-odometer.jpg')
+          cy.uploadImage('vehicle-registration-part-1-photo-upload',PathTo,'registration-part-1.jpg')
+          cy.uploadImage('vehicle-right-front-photo-upload',PathTo,'vehicle-right-front-photo.jpg')
+          cy.uploadImage('vehicle-left-rear-photo-upload',PathTo,'vehicle-left-rear-photo1.jpg')
+          cy.uploadImage('vehicle-interior-front-photo-upload',PathTo,'interior-front.jpg')
+          cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathTo,'image dashboard-odometer.jpg')
           if (loss_cause != 'Glasbruch'){
-            uploadImage('damage-photo-upload-overview-hood',PathTo,'hood.jpg')
-            uploadImage('damage-photo-upload-detail-hood',PathTo,'hood-d.jpg')
+            cy.uploadImage('damage-photo-upload-overview-hood',PathTo,'hood.jpg')
+            cy.uploadImage('damage-photo-upload-detail-hood',PathTo,'hood-d.jpg')
           }
-          uploadImage('damage-photo-upload-other',PathTo,'roof.jpg')
+          cy.uploadImage('damage-photo-upload-other',PathTo,'roof.jpg')
           nextBtn()
         }
       })

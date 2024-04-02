@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 
 const { resolveProjectReferencePath } = require("typescript")
+import { getRandomInt } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 
 const goingPage = { pageId: '', elements: []}
@@ -49,13 +50,7 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
     })
   }
 
-  function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
-  }
-
-
+  
   function _waitFor(waitFor) {
     if (waitFor == '@nextPage'){
       cy.get('@nextBtn').click({ force: true })

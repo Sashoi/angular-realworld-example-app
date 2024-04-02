@@ -1,7 +1,7 @@
 
 /// <reference types="cypress" />
 
-//import { contains } from 'cypress/types/jquery'
+import { getRandomInt } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 
 const goingPage = { pageId: '', elements: []}
@@ -46,38 +46,6 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   const executePost = true
   const generatePdfCondition = true
 
-  function makeid(length) {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    let counter = 0;
-    while (counter < length) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-      counter += 1;
-    }
-    return result;
-  }
-
-  function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
-  }
-
-  function uploadImage(selectorId,toPath,fileName){
-    cy.intercept('POST', `/questionnaire/*/attachment/answer/${selectorId}/index-*?locale=de`).as(`attachmentAnswer-${selectorId}`)
-    cy.get(`form#${selectorId}`).find('button').selectFile(`${toPath}${fileName}`, {
-      action: 'drag-drop',
-    })
-    cy.wait([`@attachmentAnswer-${selectorId}`],{log : false, timeout : $requestTimeout}).then(xhr => {
-      expect(xhr.response.statusCode).to.equal(200)
-    })
-    cy.wait('@savePage',{timeout : $requestTimeout}).then(xhr => {
-      expect(xhr.response.statusCode).to.equal(200)
-    })
-    cy.get(`form#${selectorId}`).find(`img[alt="${fileName}"]`).invoke('attr', 'alt').should('eq', fileName)
-    cy.get(`form#${selectorId}`).find(`img[alt="${fileName}"]`).should('exist')
-  }
 
   function selectCropImage(selectorId,cropSelectorId,fileName){
     cy.intercept('GET', `/questionnaire/*/attachment/answer/${selectorId}/index-*`).as(`cropOrigin-${selectorId}`)
@@ -177,7 +145,6 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   const file1 = [
-    ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"],
     ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
   ]
   file1.forEach($car => {
@@ -440,7 +407,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-08"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-08'){
-                  uploadImage('vehicle-registration-part-1-photo-upload',PathTo,`registration-part-1.jpg`)
+                  cy.uploadImage('vehicle-registration-part-1-photo-upload',PathTo,`registration-part-1.jpg`)
                   nextBtn()
                 }
               })
@@ -460,8 +427,8 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-10"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-10'){
-                  uploadImage('vehicle-interior-front-photo-upload',PathTo,`interior-front.jpg`)
-                  uploadImage('vehicle-dashboard-odometer-photo-upload',PathTo,`image dashboard-odometer.jpg`)
+                  cy.uploadImage('vehicle-interior-front-photo-upload',PathTo,`interior-front.jpg`)
+                  cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathTo,`image dashboard-odometer.jpg`)
                   cy.get('input[data-test="vehicle-mileage-question-type-vehicle-mileage"]').type('123456')
                   nextBtn()
                 }
@@ -470,8 +437,8 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-11"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-11'){
-                  uploadImage('vehicle-right-front-photo-upload',PathTo,`vehicle-right-front-photo.jpg`)
-                  uploadImage('vehicle-left-rear-photo-upload',PathTo,`vehicle-left-rear-photo1.jpg`)
+                  cy.uploadImage('vehicle-right-front-photo-upload',PathTo,`vehicle-right-front-photo.jpg`)
+                  cy.uploadImage('vehicle-left-rear-photo-upload',PathTo,`vehicle-left-rear-photo1.jpg`)
                   nextBtn()
                 }
               })
@@ -479,8 +446,8 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-12"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-12'){
-                  uploadImage('damage-photo-upload-overview-vehicle-front-left-top-side',PathTo,`airbag1.jpg`)
-                  uploadImage('damage-photo-upload-overview-vehicle-front-right-top-side',PathTo,`airbag2.jpg`)
+                  cy.uploadImage('damage-photo-upload-overview-vehicle-front-left-top-side',PathTo,`airbag1.jpg`)
+                  cy.uploadImage('damage-photo-upload-overview-vehicle-front-right-top-side',PathTo,`airbag2.jpg`)
                   nextBtn()
                 }
               })
@@ -488,7 +455,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-13"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-13'){
-                  uploadImage('damage-photo-upload-overview-windshield',PathTo,`broken front window_2.jpg`)
+                  cy.uploadImage('damage-photo-upload-overview-windshield',PathTo,`broken front window_2.jpg`)
                   selectCropImage('damage-photo-upload-overview-windshield',
                                   'damage-photo-upload-detail-windshield',
                                   `“Windschutzscheibe” - Nahaufnahme der Beschädigung`)
@@ -507,7 +474,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-15"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-15'){
-                  uploadImage('unrepaired-pre-damages-photo-upload',PathTo,`hood-npu1.jpg`)
+                  cy.uploadImage('unrepaired-pre-damages-photo-upload',PathTo,`hood-npu1.jpg`)
                   nextBtn()
                 }
               })
@@ -515,8 +482,8 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-16"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-16'){
-                  //uploadImage('police-ranger-report-photo-upload',PathTo,`police-ranger-report-photo-upload.png`)
-                  //uploadImage('incident-location-photo-upload',PathTo,`incident-location-photo-upload-1.jpg`)
+                  //cy.uploadImage('police-ranger-report-photo-upload',PathTo,`police-ranger-report-photo-upload.png`)
+                  //cy.uploadImage('incident-location-photo-upload',PathTo,`incident-location-photo-upload-1.jpg`)
 
                   nextBtn()
                 }

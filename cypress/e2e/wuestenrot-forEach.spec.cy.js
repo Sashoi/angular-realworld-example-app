@@ -1,5 +1,6 @@
 /// <reference types="cypress" />
 
+import { getRandomInt } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 
 const goingPage = { pageId: '', elements: []}
@@ -41,12 +42,6 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
   const executePost = true
-
-  function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
-  }
 
   function _waitFor(waitFor) {
     if (waitFor == '@nextPage'){

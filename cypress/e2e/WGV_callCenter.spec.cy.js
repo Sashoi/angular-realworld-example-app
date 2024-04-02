@@ -1,28 +1,13 @@
 /// <reference types="cypress" />
 
+import { getRandomInt } from "../support/utils/common.js";
+import { makeid } from "../support/utils/common.js";
+
 describe('Execute b2b/integration/wgv/callCenter', () =>{
   beforeEach('Login to the app', () =>{
     //cy.loginToApplication()
     console.clear()
   })
-
-  function makeid(length) {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    let counter = 0;
-    while (counter < length) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-      counter += 1;
-    }
-    return result;
-  }
-
-  function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
-  }
 
   it('Execute b2b/integration/wgv/callCenter', () =>{
 

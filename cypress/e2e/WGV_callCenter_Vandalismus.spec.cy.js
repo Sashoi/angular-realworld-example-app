@@ -1,5 +1,8 @@
 /// <reference types="cypress" />
 
+import { getRandomInt } from "../support/utils/common.js";
+import { makeid } from "../support/utils/common.js";
+
 describe('Execute b2b/integration/wgv/callCenter', () => {
   beforeEach('Login to the app', () => {
     //cy.loginToApplication()
@@ -8,11 +11,6 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
 
   it('Execute b2b/integration/wgv/callCenter Vandalismus', () => {
 
-    function getRandomInt(min, max) {
-      min = Math.ceil(min);
-      max = Math.floor(max);
-      return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
-    }
 
     const $dev = Cypress.env("dev");
     const userCredentials = {
@@ -22,7 +20,7 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
       "userName": Cypress.env("usernameHukS")
     }
 
-    let claim1 = cy.makeid(5)
+    let claim1 = makeid(5)
     let claim2 = getRandomInt(10000, 99999)
 
 
