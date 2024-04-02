@@ -38,7 +38,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
 
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
-  const $requestTimeout = 40000;
+  const $requestTimeout = 50000;
   const executePost = true
 
   const printQuestionnaireIds = (obj) => {

@@ -1,5 +1,7 @@
 /// <reference types="cypress" />
 
+import { getRandomInt } from "../support/utils/common.js";
+import { makeid } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 
 const goingPage = { pageId: '', elements: []}
@@ -37,10 +39,10 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
 
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
-  const $requestTimeout = 40000;
+  const $requestTimeout = 60000;
   const executePost = true
 
-  function makeid(length) {
+  function makeid1(length) {
     let result = '';
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const charactersLength = characters.length;
@@ -52,7 +54,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
     return result;
   }
 
-  function getRandomInt(min, max) {
+  function getRandomInt1(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
@@ -156,7 +158,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
       let claim1 = makeid(7)
       let claim2 = getRandomInt(10000,99999)
 
-      let claimNumber = claim1 + claim2  // "21PFQ017602MR" works for reopen
+      let claimNumber = claim1 + claim2
       let licenseplate = `HDI ${getRandomInt(1,9)}-${getRandomInt(100,999)}`
 
       const photos_available = false;

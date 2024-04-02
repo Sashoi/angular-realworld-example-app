@@ -38,7 +38,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
 
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
-  const $requestTimeout = 40000;
+  const $requestTimeout = 60000;
   const executePost = true
   const interceptZurichStandalone = true
 

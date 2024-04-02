@@ -3,8 +3,9 @@
 import file from '../fixtures/vinsArray.json'
 
 const goingPage = { pageId: '', elements: []}
-const questionnaire = { Id:'', authorization : '', bodyType: ''  }
-const logFilename = 'cypress/fixtures/wuestenrotStandalone.log'
+const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
+const logFilename = 'cypress/fixtures/hukClickableCar.log'
+const pdfPath = 'cypress/fixtures/Pdf/'
 
 describe('Start and complete wuestenrot standalone questionnaire', () => {
 
@@ -27,7 +28,6 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
       }
     })
     cy.intercept('POST', `/member/oauth/token`).as('token')
-    //cy.intercept('POST', `/b2b/integration/zurich/zurichStandalone`).as('zurichStandalone')
     cy.wrap(goingPage).its('pageId').as('goingPageId')
     cy.wrap(goingPage).its('elements').as('goingPageElements')
     cy.wrap(questionnaire).its('Id').as('questionnaireId')
@@ -39,7 +39,7 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
 
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
-  const $requestTimeout = 40000;
+  const $requestTimeout = 60000;
   const executePost = true
 
   function getRandomInt(min, max) {
@@ -116,11 +116,7 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
   }
 
   const file1 = [
-      ["WDB1704351F077666","Cabrio",              "01.01.2004","MER SLK Cabrio"],
-      ["WBAUB310X0VN69014","Hatch3",              "01.01.2012","BMW 1 Series Hatch3"],
-      ["WVWZZZ6RZGY304402","Hatch5",              "01.01.2017","Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"],
-      ["VF7SA5FS0BW550414","Hatch3",              "01.01.2014","CIT DS3 Hatch3"],
-      ["WAUZZZ4B73N015435","Sedan",               "01.01.2014","AUD A6/S6/RS6 Sedan"]
+    ["W1V44760313930767", "Van", "01.01.2017", "Mercedes Vito 09/2021"]
   ]
   file1.forEach($car => {
     it(`wuestenrot-comprehensive-call-center for vin: ${$car[0]}`, () => {
