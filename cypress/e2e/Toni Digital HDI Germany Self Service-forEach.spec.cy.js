@@ -36,7 +36,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
     cy.wrap(questionnaire).its('Id').as('questionnaireId')
     cy.wrap(questionnaire).its('authorization').as('authorization')
     cy.wrap(questionnaire).its('bodyType').as('bodyType')
-  })
+  }) //beforeEach
 
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
@@ -151,12 +151,13 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
   }
 
 
-  const file1 = [
-    ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
-  ]
+
   const $equipment_2_loading_doors = false
-  const selectAllParts = false
   const eMail = 'sivanchevski@soft2run.com'
+
+  const file1 = [
+    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"]
+  ]
 
   file1.forEach($car => {
     it(`Execute b2b/integration/toni-digital/hdiLiabilitySelfService for vin: ${$car[0]}`, () =>{
@@ -182,8 +183,9 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
       cy.request('POST',`https://${$dev}.spearhead-ag.ch/member/authenticate`,userCredentials)
           .its('body').then(body => {
           const token = body.accessToken
+          const authorization = `Bearer ${ token }`;
           cy.then(function () {
-            questionnaire.authorization = `Bearer ${token}`
+            questionnaire.authorization = authorization
           })
 
           const b2bBody = {
@@ -332,7 +334,6 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
             }
           }
 
-          const authorization = `Bearer ${ token }`;
           const options = {
             method: 'POST',
             url: `https://${$dev}.spearhead-ag.ch:443/b2b/integration/toni-digital/hdiLiabilitySelfService`,
@@ -391,7 +392,6 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                 }
               })
 
-
               //pageId: "page-02"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-02'){
@@ -434,7 +434,6 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                     cy.selectSVG('hood')
                     cy.selectSVG('grill')
 
-
                     const regex = /g .*id="front-bumper"/;
                     if (SVGbody.search(regex) > 0){
                       cy.selectSVG('front-bumper')
@@ -443,7 +442,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                     cy.selectSVG('exhaust')
                     //selectSVG('towing-hook')
                     cy.selectSVG('airbag')
-                    })
+                  })
                   nextBtn()
                 }
               })
@@ -483,6 +482,11 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
               //pageId: "page-07"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-07'){
+                  cy.get('@goingPageElements').then(function (elements) {
+                    elements.forEach(element => {
+                      console.log(`id: ${element}`)
+                    })
+                  })
                   if (false) { // click without image upload
 
                     cy.get('div#damage-photo-upload-overview-hood').find('label[for="multiple-upload-skip__damage-photo-upload-overview-hood"]').click({ force: true })
@@ -503,11 +507,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                     cy.get('div#damage-photo-upload-overview-airbag').find('label[for="multiple-upload-skip__damage-photo-upload-overview-airbag"]').click({ force: true })
                     cy.get('div#damage-photo-upload-detail-airbag').find('label[for="multiple-upload-skip__damage-photo-upload-detail-airbag"]').click({ force: true })
                   }
-                  cy.get('@goingPageElements').then(function (elements) {
-                    elements.forEach(element => {
-                      console.log(`id: ${element}`)
-                    })
-                  })
+
                   const file7_1 ="airbag.jpg"
                   cy.elementExists('form#damage-photo-upload-overview-tailgate').then(($element) => {
                     console.log(`$element: ` + $element)
@@ -521,7 +521,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                   //   cy.uploadImage('damage-photo-upload-overview-left-load-door',PathTo,file7_1)
                   // })
                   // cy.elementExists('form#damage-photo-upload-detail-left-load-door').then(($element) => {
-                    cy.//   uploadImage('damage-photo-upload-detail-left-load-door',PathTo,file7_1)
+                  //   cy.uploadImage('damage-photo-upload-detail-left-load-door',PathTo,file7_1)
                   // })
                   // cy.elementExists('form#damage-photo-upload-overview-right-load-door').then(($element) => {
                   //   cy.uploadImage('damage-photo-upload-overview-right-load-door',PathTo,file7_1)
@@ -530,7 +530,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                   //   cy.uploadImage('damage-photo-upload-detail-right-load-door',PathTo,file7_1)
                   // })
 
-                  uploadImage1('damage-photo-upload-overview-hood',PathTo,'hood.jpg')
+                  cy.uploadImage('damage-photo-upload-overview-hood',PathTo,'hood.jpg')
                   cy.uploadImage('damage-photo-upload-detail-hood',PathTo,'hood-d.jpg')
                   cy.uploadImage('damage-photo-upload-overview-front-bumper',PathTo,file7_1)
                   cy.uploadImage('damage-photo-upload-detail-front-bumper',PathTo,file7_1)
@@ -565,8 +565,13 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                 }
               })
 
-        })
-      })
-    })
-  })
-})
+        })  //hdiLiabilitySelfService
+      })  ///member/authenticate
+    }) //it
+
+    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+      cy.GeneratePDFs(['toni_hdi_tele_check','toni_tele_check','toni_tele_expert'])
+    }) //it PDF from commands
+
+  })  //forEach
+}) //describe

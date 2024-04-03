@@ -141,6 +141,7 @@
 const c_requestTimeout = 60000;
 
 
+
 Cypress.Commands.add('elementExists', (selector) =>{
   cy.get('body').then(($body) => {
     if ($body.find(selector).length) {
@@ -225,6 +226,7 @@ Cypress.Commands.add('postPost', (xhr, hasDialog = true) =>{
   }
   expect(xhr.response.statusCode).to.equal(200)
   const notificationId = xhr.response.body.notification.id;
+  Cypress.env('notificationId', notificationId)
   console.log(`notificationId: ${notificationId}`);
   const requestedInformation = xhr.response.body.notification.body.requestedInformation;
   console.log(`requestedInformation: ${requestedInformation}`);
@@ -253,34 +255,78 @@ Cypress.Commands.add('postPost', (xhr, hasDialog = true) =>{
 
 Cypress.Commands.add('generatePdf', function (baseUrl_lp, pdfPath, pdf_template) {
   cy.get('@authorization').then(function (authorization) {
-    cy.get('@notificationId').then(function (notificationId) {
-      // console.log(`baseUrl_lp: ${baseUrl_lp}`)
-      // console.log(`pdfPath: ${pdfPath}`)
-      // console.log(`pdf_template: ${pdf_template}`)
-      // console.log(`authorization: ${authorization}`)
-      // console.log(`notificationId: ${notificationId}`)
-      const options = {
-        method: 'GET',
-        encoding : 'base64',
-        url: `${baseUrl_lp}damage/notification/${notificationId}/pdf/${pdf_template}`,
+    const notificationId = Cypress.env('notificationId')
+    // console.log(`baseUrl_lp: ${baseUrl_lp}`)
+    // console.log(`pdfPath: ${pdfPath}`)
+    // console.log(`pdf_template: ${pdf_template}`)
+    // console.log(`authorization: ${authorization}`)
+    // console.log(`notificationId: ${notificationId}`)
+    const options = {
+      method: 'GET',
+      encoding : 'base64',
+      url: `${baseUrl_lp}damage/notification/${notificationId}/pdf/${pdf_template}`,
 
-        //responseTimeout: 60000,
-        headers: {
-          'Accept': '*/*',
-          'Accept-Encoding':'gzip, deflate, br',
-          'Content-Type': 'application/json',
-          'Connection' : 'keep-alive',
-          authorization
-        }
+      //responseTimeout: 60000,
+      headers: {
+        'Accept': '*/*',
+        'Accept-Encoding':'gzip, deflate, br',
+        'Content-Type': 'application/json',
+        'Connection' : 'keep-alive',
+        authorization
       }
-      cy.request(options).then(
-        (response) => {
-        expect(response.status).to.eq(200)
-        const filePath = `${pdfPath}${pdf_template}_${notificationId}.pdf`;
-        cy.writeFile(filePath, response.body, 'base64')
-      })
-    }) //get('@notificationId'
+    }
+    cy.request(options).then(
+      (response) => {
+      expect(response.status).to.eq(200)
+      const filePath = `${pdfPath}${pdf_template}_${notificationId}.pdf`;
+      cy.writeFile(filePath, response.body, 'base64')
+    })
   }) //get('@authorization'
+})
+
+Cypress.Commands.add(`GeneratePDFs`, function (pdf_templates) {
+
+  const $dev = Cypress.env("dev");
+  const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
+  const pdfPath = 'cypress/fixtures/Pdf/'
+
+  const userCredentials =  {
+    "password": Cypress.env("passwordHukS"),
+    "remoteUser": "",
+    "sessionLanguage": "en",
+    "userName": Cypress.env("usernameHukS")
+  }
+
+  cy.request('POST',`https://${$dev}.spearhead-ag.ch/member/authenticate`,userCredentials)
+  .its('body').then(body => {
+
+    const token = body.accessToken
+    const authorization = `Bearer ${token}`;
+
+    const headers_1 = {
+      'Accept': '*/*',
+      'Accept-Encoding':'gzip, deflate, br',
+      'Content-Type': 'application/json',
+      authorization,
+    }
+
+    const damageNotificationId = Cypress.env('notificationId')
+
+    const options = {
+      method: 'GET',
+      url: `${baseUrl_lp}damage/notification/${damageNotificationId}`,
+      headers: headers_1
+    }
+    cy.request(options).then(
+      (response) => {
+      expect(response.status).to.eq(200) // true
+      const vin = response.body.body.vehicleIdentification.vin;
+      console.log(`vin: ${vin}`)
+      pdf_templates.forEach(pdf_template => {
+        cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
+      })
+    })
+  })
 })
 
 

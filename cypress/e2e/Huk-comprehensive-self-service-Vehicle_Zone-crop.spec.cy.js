@@ -522,7 +522,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
         })
       })
     }) //it Huk
-    it(`Generate PDFs for ${$car[0]}`, function () {
+    it.skip(`Generate PDFs for ${$car[0]}`, function () {
 
       const userCredentials =  {
         "password": Cypress.env("passwordHukS"),
@@ -569,5 +569,8 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
         })
       })
     }) //it PDF
+    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+      cy.GeneratePDFs(['dekra_schadenbilder','dekra_abschlussbericht'])
+    }) //it PDF from commands
   }) //forEach
 })  //describe
