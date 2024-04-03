@@ -118,7 +118,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
     _waitFor('@currentPage')
   }
 
-  function getBodyType($car) {
+  function getBodyType1($car) {
     cy.get('@authorization').then(function (token) {
       cy.get('@questionnaireId').then(function (questionnaireId) {
         const options = {
@@ -368,7 +368,11 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
 
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-01'){
-                  getBodyType($car)
+                  cy.getBodyType($car,logFilename).then(function (bodyType) {
+                    cy.then(function () {
+                      questionnaire.bodyType = bodyType
+                    })
+                  })
                   cy.get('@bodyType').then(function (bodyType) {
                     if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
                       cy.wait(2000)

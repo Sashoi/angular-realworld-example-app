@@ -216,7 +216,43 @@ Cypress.Commands.add('uploadImage', (selectorId,toPath,fileName) =>{
   cy.get(`form#${selectorId}`).find(`img[alt="${fileName}"]`).invoke('attr', 'alt').should('eq', fileName)
   cy.get(`form#${selectorId}`).find(`img[alt="${fileName}"]`).should('exist')
 })
+Cypress.Commands.add('getBodyType', ($car,logFilename) =>{
+  const $dev = Cypress.env("dev");
+  const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
+  cy.get('@authorization').then(function (token) {
+    cy.get('@questionnaireId').then(function (questionnaireId) {
+      const options = {
+        method: 'GET',
+        url: `${baseUrl_lp}questionnaire/${questionnaireId}`,
+        headers:  {
+          'Accept': '*/*',
+          'Accept-Encoding':'gzip, deflate, br',
+          'Content-Type': 'application/json',
+          token,
+          'timeout' : c_requestTimeout
+        }
+      };
+      cy.request(options).then(
+        (response) => {
+        expect(response.status).to.eq(200) // true
+        const bodyType = response.body.supportInformation.bodyType
+        console.log(`supportInformation.bodyType: ${bodyType}.`)
+        // cy.then(function () {
+        //   questionnaire.bodyType = bodyType
+        // })
+        cy.readFile(logFilename).then((text) => {
+          const addRow = `vin: ${$car[0]} expected: ${$car[1].padStart(18, ' ')} real: ${bodyType.padStart(18, ' ')} desc: ${$car[3]} \n`
+          text += addRow
+          cy.writeFile(logFilename, text)
 
+        })
+        cy.wrap(bodyType).then((bodyType) => {
+          return bodyType
+        })
+      }) //request(options)
+    }) //get('@questionnaireId'
+  }) //get('@authorization'
+})
 
 Cypress.Commands.add('postPost', (xhr, hasDialog = true) =>{
   if (xhr.response.statusCode != 200){
