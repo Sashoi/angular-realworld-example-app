@@ -50,7 +50,7 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
     })
   }
 
-  
+
   function _waitFor(waitFor) {
     if (waitFor == '@nextPage'){
       cy.get('@nextBtn').click({ force: true })
@@ -84,38 +84,6 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
 
   function currentPage() {
     _waitFor('@currentPage')
-  }
-
-  function getBodyType($car) {
-    cy.get('@authorization').then(function (token) {
-      cy.get('@questionnaireId').then(function (questionnaireId) {
-        const options = {
-          method: 'GET',
-          url: `${baseUrl_lp}questionnaire/${questionnaireId}`,
-          headers:  {
-            'Accept': '*/*',
-            'Accept-Encoding':'gzip, deflate, br',
-            'Content-Type': 'application/json',
-            token,
-            'timeout' : 50000
-          }
-        };
-        cy.request(options).then(
-          (response) => {
-          expect(response.status).to.eq(200) // true
-          const bodyType = response.body.supportInformation.bodyType
-          console.log(`supportInformation.bodyType: ${bodyType}.`)
-          cy.then(function () {
-            questionnaire.bodyType = bodyType
-          })
-          cy.readFile(logFilename).then((text) => {
-            const addRow = `vin: ${$car[0]} expected: ${$car[1].padStart(18, ' ')} real: ${bodyType.padStart(18, ' ')} desc: ${$car[3]} \n`
-            text += addRow
-            cy.writeFile(logFilename, text)
-          })
-        }) //request(options)
-      }) //get('@questionnaireId'
-    }) //get('@authorization'
   }
 
   const file1 = [
@@ -191,7 +159,11 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
           cy.selectSingleList('switch-to-self-service-workflow',1)
           cy.selectSingleList('insurance-policy-type',0)
 
-          getBodyType($car)
+          cy.getBodyType($car,logFilename).then(function (bodyType) {
+            cy.then(function () {
+              questionnaire.bodyType = bodyType
+            })
+          })
 
           cy.get('@bodyType').then(function (bodyType) {
             if (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine'){

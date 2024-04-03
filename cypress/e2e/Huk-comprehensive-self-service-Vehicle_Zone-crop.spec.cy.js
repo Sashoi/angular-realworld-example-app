@@ -112,40 +112,11 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
     _waitFor('@currentPage')
   }
 
-  function getBodyType($car) {
-    cy.get('@authorization').then(function (token) {
-      cy.get('@questionnaireId').then(function (questionnaireId) {
-        const options = {
-          method: 'GET',
-          url: `${baseUrl_lp}questionnaire/${questionnaireId}`,
-          headers:  {
-            'Accept': '*/*',
-            'Accept-Encoding':'gzip, deflate, br',
-            'Content-Type': 'application/json',
-            token,
-            'timeout' : 50000
-          }
-        };
-        cy.request(options).then(
-          (response) => {
-          expect(response.status).to.eq(200) // true
-          const bodyType = response.body.supportInformation.bodyType
-          console.log(`supportInformation.bodyType: ${bodyType}.`)
-          cy.then(function () {
-            questionnaire.bodyType = bodyType
-          })
-          cy.readFile(logFilename).then((text) => {
-            const addRow = `vin: ${$car[0]} expected: ${$car[1].padStart(18, ' ')} real: ${bodyType.padStart(18, ' ')} desc: ${$car[3]} \n`
-            text += addRow
-            cy.writeFile(logFilename, text)
-          })
-        }) //request(options)
-      }) //get('@questionnaireId'
-    }) //get('@authorization'
-  }
-
   const file1 = [
-    ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
+    ["W0L0XCR975E026845", "Cabrio", "01.01.2009", "OPE Tigra Cabrio"],
+    ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5"],
+    ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
+    ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
   ]
   file1.forEach($car => {
     it(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
@@ -349,7 +320,11 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                 }
               })
 
-              getBodyType($car)
+              cy.getBodyType($car,logFilename).then(function (bodyType) {
+                cy.then(function () {
+                  questionnaire.bodyType = bodyType
+                })
+              })
 
               //"page-04"
               cy.get('@goingPageId').then(function (aliasValue) {
@@ -522,53 +497,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
         })
       })
     }) //it Huk
-    it.skip(`Generate PDFs for ${$car[0]}`, function () {
 
-      const userCredentials =  {
-        "password": Cypress.env("passwordHukS"),
-        "remoteUser": "",
-        "sessionLanguage": "en",
-        "userName": Cypress.env("usernameHukS")
-      }
-
-      cy.request('POST',`https://${$dev}.spearhead-ag.ch/member/authenticate`,userCredentials)
-      .its('body').then(body => {
-
-        const token = body.accessToken
-        const authorization = `Bearer ${token}`;
-        cy.then(function () {
-          questionnaire.authorization = authorization
-        })
-
-        const headers_1 = {
-          'Accept': '*/*',
-          'Accept-Encoding':'gzip, deflate, br',
-          'Content-Type': 'application/json',
-          authorization,
-        }
-
-        const damageNotificationId = Cypress.env('notificationId')
-        cy.then(function () {
-          questionnaire.notificationId = damageNotificationId
-        })
-
-        const options3 = {
-          method: 'GET',
-          url: `${baseUrl_lp}damage/notification/${damageNotificationId}`,
-          headers: headers_1
-        }
-        cy.request(options3).then(
-          (response3) => {
-          expect(response3.status).to.eq(200) // true
-          const vin = response3.body.body.vehicleIdentification.vin;
-          console.log(`vin: ${vin}`)
-          let pdf_template = 'dekra_schadenbilder'
-          cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
-          pdf_template = 'dekra_abschlussbericht'
-          cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
-        })
-      })
-    }) //it PDF
     it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['dekra_schadenbilder','dekra_abschlussbericht'])
     }) //it PDF from commands

@@ -42,7 +42,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
   const $requestTimeout = 60000;
   const executePost = true
 
-  
+
   function _waitFor(waitFor) {
     if (waitFor == '@nextPage'){
       cy.get('@nextBtn').click({ force: true })
@@ -88,38 +88,6 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
 
   function currentPage() {
     _waitFor('@currentPage')
-  }
-
-  function getBodyType($car) {
-    cy.get('@authorization').then(function (token) {
-      cy.get('@questionnaireId').then(function (questionnaireId) {
-        const options = {
-          method: 'GET',
-          url: `${baseUrl_lp}questionnaire/${questionnaireId}`,
-          headers:  {
-            'Accept': '*/*',
-            'Accept-Encoding':'gzip, deflate, br',
-            'Content-Type': 'application/json',
-            token,
-            'timeout' : 50000
-          }
-        };
-        cy.request(options).then(
-          (response) => {
-          expect(response.status).to.eq(200) // true
-          const bodyType = response.body.supportInformation.bodyType
-          console.log(`supportInformation.bodyType: ${bodyType}.`)
-          cy.then(function () {
-            questionnaire.bodyType = bodyType
-          })
-          cy.readFile(logFilename).then((text) => {
-            const addRow = `vin: ${$car[0]} expected: ${$car[1].padStart(18, ' ')} real: ${bodyType.padStart(18, ' ')} desc: ${$car[3]} \n`
-            text += addRow
-            cy.writeFile(logFilename, text)
-          })
-        }) //request(options)
-      }) //get('@questionnaireId'
-    }) //get('@authorization'
   }
 
   const file1 = [
@@ -341,7 +309,11 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
 
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-01'){
-                  getBodyType($car)
+                  cy.getBodyType($car,logFilename).then(function (bodyType) {
+                    cy.then(function () {
+                      questionnaire.bodyType = bodyType
+                    })
+                  })
                   cy.get('@bodyType').then(function (bodyType) {
                     if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
                       cy.wait(2000)

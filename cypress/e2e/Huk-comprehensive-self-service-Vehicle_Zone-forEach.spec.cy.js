@@ -79,38 +79,6 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
     _waitFor('@currentPage')
   }
 
-  function getBodyType($car) {
-    cy.get('@authorization').then(function (token) {
-      cy.get('@questionnaireId').then(function (questionnaireId) {
-        const options = {
-          method: 'GET',
-          url: `${baseUrl_lp}questionnaire/${questionnaireId}`,
-          headers:  {
-            'Accept': '*/*',
-            'Accept-Encoding':'gzip, deflate, br',
-            'Content-Type': 'application/json',
-            token,
-            'timeout' : 50000
-          }
-        };
-        cy.request(options).then(
-          (response) => {
-          expect(response.status).to.eq(200) // true
-          const bodyType = response.body.supportInformation.bodyType
-          console.log(`supportInformation.bodyType: ${bodyType}.`)
-          cy.then(function () {
-            questionnaire.bodyType = bodyType
-          })
-          cy.readFile(logFilename).then((text) => {
-            const addRow = `vin: ${$car[0]} expected: ${$car[1].padStart(18, ' ')} real: ${bodyType.padStart(18, ' ')} desc: ${$car[3]} \n`
-            text += addRow
-            cy.writeFile(logFilename, text)
-          })
-        }) //request(options)
-      }) //get('@questionnaireId'
-    }) //get('@authorization'
-  }
-
   const file1 = [
     ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
   ]
@@ -314,7 +282,11 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                 }
               })
 
-              getBodyType($car)
+              cy.getBodyType($car,logFilename).then(function (bodyType) {
+                cy.then(function () {
+                  questionnaire.bodyType = bodyType
+                })
+              })
 
               //"page-04"
               cy.get('@goingPageId').then(function (aliasValue) {

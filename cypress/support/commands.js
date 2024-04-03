@@ -237,9 +237,6 @@ Cypress.Commands.add('getBodyType', ($car,logFilename) =>{
         expect(response.status).to.eq(200) // true
         const bodyType = response.body.supportInformation.bodyType
         console.log(`supportInformation.bodyType: ${bodyType}.`)
-        // cy.then(function () {
-        //   questionnaire.bodyType = bodyType
-        // })
         cy.readFile(logFilename).then((text) => {
           const addRow = `vin: ${$car[0]} expected: ${$car[1].padStart(18, ' ')} real: ${bodyType.padStart(18, ' ')} desc: ${$car[3]} \n`
           text += addRow
@@ -357,7 +354,7 @@ Cypress.Commands.add(`GeneratePDFs`, function (pdf_templates) {
       (response) => {
       expect(response.status).to.eq(200) // true
       const vin = response.body.body.vehicleIdentification.vin;
-      console.log(`vin: ${vin}`)
+      console.log(`GeneratePDFs for vin: ${vin}`)
       pdf_templates.forEach(pdf_template => {
         cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
       })

@@ -118,40 +118,6 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
     _waitFor('@currentPage')
   }
 
-  function getBodyType1($car) {
-    cy.get('@authorization').then(function (token) {
-      cy.get('@questionnaireId').then(function (questionnaireId) {
-        const options = {
-          method: 'GET',
-          url: `${baseUrl_lp}questionnaire/${questionnaireId}`,
-          headers:  {
-            'Accept': '*/*',
-            'Accept-Encoding':'gzip, deflate, br',
-            'Content-Type': 'application/json',
-            token,
-            'timeout' : 50000
-          }
-        };
-        cy.request(options).then(
-          (response) => {
-          expect(response.status).to.eq(200) // true
-          const bodyType = response.body.supportInformation.bodyType
-          console.log(`supportInformation.bodyType: ${bodyType}.`)
-          cy.then(function () {
-            questionnaire.bodyType = bodyType
-          })
-          cy.readFile(logFilename).then((text) => {
-            const addRow = `vin: ${$car[0]} expected: ${$car[1].padStart(18, ' ')} real: ${bodyType.padStart(18, ' ')} desc: ${$car[3]} \n`
-            text += addRow
-            cy.writeFile(logFilename, text)
-          })
-        }) //request(options)
-      }) //get('@questionnaireId'
-    }) //get('@authorization'
-  }
-
-
-
   const $equipment_2_loading_doors = false
   const eMail = 'sivanchevski@soft2run.com'
 

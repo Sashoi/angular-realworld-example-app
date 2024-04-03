@@ -78,38 +78,6 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
     _waitFor('@currentPage')
   }
 
-  function getBodyType($car) {
-    cy.get('@authorization').then(function (token) {
-      cy.get('@questionnaireId').then(function (questionnaireId) {
-        const options = {
-          method: 'GET',
-          url: `${baseUrl_lp}questionnaire/${questionnaireId}`,
-          headers:  {
-            'Accept': '*/*',
-            'Accept-Encoding':'gzip, deflate, br',
-            'Content-Type': 'application/json',
-            token,
-            'timeout' : 50000
-          }
-        };
-        cy.request(options).then(
-          (response) => {
-          expect(response.status).to.eq(200) // true
-          const bodyType = response.body.supportInformation.bodyType
-          console.log(`supportInformation.bodyType: ${bodyType}.`)
-          cy.then(function () {
-            questionnaire.bodyType = bodyType
-          })
-          cy.readFile(logFilename).then((text) => {
-            const addRow = `vin: ${$car[0]} expected: ${$car[1].padStart(18, ' ')} real: ${bodyType.padStart(18, ' ')} desc: ${$car[3]} \n`
-            text += addRow
-            cy.writeFile(logFilename, text)
-          })
-        }) //request(options)
-      }) //get('@questionnaireId'
-    }) //get('@authorization'
-  }
-
   const file1 = [
     ["W1V44760313930767", "Van", "01.01.2017", "Mercedes Vito 09/2021"]
   ]
@@ -173,7 +141,11 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
           cy.get('#vehicle-mileage-input').clear().type('123456')
           //cy.selectSingleList('loss-cause',0) // already selected
           cy.selectSingleList('loss-circumstances-details',8)
-          getBodyType($car)
+          cy.getBodyType($car,logFilename).then(function (bodyType) {
+            cy.then(function () {
+              questionnaire.bodyType = bodyType
+            })
+          })
           cy.get('@bodyType').then(function (bodyType) {
             if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
               cy.wait(2000)

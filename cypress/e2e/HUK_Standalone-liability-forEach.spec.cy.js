@@ -75,39 +75,6 @@ describe('Start and complete huk standalone questionnaire - huk_liability_call_c
     _waitFor('@currentPage')
   }
 
-  function getBodyType($car) {
-    cy.get('@authorization').then(function (token) {
-      cy.get('@questionnaireId').then(function (questionnaireId) {
-        const options = {
-          method: 'GET',
-          url: `${baseUrl_lp}questionnaire/${questionnaireId}`,
-          headers:  {
-            'Accept': '*/*',
-            'Accept-Encoding':'gzip, deflate, br',
-            'Content-Type': 'application/json',
-            token,
-            'timeout' : 50000
-          }
-        };
-        cy.request(options).then(
-          (response) => {
-          expect(response.status).to.eq(200) // true
-          const bodyType = response.body.supportInformation.bodyType
-          console.log(`supportInformation.bodyType : ${bodyType}.`)
-          cy.then(function () {
-            questionnaire.bodyType = bodyType
-          })
-          cy.readFile(logFilename).then((text) => {
-            const addRow = `vin: ${$car[0]} expected: ${$car[1].padStart(18, ' ')} real: ${bodyType.padStart(18, ' ')} desc: ${$car[3]} \n`
-            text += addRow
-            cy.writeFile(logFilename, text)
-          })
-        }) //request(options)
-      }) //get('@questionnaireId'
-    }) //get('@authorization'
-  }
-
-
   const file1 = [
     ["WDB1704351F077666","Cabrio",              "01.01.2004","MER SLK Cabrio"]
   ]
@@ -177,7 +144,11 @@ describe('Start and complete huk standalone questionnaire - huk_liability_call_c
           cy.selectSingleList('odometer-reading-source-display',0)
           cy.selectDropDown('select_buildPeriod',1)
 
-          getBodyType($car)
+          cy.getBodyType($car,logFilename).then(function (bodyType) {
+            cy.then(function () {
+              questionnaire.bodyType = bodyType
+            })
+          })
 
           cy.get('@bodyType').then(function (bodyType) {
             if (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine'){
