@@ -5,7 +5,7 @@ import file from '../fixtures/vinsArray.json'
 
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
-const logFilename = 'cypress/fixtures/hukClickableCar.log'
+const logFilename = 'cypress/fixtures/wuestenrot.log'
 const pdfPath = 'cypress/fixtures/Pdf/'
 
 describe('Start and complete wuestenrot standalone questionnaire', () => {
@@ -79,7 +79,7 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
   }
 
   const file1 = [
-    ["W1V44760313930767", "Van", "01.01.2017", "Mercedes Vito 09/2021"]
+    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"]
   ]
   file1.forEach($car => {
     it(`wuestenrot-comprehensive-call-center for vin: ${$car[0]}`, () => {
@@ -90,7 +90,7 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
       cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
       cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
       cy.get('form').submit()
-      cy.wait('@token',{requestTimeout : $requestTimeout}).then(xhr => {
+      cy.wait('@token',{requestTimeout : $requestTimeout, log: false}).then(xhr => {
         expect(xhr.response.statusCode).to.equal(200)
         const access_token = xhr.response.body.access_token
         cy.then(function () {
@@ -118,7 +118,7 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
       cy.get('[class="btn btn-primary btn-submit"]').click()
       cy.wait(500)
 
-      cy.wait('@postStart').then(xhr => {
+      cy.wait('@postStart',{log: false}).then(xhr => {
         expect(xhr.response.statusCode).to.equal(200)
         console.log(`questionnaireId: ${xhr.response.body.questionnaireId}`)
         cy.then(function () {
@@ -169,7 +169,7 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-02'){  // Schadenbeschreibung
-          cy.wait('@clickableCar',{requestTimeout : $requestTimeout}).then(xhr => {
+          cy.wait('@clickableCar',{requestTimeout : $requestTimeout, log: false}).then(xhr => {
             expect(xhr.response.statusCode).to.equal(200)
             console.log(`Comming SVG with clickableCar`)
             const SVGbody = xhr.response.body;
@@ -191,6 +191,14 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
             cy.selectSingleList('vehicle-ready-to-drive',0)
             cy.selectSingleList('unrepaired-pre-damages',0)
             cy.selectSingleList('vehicle-damage-repaired',0)
+
+            cy.selectSVG('exhaust') // Welche Art von Beschädigung sehen Sie? - selected
+            cy.selectSVG(`right-taillight`)
+            cy.selectSingleList('right-taillight-equipment-led-rear-lights', 0)
+
+            cy.selectSVG(`left-sill`)
+            cy.selectMultipleList('left-sill-damage-type', 1)
+            cy.selectSingleList('left-sill-damage-size', 3)
             nextBtn()
           })  //wait('@clickableCar'
         }  // if
@@ -218,12 +226,17 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
           if (executePost) {
             //pageId: "summary-page"
             cy.get('button[type="submit"]').contains('Schadenanlage beenden').click()
-            cy.wait('@postPost').then(xhr => {
+            cy.wait('@postPost',{ log: false }).then(xhr => {
               cy.postPost(xhr)
             })
           }
         }
       })
-    })  //it
+    })  //it wuestenrot
+
+    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+      cy.GeneratePDFs(['wuestenrot_abschlussbericht'])
+    }) //it PDF from commands
+
   })  //forEach
 })

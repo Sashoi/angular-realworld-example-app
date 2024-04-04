@@ -90,8 +90,26 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
     _waitFor('@currentPage')
   }
 
+  function fulfilCompoundQuestion(question,instance,lastInstance) {
+    cy.get(`div#${question}`).find(`input#${question}-first-name__--__${instance}-input`).type(`first name ${instance + 1}`)
+    cy.get(`div#${question}`).find(`input#${question}-last-name__--__${instance}-input`).type(`last name ${instance + 1}`)
+    cy.get(`div#${question}`).find(`input#${question}-street-name__--__${instance}-input`).type(`street name ${instance + 1}`)
+    cy.get(`div#${question}`).find(`input#${question}-street-number__--__${instance}-input`).type(`${instance + 1}`)
+    cy.get(`div#${question}`).find(`input#${question}-zip-code__--__${instance}-input`).type(`1011${instance + 6}`)
+    cy.get(`div#${question}`).find(`input#${question}-city__--__${instance}-input`).type(`Sofia ${instance + 1}`)
+    cy.get(`div#${question}`).find(`input#${question}-phone-number__--__${instance}-input`).type(`08880${instance + 1}`)
+    cy.get(`div#${question}`).find(`input#${question}-email__--__${instance}-input`).type(`sivanchevski@soft2run.com`)
+    cy.get(`div#${question}`).find(`input#${question}-objects-description__--__${instance}-input`).type(`objects-description ${instance + 1}`)
+    if (!lastInstance) {
+      cy.get(`div#${question}`).find(`input#${question}-email__--__${instance}-input`).focus()
+    cy.get(`div#${question}`).find('button[type="button"]').click({ force: true })
+    }
+  }
+
   const file1 = [
-    ["VF7SA5FS0BW550414", "Hatch3", "01.01.2014", "CIT DS3 Hatch3"]
+    ["W1V44760313930767", "Van", "01.01.2017", "Mercedes Vito 09/2021"],
+    ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"],
+    ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
   ]
 
   file1.forEach($car => {
@@ -121,10 +139,10 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
       cy.request('POST',`${baseUrl_lp}/member/authenticate`,userCredentials)
           .its('body').then(body => {
             const token = body.accessToken
+            const authorization = `Bearer ${ token }`;
             cy.then(function () {
-              questionnaire.authorization = `Bearer ${token}`
+              questionnaire.authorization = authorization
             })
-
 
           const b2bBody = {
               "qas": [
@@ -272,7 +290,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
               }
           }
 
-          const authorization = `Bearer ${ token }`;
+
           const options = {
             method: 'POST',
             url: `${baseUrl_lp}b2b/integration/toni-digital/hdiLiabilityCallCenter`,
@@ -319,9 +337,9 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
                       cy.wait(2000)
                       cy.selectSingleList('equipment-slide-door',1)
                       cy.selectSingleList('equipment-2-loading-doors',Number($equipment_2_loading_doors))
-                      cy.selectSingleList('equipment-length',0)
-                      cy.selectSingleList('equipment-height',0)
-                      cy.selectSingleList('equipment-vehicle-rear-glassed',0)
+                      cy.selectSingleList('equipment-length',2)
+                      cy.selectSingleList('equipment-height',2)
+                      cy.selectSingleList('equipment-vehicle-rear-glassed',1)
                       cy.selectSingleList('vehicle-customized-interior',0)
                     }
                     if (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine'){
@@ -352,8 +370,10 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
 
                   cy.selectMultipleList('damaged-objects',3)
                   cy.selectSingleList('accident-opponent-damaged-objects-owner-known',0)
-                  cy.get('div#accident-opponent-damaged-objects-owner').find('button[type="button"]').click({ force: true })
-
+                  const compoundQuestion = 'accident-opponent-damaged-objects-owner'
+                  fulfilCompoundQuestion(compoundQuestion,0,false)
+                  fulfilCompoundQuestion(compoundQuestion,1,false)
+                  fulfilCompoundQuestion(compoundQuestion,2,true)
                   nextBtn()
                 }
               })
@@ -706,6 +726,10 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
               })
         })
       })
-    })
-  })
+    }) //it hdiLiabilityCallCenter
+
+    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+      cy.GeneratePDFs(['toni_hdi_tele_check','toni_tele_check','toni_tele_expert'])
+    }) //it PDF from commands
+  }) //forEach
 })

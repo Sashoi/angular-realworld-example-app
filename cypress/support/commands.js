@@ -344,21 +344,24 @@ Cypress.Commands.add(`GeneratePDFs`, function (pdf_templates) {
     }
 
     const damageNotificationId = Cypress.env('notificationId')
-
-    const options = {
-      method: 'GET',
-      url: `${baseUrl_lp}damage/notification/${damageNotificationId}`,
-      headers: headers_1
-    }
-    cy.request(options).then(
-      (response) => {
-      expect(response.status).to.eq(200) // true
-      const vin = response.body.body.vehicleIdentification.vin;
-      console.log(`GeneratePDFs for vin: ${vin}`)
-      pdf_templates.forEach(pdf_template => {
-        cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
+    if (damageNotificationId != null && damageNotificationId.length > 0){
+      const options = {
+        method: 'GET',
+        url: `${baseUrl_lp}damage/notification/${damageNotificationId}`,
+        headers: headers_1
+      }
+      cy.request(options).then(
+        (response) => {
+        expect(response.status).to.eq(200) // true
+        const vin = response.body.body.vehicleIdentification.vin;
+        console.log(`GeneratePDFs for vin: ${vin}`)
+        pdf_templates.forEach(pdf_template => {
+          cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
+        })
       })
-    })
+    } else {
+      assert.isOk('OK', 'damageNotificationId not exist.')
+    }
   })
 })
 

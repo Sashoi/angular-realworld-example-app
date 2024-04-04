@@ -84,11 +84,13 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
   function currentPage() {
     _waitFor('@currentPage')
   }
-  
+
   const file1 = [
-    ["6FPGXXMJ2GEL59891","PickUpSingleCabine",  "01.01.2012","Ford Ranger single cabine, Pick-up"]
+    ["W1V44760313930767", "Van", "01.01.2017", "Mercedes Vito 09/2021"],
+  ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"],
+  ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
   ]
-  file.forEach($car => {
+  file1.forEach($car => {
     it(`zurich standalone questionnaire - zurich_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
@@ -383,11 +385,16 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
           if (executePost) {
             cy.get('button[type="submit"]').contains('Schadenaufnahme beenden').click()
             cy.wait('@postPost').then(xhr => {
-              //cy.postPost(xhr)
+              cy.postPost(xhr)
             })
           }
         }
       })
     }) //it
+
+    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+      cy.GeneratePDFs(['zurich_default','zurich_pg1_schadenbericht','zurich_pg1_schadenprotokoll'])
+    }) //it PDF from commands
+
   })  //forEach
 }) //describe
