@@ -29,7 +29,6 @@ describe('Start and complete vlv standalone questionnaire', () => {
       }
     })
     cy.intercept('POST', `/member/oauth/token`).as('token')
-    //cy.intercept('POST', `/b2b/integration/zurich/zurichStandalone`).as('zurichStandalone')
     cy.wrap(goingPage).its('pageId').as('goingPageId')
     cy.wrap(goingPage).its('elements').as('goingPageElements')
     cy.wrap(questionnaire).its('Id').as('questionnaireId')
@@ -41,7 +40,7 @@ describe('Start and complete vlv standalone questionnaire', () => {
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
   const executePost = true
-  const interceptZurichStandalone = true
+
 
   function _waitFor(waitFor) {
     if (waitFor == '@nextPage'){
@@ -95,7 +94,7 @@ describe('Start and complete vlv standalone questionnaire', () => {
       cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
       cy.get('form').submit()
       cy.wait(500)
-      cy.wait('@token',{requestTimeout : $requestTimeout}).then(xhr => {
+      cy.wait('@token',{requestTimeout : $requestTimeout, log : false}).then(xhr => {
         expect(xhr.response.statusCode).to.equal(200)
         const access_token = xhr.response.body.access_token
         cy.then(function () {
@@ -128,7 +127,7 @@ describe('Start and complete vlv standalone questionnaire', () => {
       cy.get('[class="btn btn-primary btn-submit"]').click()
       cy.wait(500)
 
-      cy.wait('@postStart').then(xhr => {
+      cy.wait('@postStart', {log : false}).then(xhr => {
         expect(xhr.response.statusCode).to.equal(200)
         const questionnaireId = xhr.response.body.questionnaireId;
         cy.then(function () {
@@ -207,6 +206,16 @@ describe('Start and complete vlv standalone questionnaire', () => {
             cy.selectSVG('hood')
             cy.selectMultipleList('hood-damage-type',1)
             cy.selectSingleList('hood-damage-size',2)
+
+            cy.selectSVG('exhaust') // Welche Art von Beschädigung sehen Sie? - selected
+
+            cy.selectSVG(`right-taillight`)
+            cy.selectSingleList('right-taillight-equipment-led-rear-lights', 0)
+
+            cy.selectSVG(`left-sill`)
+            cy.selectMultipleList('left-sill-damage-type', 1)
+            cy.selectSingleList('left-sill-damage-size', 3)
+
             cy.get('@bodyType').then(function (bodyType) {
               if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
                 cy.selectSingleList('loading-floor-area-bend',0)
@@ -237,8 +246,16 @@ describe('Start and complete vlv standalone questionnaire', () => {
           if (loss_cause != 'Glasbruch'){
             cy.uploadImage('damage-photo-upload-overview-hood',PathTo,'hood.jpg')
             cy.uploadImage('damage-photo-upload-detail-hood',PathTo,'hood-d.jpg')
+            cy.uploadImage('damage-photo-upload-overview-left-sill',PathTo,'left-sill-o.jpg')
+            cy.uploadImage('damage-photo-upload-detail-left-sill',PathTo,'left-sill-d.jpg')
+            cy.uploadImage('damage-photo-upload-overview-exhaust',PathTo,'broken exhaust_1.jpg')
+            cy.uploadImage('damage-photo-upload-detail-exhaust',PathTo,'broken exhaust_2.jpg')
+            cy.uploadImage('damage-photo-upload-overview-right-taillight',PathTo,'right-taillight-o.jpg')
+            cy.uploadImage('damage-photo-upload-detail-right-taillight',PathTo,'right-taillight-d.jpg')
           }
-          cy.uploadImage('damage-photo-upload-other',PathTo,'roof.jpg')
+          cy.uploadImage('damage-photo-upload-other',PathTo,'incident-location-photo-upload-1.jpg')
+          cy.uploadImage('damage-photo-upload-other',PathTo,'incident-location-photo-upload-2.jpg')
+          cy.uploadImage('damage-photo-upload-other',PathTo,'incident-location-photo-upload-3.jpg')
           nextBtn()
         }
       })
@@ -251,12 +268,16 @@ describe('Start and complete vlv standalone questionnaire', () => {
           })
           if (executePost) {
             cy.get('button[type="submit"]').contains('Schadenanlage beenden').click()
-            cy.wait('@postPost').then(xhr => {
+            cy.wait('@postPost', { log : false }).then(xhr => {
               cy.postPost(xhr)
             })
           }
         }
       })
-    })
-  })
+    })  //it vlv
+
+    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+      cy.GeneratePDFs(['vlv_abschlussbericht'])
+    }) //it PDF from commands
+  }) //forEach
 })

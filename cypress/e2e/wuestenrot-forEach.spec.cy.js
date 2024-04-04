@@ -17,10 +17,11 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
   beforeEach('Setting up integrations and common variables', () => {
     //cy.loginToHukStandalone()
     console.clear()
-    cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
+    //cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
     cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
     cy.intercept('GET', `/questionnaire/*//picture/clickableCar*`).as('clickableCar')
+    cy.intercept('POST', `/b2b/integration/wuestenrot/wuestenrot-comprehensive-call-center?identifyVehicleAsync=false`).as('postStart')
     cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
       if (req.url.includes('navigateTo')) {
         req.alias = "nextPage"
@@ -34,8 +35,6 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
     cy.wrap(questionnaire).its('Id').as('questionnaireId')
     cy.wrap(questionnaire).its('authorization').as('authorization')
     cy.wrap(questionnaire).its('bodyType').as('bodyType')
-
-    cy.intercept('POST', `/b2b/integration/wuestenrot/wuestenrot-comprehensive-call-center?identifyVehicleAsync=false`).as('postStart')
   })
 
   const $dev = Cypress.env("dev");
