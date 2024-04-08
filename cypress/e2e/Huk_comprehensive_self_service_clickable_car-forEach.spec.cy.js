@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 import { getRandomInt } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
+import b2bBody from '../fixtures/b2bBody.json'
 
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
@@ -126,7 +127,13 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
         cy.then(function () {
           questionnaire.authorization = `Bearer ${token}`
         })
-        const b2bBody =  {
+
+        b2bBody.qas.find(q => {return q.questionId === "client-insurance-claim-number"}).answer = claimNumber
+        b2bBody.qas.find(q => {return q.questionId === "vehicle-vin"}).answer = vin
+        b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licenseplate
+        b2bBody.qas.find(q => {return q.questionId === "part-selection-type"}).answer = 'clickable-car'
+
+        const b2bBody1 =  {
           "qas": [
               {
                   "questionId": "role-type",
@@ -678,7 +685,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
       })
     }) //it Huk
 
-    it(`Generate PDFs for ${$car[0]}`, function () {
+    it.skip(`Generate PDFs for ${$car[0]}`, function () {
 
       const userCredentials =  {
         "password": Cypress.env("passwordHukS"),
@@ -725,5 +732,10 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
         })
       })
     }) //it PDF
+
+    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+      cy.GeneratePDFs(['dekra_schadenbilder','dekra_abschlussbericht'])
+    }) //it PDF from commands
+
  }) //forEach
 })  //describe

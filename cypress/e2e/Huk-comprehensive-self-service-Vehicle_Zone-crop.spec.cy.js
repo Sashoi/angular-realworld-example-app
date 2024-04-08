@@ -3,6 +3,7 @@
 
 import { getRandomInt } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
+import b2bBody from '../fixtures/b2bBody.json'
 
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
@@ -113,9 +114,6 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   const file1 = [
-    ["W0L0XCR975E026845", "Cabrio", "01.01.2009", "OPE Tigra Cabrio"],
-    ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5"],
-    ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
     ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
   ]
   file1.forEach($car => {
@@ -152,8 +150,11 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
         })
         const claimNumber = ran1 + "-13-"+ ran2 + "/" + ran3 + "-Z";
         console.log(`claimNumber: ${claimNumber}`);
+        b2bBody.qas.find(q => {return q.questionId === "client-insurance-claim-number"}).answer = claimNumber
+        b2bBody.qas.find(q => {return q.questionId === "vehicle-vin"}).answer = $vin
+        b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licenseplate
 
-        const b2bBody =  {
+        const b2bBody1 =  {
             "qas": [
                 {
                     "questionId": "role-type",

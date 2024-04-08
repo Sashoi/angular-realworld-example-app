@@ -14,7 +14,7 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
     cy.writeFile(logFilename, '')
   })
 
-  beforeEach('Setting up integrations and common variables', () => {
+  beforeEach('Setting up intercepts and common variables', () => {
     //cy.loginToHukStandalone()
     console.clear()
     //cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
