@@ -100,21 +100,12 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
       const vin = $car[0]
       console.log(`vin : ${vin}`)
 
-      const userCredentials = {
-        "password": Cypress.env("passwordHukS"),
-        "remoteUser": "",
-        "sessionLanguage": "en",
-        "userName": Cypress.env("usernameHukS")
-      }
-
       let claim1 = makeid(5)
       let claim2 = getRandomInt(10000, 99999)
 
-
-      cy.request('POST', `https://${$dev}.spearhead-ag.ch/member/authenticate`, userCredentials)
-        .its('body').then(body => {
-          const token = body.accessToken
-          const authorization = `Bearer ${ token }`;
+      cy.authenticate().then(function (authorization) {
+          //const token = body.accessToken
+          //const authorization = `Bearer ${ token }`;
           cy.then(function () {
             questionnaire.authorization = authorization
           })
@@ -136,7 +127,7 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
 
           const options = {
             method: 'POST',
-            url: `https://${$dev}.spearhead-ag.ch:443/b2b/integration/wgv/callCenter`,
+            url: `${baseUrl_lp}b2b/integration/wgv/callCenter`,
             body: b2bBody,
             headers:header
           };

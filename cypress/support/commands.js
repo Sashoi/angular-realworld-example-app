@@ -36,8 +36,10 @@
 //   }
 // }
 
+import header from '../fixtures/header.json'
 
-const c_requestTimeout = 60000;
+
+const c_requestTimeout = 60000; 
 
 Cypress.Commands.add('elementExists', (selector) =>{
   cy.get('body').then(($body) => {
@@ -117,18 +119,14 @@ Cypress.Commands.add('uploadImage', (selectorId,toPath,fileName) =>{
 Cypress.Commands.add('getBodyType', ($car,logFilename) =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
-  cy.get('@authorization').then(function (token) {
+  cy.get('@authorization').then(function (authorization) {
     cy.get('@questionnaireId').then(function (questionnaireId) {
+      Cypress._.merge(header, {'authorization':authorization});
+      Cypress._.merge(header, {'timeout':c_requestTimeout});
       const options = {
         method: 'GET',
         url: `${baseUrl_lp}questionnaire/${questionnaireId}`,
-        headers:  {
-          'Accept': '*/*',
-          'Accept-Encoding':'gzip, deflate, br',
-          'Content-Type': 'application/json',
-          token,
-          'timeout' : c_requestTimeout
-        }
+        headers: header
       };
       cy.request(options).then(
         (response) => {
@@ -155,18 +153,14 @@ Cypress.Commands.add('getBodyType', ($car,logFilename) =>{
 Cypress.Commands.add('getQuestionnaireInfo', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
-  cy.get('@authorization').then(function (token) {
+  cy.get('@authorization').then(function (authorization) {
     cy.get('@questionnaireId').then(function (questionnaireId) {
+      Cypress._.merge(header, {'authorization':authorization});
+      Cypress._.merge(header, {'timeout':c_requestTimeout});
       const options = {
         method: 'GET',
         url: `${baseUrl_lp}questionnaire/${questionnaireId}`,
-        headers:  {
-          'Accept': '*/*',
-          'Accept-Encoding':'gzip, deflate, br',
-          'Content-Type': 'application/json',
-          token,
-          'timeout' : c_requestTimeout
-        }
+        headers: header
       };
       cy.request(options).then(
         (response) => {
@@ -245,19 +239,13 @@ Cypress.Commands.add('postPost', (xhr, hasDialog = true) =>{
 Cypress.Commands.add('generatePdf', function (baseUrl_lp, pdfPath, pdf_template) {
   cy.get('@authorization').then(function (authorization) {
     const notificationId = Cypress.env('notificationId')
+    Cypress._.merge(header, {'authorization':authorization})
+
     const options = {
       method: 'GET',
       encoding : 'base64',
       url: `${baseUrl_lp}damage/notification/${notificationId}/pdf/${pdf_template}`,
-
-      //responseTimeout: 60000,
-      //'Connection' : 'keep-alive',
-      headers: {
-        'Accept': '*/*',
-        'Accept-Encoding':'gzip, deflate, br',
-        'Content-Type': 'application/json',
-        authorization
-      }
+      headers: header
     }
     cy.request(options).then(
       (response) => {
@@ -274,24 +262,15 @@ Cypress.Commands.add(`GeneratePDFs`, function (pdf_templates) {
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
   const pdfPath = 'cypress/fixtures/Pdf/'
 
-    cy.authenticate().then(function (authorization) {
+  cy.authenticate().then(function (authorization) {
 
-    //const token = body.accessToken
-    //const authorization = `Bearer ${token}`;
-
-    const headers_1 = {
-      'Accept': '*/*',
-      'Accept-Encoding':'gzip, deflate, br',
-      'Content-Type': 'application/json',
-      authorization,
-    }
-
+    Cypress._.merge(header, {'authorization':authorization});
     const damageNotificationId = Cypress.env('notificationId')
     if (damageNotificationId != null && damageNotificationId.length > 0){
       const options = {
         method: 'GET',
         url: `${baseUrl_lp}damage/notification/${damageNotificationId}`,
-        headers: headers_1
+        headers: header
       }
       cy.request(options).then(
         (response) => {
@@ -331,7 +310,13 @@ Cypress.Commands.add('authenticate', function () {
     "sessionLanguage": "en",
     "userName": Cypress.env("usernameHukS")
   }
-  cy.request('POST',`${baseUrl_lp}member/authenticate`,userCredentials)
+  const options = {
+    method: 'POST',
+    url: `${baseUrl_lp}member/authenticate`,
+    body: userCredentials,
+    log : false
+  }
+  cy.request(options)
     .its('body').then(body => {
       const authorization = `Bearer ${ body.accessToken }`;
       cy.wrap(authorization).then((authorization) => {

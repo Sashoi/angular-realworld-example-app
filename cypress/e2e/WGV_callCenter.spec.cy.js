@@ -97,9 +97,6 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
 
       cy.authenticate().then(function (authorization) {
 
-          //const token = body.accessToken
-          //const authorization = `Bearer ${ token }`;
-
           cy.then(function () {
             questionnaire.authorization = authorization
           })
