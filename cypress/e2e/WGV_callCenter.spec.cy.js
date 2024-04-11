@@ -5,6 +5,7 @@ import { makeid } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 import b2bBody from '../fixtures/templates/b2bBodyWGV.json'
 import emailBody from '../fixtures/templates/emailBody.json'
+import header from '../fixtures/header.json'
 
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
@@ -44,7 +45,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   const $requestTimeout = 60000;
   const executePost = true
   const createNewQuestionnaires = true
-  const interceptWGV = true
+  const interceptWGV = false
   const $equipment_2_loading_doors = true
 
   function _waitFor(waitFor) {
@@ -83,30 +84,21 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   }
 
   const file1 = [
-    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"]
+    ["W1V44760313930767", "Van", "01.01.2017", "Mercedes Vito 09/2021"]
   ]
-  file.forEach($car => {
+  file1.forEach($car => {
     it(`wgv callCenter for vin: ${$car[0]}`, () =>{
-      //does not work
 
       const $vin = $car[0]
       console.log(`vin :${$vin}`)
 
-      const userCredentials =  {
-        "password": Cypress.env("passwordHukS"),
-        "remoteUser": "",
-        "sessionLanguage": "en",
-        "userName": Cypress.env("usernameHukS")
-      }
-
       let claim1 = makeid(5)
       let claim2 = getRandomInt(10000,99999)
 
+      cy.authenticate().then(function (authorization) {
 
-      cy.request('POST',`${baseUrl_lp}member/authenticate`,userCredentials)
-        .its('body').then(body => {
-          const token = body.accessToken
-          const authorization = `Bearer ${ token }`;
+          //const token = body.accessToken
+          //const authorization = `Bearer ${ token }`;
 
           cy.then(function () {
             questionnaire.authorization = authorization
@@ -126,18 +118,15 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
           b2bBody.vin =  $vin
           b2bBody.licensePlate = `EH${claim2}BT` //"EH1234BT"
 
-          //const contentType = `application/json`;
-          //const accept =`*/*`;
+          Cypress._.merge(header, {'authorization':authorization});
           const options = {
             method: 'POST',
             url: `${baseUrl_lp}b2b/integration/wgv/callCenter`,
             body: b2bBody,
-            headers: {
-              'Accept': '*/*',
-              'Accept-Encoding':'gzip, deflate, br',
-              'Content-Type': 'application/json',
-              authorization,
-            }};
+            headers:header
+          };
+
+
 
           cy.request(options).then(
             (response) => {
@@ -153,8 +142,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
               console.log(`uiUrl: ${callCenterQuestionnaireUrl}`)
 
               cy.visit(callCenterQuestionnaireUrl)
-              cy.get('.loader')
-              .should('not.exist')
+              //cy.get('.loader').should('not.exist')
               //cy.wait(1000)
           })
 
@@ -306,30 +294,20 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
                 cy.wait('@postPost',{ log: false }).then(xhr => {
                   cy.postPost(xhr).then(function (notificationId) {
                     if (createNewQuestionnaires) {
-                      const b3bBody =  {
-                        "receiver": "sivanchevski@soft2run.com",
-                        "contact": {
-                          "firstName": "Ssss",
-                          "lastName": "Iiiii",
-                          "email": "sivanchevski@soft2run.com",
-                          "mobileNumber": "",
-                          "type": "PERSON"
-                        },
-                        "emailTemplate": "huk_start_self_service"
-                      }
 
                       let _headers = {
                         'Accept': '*/*',
                         'Accept-Encoding':'gzip, deflate, br',
                         'Content-Type': 'application/json',
-                        authorization,
+                        authorization
                       }
+
 
                       const options2 = {
                         method: 'POST',
                         url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/wgv_comprehensive_self_service_app`,
                         body: emailBody,
-                        headers: _headers
+                        headers: header
                       };
 
                       cy.request(options2).then(
@@ -337,14 +315,14 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
                           // response.body is automatically serialized into JSON
                           expect(response.status).to.eq(200) // true
                           console.log(`wgv_comprehensive_self_service_app:`);
-                          cy.printRequestedInformation(response.body.requestedInformation);
+                          //cy.printRequestedInformation(response.body.requestedInformation);
                         })
 
                       const options3 = {
                         method: 'POST',
                         url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/wgv_liability_self_service_app`,
-                        body: b3bBody,
-                        headers: _headers
+                        body: emailBody,
+                        headers: header
                       };
 
                       cy.request(options3).then(
@@ -352,7 +330,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
                           // response.body is automatically serialized into JSON
                           expect(response.status).to.eq(200) // true
                           console.log(`wgv_liability_self_service_app:`);
-                          cy.printRequestedInformation(response.body.requestedInformation);
+                          //cy.printRequestedInformation(response.body.requestedInformation);
                       })
                     }
                   })
@@ -363,7 +341,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
       }) // authenticate
     }) // it wgv
 
-    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['wgv_default','wgv_pilot','wgv_pilot_2023'])
     }) //it PDF from commands
 

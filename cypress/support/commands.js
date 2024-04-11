@@ -36,111 +36,8 @@
 //   }
 // }
 
-// Cypress.Commands.add('loginToApplication',() =>{
-
-//   const userCredentials =  {
-//     "user": {
-//         "email": Cypress.env("username"),
-//         "password": Cypress.env("password")
-//     }
-//   }
-
-//   cy.request('POST',Cypress.env("apiUrl") + '/api/users/login',userCredentials)
-//     .its('body').then(body => {
-//       const token = body.user.token
-//       cy.wrap(token).as('token')
-
-//       cy.visit('/',{
-//         onBeforeLoad(win){
-//           win.localStorage.setItem('jwtToken', token)
-//         }
-//       })
-//   })
-//   // cy.visit('/login')
-//   // cy.get('[placeholder="Email"]').type('artem.bondar16@gmail.com')
-//   // cy.get('[placeholder="Password"]').type('CypressTest1')
-//   // cy.get('form').submit()
-// })
-
-// Cypress.Commands.add('loginToHukStandalone',() =>{
-
-//   const userCredentials =  {
-//     "password": Cypress.env("passwordHukS"),
-//     "remoteUser": "",
-//     "sessionLanguage": "en",
-//     "userName": Cypress.env("usernameHukS")
-//   }
-
-
-//   cy.request('POST','https://dev02.spearhead-ag.ch/member/authenticate',userCredentials)
-//     .its('body').then(body => {
-//       const token = body.accessToken
-//       cy.wrap(token).as('token')
-
-//       cy.visit('https://dev02.spearhead-ag.ch/ui/questionnaire/zurich/#/standalone/home?theme=huk',{
-//         onBeforeLoad(win){
-//           win.localStorage.setItem('jwtToken', token)
-//           win.sessionStorage.setItem("access_token", "value")
-//         }
-//       })
-//   })
-//   // cy.visit('/login')
-//   // cy.get('[placeholder="Email"]').type('artem.bondar16@gmail.com')
-//   // cy.get('[placeholder="Password"]').type('CypressTest1')
-//   // cy.get('form').submit()
-// })
-
-// Cypress.Commands.add('toniHdiPhotosUpload', ($dev,pageId,fileToUpload,timeoutFileUpload) =>{
-//     cy.intercept('POST', `https://${$dev}.spearhead-ag.ch/questionnaire/*/page/page-${pageId}?locale=de`).as(`waitPage`)
-//     cy.fixture(fileToUpload, null).as('MyfileToUpload')
-//     cy.get('input[type=file]').each(($el, index, $list) => {
-//       console.log(`index:` + index)
-//       console.log(`$el:` + cy.wrap($el))
-//       console.log(`$list[${index}]:` + $list[index])
-//       console.log(`$list.length:` + $list.length)
-//       console.log(`$list:` + $list)
-//       // $el is a wrapped jQuery element
-//       cy.wrap($el).selectFile('@MyfileToUpload',{ force: true , timeout: timeoutFileUpload})
-//       const w = 3000*$list.length;
-//       console.log(`wait:` + w)
-//       cy.wait(w)
-//   })
-//   cy.wait(`@waitPage`).then(xhr => {
-//     //console.log(xhr)
-//     expect(xhr.response.statusCode).to.equal(200)
-//     const pageId1 = xhr.response.body.pageId;
-//     console.log(`pageId:${pageId1}`);
-//     expect(pageId1).to.equal(`page-${pageId}`)
-//   })
-//   //cy.get('div[class="dz-preview dz-image-preview row dz-complete"]').should('exist');
-//   cy.get('div[class^="error-container d-block"]').should('not.exist');
-//   cy.wait(1000)
-
-// })
-
-// Cypress.Commands.add('toniHdiPhotosUpload2', ($dev,pageId,fileToUpload,timeoutFileUpload,len) =>{
-//   cy.intercept('POST', `https://${$dev}.spearhead-ag.ch/questionnaire/*/page/page-${pageId}?locale=de`).as(`waitPage`)
-//   cy.fixture(fileToUpload, null).as('MyfileToUpload')
-//   cy.get('input[type=file]').each((item, index, list) => {
-//     // Returns the elements from the cy.get command
-//     //expect(list).to.have.length(len);
-//     cy.wrap(item).selectFile('@MyfileToUpload',{ force: true , timeout: timeoutFileUpload})
-//   });
-//   cy.wait(`@waitPage`).then(xhr => {
-//     //console.log(xhr)
-//     expect(xhr.response.statusCode).to.equal(200)
-//     const pageId1 = xhr.response.body.pageId;
-//     console.log(`pageId:${pageId1}`);
-//     expect(pageId1).to.equal(`page-${pageId}`)
-//   })
-//   //cy.get('div[class="dz-preview dz-image-preview row dz-complete"]').should('exist');
-//   cy.get('div[class^="error-container d-block"]').should('not.exist');
-//   cy.wait(1000)
-// })
 
 const c_requestTimeout = 60000;
-
-
 
 Cypress.Commands.add('elementExists', (selector) =>{
   cy.get('body').then(($body) => {
@@ -348,22 +245,17 @@ Cypress.Commands.add('postPost', (xhr, hasDialog = true) =>{
 Cypress.Commands.add('generatePdf', function (baseUrl_lp, pdfPath, pdf_template) {
   cy.get('@authorization').then(function (authorization) {
     const notificationId = Cypress.env('notificationId')
-    // console.log(`baseUrl_lp: ${baseUrl_lp}`)
-    // console.log(`pdfPath: ${pdfPath}`)
-    // console.log(`pdf_template: ${pdf_template}`)
-    // console.log(`authorization: ${authorization}`)
-    // console.log(`notificationId: ${notificationId}`)
     const options = {
       method: 'GET',
       encoding : 'base64',
       url: `${baseUrl_lp}damage/notification/${notificationId}/pdf/${pdf_template}`,
 
       //responseTimeout: 60000,
+      //'Connection' : 'keep-alive',
       headers: {
         'Accept': '*/*',
         'Accept-Encoding':'gzip, deflate, br',
         'Content-Type': 'application/json',
-        'Connection' : 'keep-alive',
         authorization
       }
     }
@@ -382,18 +274,10 @@ Cypress.Commands.add(`GeneratePDFs`, function (pdf_templates) {
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
   const pdfPath = 'cypress/fixtures/Pdf/'
 
-  const userCredentials =  {
-    "password": Cypress.env("passwordHukS"),
-    "remoteUser": "",
-    "sessionLanguage": "en",
-    "userName": Cypress.env("usernameHukS")
-  }
+    cy.authenticate().then(function (authorization) {
 
-  cy.request('POST',`https://${$dev}.spearhead-ag.ch/member/authenticate`,userCredentials)
-  .its('body').then(body => {
-
-    const token = body.accessToken
-    const authorization = `Bearer ${token}`;
+    //const token = body.accessToken
+    //const authorization = `Bearer ${token}`;
 
     const headers_1 = {
       'Accept': '*/*',
@@ -437,6 +321,24 @@ Cypress.Commands.add('printRequestedInformation', function (requestedInformation
 
 })
 
+
+Cypress.Commands.add('authenticate', function () {
+  const $dev = Cypress.env("dev");
+  const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
+  const userCredentials =  {
+    "password": Cypress.env("passwordHukS"),
+    "remoteUser": "",
+    "sessionLanguage": "en",
+    "userName": Cypress.env("usernameHukS")
+  }
+  cy.request('POST',`${baseUrl_lp}member/authenticate`,userCredentials)
+    .its('body').then(body => {
+      const authorization = `Bearer ${ body.accessToken }`;
+      cy.wrap(authorization).then((authorization) => {
+        return authorization
+      })
+    })
+})
 
 
 

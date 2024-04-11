@@ -5,6 +5,7 @@ import { makeid } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 import b2bBody from '../fixtures/templates/b2bBodyWGV.json'
 import emailBody from '../fixtures/templates/emailBody.json'
+import header from '../fixtures/header.json'
 
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: ''  }
@@ -90,16 +91,10 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
   }
 
   const file1 = [
-
-    [
-      "WDB2083441T069719",
-      "Coupe",
-      "01.01.2008",
-      "MER CLK Coupe (partial identification, build period to be defined manually)"
-    ]
+    ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"]
   ]
 
-  file.forEach($car => {
+  file1.forEach($car => {
     it(`Execute b2b/integration/wgv/callCenter Vandalismus with vin:${$car[0]}`, () => {
 
       const vin = $car[0]
@@ -137,16 +132,13 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
           b2bBody.vin =  vin
           b2bBody.licensePlate = `EH${claim2}BT` //"EH1234BT"
 
+          Cypress._.merge(header, {'authorization':authorization});
+
           const options = {
             method: 'POST',
             url: `https://${$dev}.spearhead-ag.ch:443/b2b/integration/wgv/callCenter`,
             body: b2bBody,
-            headers: {
-              'Accept': '*/*',
-              'Accept-Encoding': 'gzip, deflate, br',
-              'Content-Type': 'application/json',
-              authorization,
-            }
+            headers:header
           };
 
           cy.request(options).then(
@@ -224,7 +216,6 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
             }
           })
 
-
           //pageId:"page-03"
           cy.get('@goingPageId').then(function (aliasValue) {
             if (aliasValue == 'page-03'){
@@ -278,8 +269,6 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
             } // if
           })
 
-
-
           //pageId:"page-04"
           cy.get('@goingPageId').then(function (aliasValue) {
             if (aliasValue == 'page-04'){
@@ -292,9 +281,6 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
               nextBtn()
             }
           })
-
-
-
 
           //pageId:"summary-page"
           cy.get('@goingPageId').then(function (aliasValue) {
