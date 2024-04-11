@@ -1,0 +1,108 @@
+{
+  "qas": [
+    {
+      "questionId": "role-type",
+      "answer": ["client"]
+    },
+    {
+      "questionId": "accident-date",
+      "answer": ["2020-01-01"]
+    },
+    {
+      "questionId": "loss-cause",
+      "answer": ["animal"]
+    },
+    {
+      "questionId": "loss-circumstances",
+      "answer": ["rear-end-collision"]
+    },
+    {
+      "questionId": "client-insurance-claim-number",
+      "answer": ["22-31-124/240318-A"]
+    },
+    {
+      "questionId": "animal-species",
+      "answer": ["fox"]
+    },
+    {
+      "questionId": "huk-coburg-triage-category",
+      "answer": ["total-loss"]
+    },
+    {
+      "questionId": "client-insurance-policy-number",
+      "answer": ["123456789X"]
+    },
+    {
+      "questionId": "insurance-policy-type",
+      "answer": [""]
+    },
+    {
+      "questionId": "insurance-name",
+      "answer": ["huk-coburg"]
+    },
+    {
+      "questionId": "client-first-name",
+      "answer": ["Pascal"]
+    },
+    {
+      "questionId": "client-last-name",
+      "answer": ["Stucki"]
+    },
+    {
+      "questionId": "client-street-name",
+      "answer": ["Blumenstr"]
+    },
+    {
+      "questionId": "client-street-number",
+      "answer": ["13a"]
+    },
+    {
+      "questionId": "client-city",
+      "answer": ["Coburg"]
+    },
+    {
+      "questionId": "client-zip-code",
+      "answer": ["96450"]
+    },
+    {
+      "questionId": "client-country",
+      "answer": ["DE"]
+    },
+    {
+      "questionId": "vehicle-hsn-tsn1",
+      "answer": ["0603ABM"]
+    },
+    {
+      "questionId": "vehicle-first-registration-date",
+      "answer": ["2019-10-01"]
+    },
+    {
+      "questionId": "client-vehicle-license-plate",
+      "answer": ["{{client-vehicle-license-plate}}"]
+    },
+    {
+      "questionId": "vehicle-financed",
+      "answer": ["yes"]
+    },
+    {
+      "questionId": "vehicle-leased",
+      "answer": ["no"]
+    },
+    {
+      "questionId": "vehicle-owner-entitled-for-pre-tax-deduction",
+      "answer": ["no"]
+    },
+    {
+      "questionId": "client-email",
+      "answer": ["sivanchevski@soft2run.com"]
+    },
+    {
+      "questionId": "client-phone-number",
+      "answer": ["123654789"]
+    }
+  ],
+  "supportInformation": {
+    "vin": "{{vin}}"
+  },
+  "readOnlyQuestions": null
+}

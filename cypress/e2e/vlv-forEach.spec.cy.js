@@ -6,6 +6,7 @@ import file from '../fixtures/vinsArray.json'
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: ''  }
 const logFilename = 'cypress/fixtures/vlvStandalone.log'
+const PathTo ='cypress/fixtures/'
 
 describe('Start and complete vlv standalone questionnaire', () => {
 
@@ -232,9 +233,6 @@ describe('Start and complete vlv standalone questionnaire', () => {
           nextBtn()
         }
       })
-
-      const PathTo ='D://Projects/Cypress/bondar-artem/angular-realworld-example-app/cypress/fixtures/'
-      //const PathTo = '../fixtures/'
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-04'){

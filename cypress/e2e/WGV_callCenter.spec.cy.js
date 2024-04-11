@@ -3,6 +3,8 @@
 import { getRandomInt } from "../support/utils/common.js";
 import { makeid } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
+import b2bBody from '../fixtures/templates/b2bBodyWGV.json'
+import emailBody from '../fixtures/templates/emailBody.json'
 
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
@@ -43,6 +45,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   const executePost = true
   const createNewQuestionnaires = true
   const interceptWGV = true
+  const $equipment_2_loading_doors = true
 
   function _waitFor(waitFor) {
     if (waitFor == '@nextPage'){
@@ -82,9 +85,9 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   const file1 = [
     ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"]
   ]
-  file1.forEach($car => {
+  file.forEach($car => {
     it(`wgv callCenter for vin: ${$car[0]}`, () =>{
-      does not work
+      //does not work
 
       const $vin = $car[0]
       console.log(`vin :${$vin}`)
@@ -100,7 +103,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
       let claim2 = getRandomInt(10000,99999)
 
 
-      cy.request('POST',`https://${$dev}.spearhead-ag.ch/member/authenticate`,userCredentials)
+      cy.request('POST',`${baseUrl_lp}member/authenticate`,userCredentials)
         .its('body').then(body => {
           const token = body.accessToken
           const authorization = `Bearer ${ token }`;
@@ -115,43 +118,19 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
           //"claimType": "01", - "liability"          templateId: "wgv_liability_call_center"
           //"claimType": "02", - "fullCoverage"       templateId: "wgv_comprehensive_call_center"
           //"claimType": "03", - "partialCoverage"    templateId: "wgv_comprehensive_call_center"
+          // see "fixtures/damage_cause_mapping.json"
 
-          const b2bBody =  {
-            "claimNumber": `${ claimNumber }`,
-            "claimType": "01",  //01, 02, 03, 53IV
-            "damageCause": "collisionsingle", // see "fixtures/damage_cause_mapping.json"
-            "countryVehicleIdentification": "HSN/TSN",
-            "vin": `${ $vin }`,
-            "firstRegistrationDate": "2012-04-20",
-            "licensePlate": `EH${ claim2 }BT`, //"EH1234BT"
-            "notificationDetails1": {
-              "equipmentList": [
-                {}
-              ],
-              "gearType": "manual",
-              "pointOfImpact": "1",
-              "priorDamage": "no",
-              "repairShopContract": false,
-              "vehicleCondition": "bad",
-              "vehicleManufacturer": "BMW",
-              "vehicleModel": "3 Kombi"
-            },
-            "repairLocationZipCode": "1234",
-            "responsibleClerk": {
-              "firstName": "John",
-              "lastName": "Wick",
-              "phoneNumber": "0879123456",
-              "salutation": "Mr",
-              "type": "individual",
-              "email": "sivanchevski@soft2run.com"
-            }
-          }
+          b2bBody.claimNumber = claimNumber
+          b2bBody.claimType = "03"  //01, 02, 03, 53IV
+          b2bBody.damageCause =  "glass" // see "fixtures/damage_cause_mapping.json"
+          b2bBody.vin =  $vin
+          b2bBody.licensePlate = `EH${claim2}BT` //"EH1234BT"
 
           //const contentType = `application/json`;
           //const accept =`*/*`;
           const options = {
             method: 'POST',
-            url: `https://${$dev}.spearhead-ag.ch:443/b2b/integration/wgv/callCenter`,
+            url: `${baseUrl_lp}b2b/integration/wgv/callCenter`,
             body: b2bBody,
             headers: {
               'Accept': '*/*',
@@ -325,90 +304,66 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
                 //pageId: "summary-page"
                 cy.get('button[type="submit"]').contains('Senden').click()
                 cy.wait('@postPost',{ log: false }).then(xhr => {
-                  cy.postPost(xhr)
-                  if (createNewQuestionnaires) {
-                    const notificationId = Cypress.env('notificationId')
-                    const b3bBody =  {
-                      "receiver": "sivanchevski@soft2run.com",
-                      "contact": {
-                        "firstName": "Ssss",
-                        "lastName": "Iiiii",
-                        "email": "sivanchevski@soft2run.com",
-                        "mobileNumber": "",
-                        "type": "PERSON"
-                      },
-                      "emailTemplate": "wgv_request_email"
-                    }
+                  cy.postPost(xhr).then(function (notificationId) {
+                    if (createNewQuestionnaires) {
+                      const b3bBody =  {
+                        "receiver": "sivanchevski@soft2run.com",
+                        "contact": {
+                          "firstName": "Ssss",
+                          "lastName": "Iiiii",
+                          "email": "sivanchevski@soft2run.com",
+                          "mobileNumber": "",
+                          "type": "PERSON"
+                        },
+                        "emailTemplate": "huk_start_self_service"
+                      }
 
-                    let _headers = {
-                      'Accept': '*/*',
-                      'Accept-Encoding':'gzip, deflate, br',
-                      'Content-Type': 'application/json',
-                      authorization,
-                    }
+                      let _headers = {
+                        'Accept': '*/*',
+                        'Accept-Encoding':'gzip, deflate, br',
+                        'Content-Type': 'application/json',
+                        authorization,
+                      }
 
-                    const options2 = {
-                      method: 'POST',
-                      url: `https://${$dev}.spearhead-ag.ch:443//damage/notification/${notificationId}/requestInformation/wgv_comprehensive_self_service_app`,
-                      body: b3bBody,
-                      headers: _headers
-                    };
+                      const options2 = {
+                        method: 'POST',
+                        url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/wgv_comprehensive_self_service_app`,
+                        body: emailBody,
+                        headers: _headers
+                      };
 
-                    cy.request(options2).then(
-                      (response) => {
-                        // response.body is automatically serialized into JSON
-                        expect(response.status).to.eq(200) // true
-                        console.log(`wgv_comprehensive_self_service_app:`);
-                        const requestedInformation = response.body.requestedInformation;
-                        if (requestedInformation != null && requestedInformation.length > 0){
-                          requestedInformation.forEach((element, index) => {
-                            console.log(`ri[${index}]:`);
-                            console.log(`questionnaireId:${element.questionnaireId}`);
-                            console.log(`workflowType:${element.workflowType}`);
-                            console.log(`templateId:${element.templateId}`);
-                            console.log(`requestUrl:${element.requestUrl}`);
-                          });
+                      cy.request(options2).then(
+                        (response) => {
+                          // response.body is automatically serialized into JSON
+                          expect(response.status).to.eq(200) // true
+                          console.log(`wgv_comprehensive_self_service_app:`);
+                          cy.printRequestedInformation(response.body.requestedInformation);
+                        })
 
-                        }
-                        const qsr = response.body.qsr;
-                        //console.log(qsr)
+                      const options3 = {
+                        method: 'POST',
+                        url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/wgv_liability_self_service_app`,
+                        body: b3bBody,
+                        headers: _headers
+                      };
+
+                      cy.request(options3).then(
+                        (response) => {
+                          // response.body is automatically serialized into JSON
+                          expect(response.status).to.eq(200) // true
+                          console.log(`wgv_liability_self_service_app:`);
+                          cy.printRequestedInformation(response.body.requestedInformation);
                       })
-
-                    const options3 = {
-                      method: 'POST',
-                      url: `https://${$dev}.spearhead-ag.ch:443//damage/notification/${notificationId}/requestInformation/wgv_liability_self_service_app`,
-                      body: b3bBody,
-                      headers: _headers
-                    };
-
-                    cy.request(options3).then(
-                      (response) => {
-                        // response.body is automatically serialized into JSON
-                        expect(response.status).to.eq(200) // true
-                        console.log(`wgv_liability_self_service_app:`);
-                        const requestedInformation = response.body.requestedInformation;
-                        if (requestedInformation != null && requestedInformation.length > 0){
-                          requestedInformation.forEach((element, index) => {
-                            console.log(`ri[${index}]:`);
-                            console.log(`questionnaireId:${element.questionnaireId}`);
-                            console.log(`workflowType:${element.workflowType}`);
-                            console.log(`templateId:${element.templateId}`);
-                            console.log(`requestUrl:${element.requestUrl}`);
-                          });
-
-                        }
-                        const qsr = response.body.qsr;
-                        //console.log(qsr)
-                    })
-                  }
+                    }
+                  })
                 })
               }
             }
           })
-      })
+      }) // authenticate
     }) // it wgv
 
-    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['wgv_default','wgv_pilot','wgv_pilot_2023'])
     }) //it PDF from commands
 

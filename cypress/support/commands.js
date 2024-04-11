@@ -216,6 +216,7 @@ Cypress.Commands.add('uploadImage', (selectorId,toPath,fileName) =>{
   cy.get(`form#${selectorId}`).find(`img[alt="${fileName}"]`).invoke('attr', 'alt').should('eq', fileName)
   cy.get(`form#${selectorId}`).find(`img[alt="${fileName}"]`).should('exist')
 })
+
 Cypress.Commands.add('getBodyType', ($car,logFilename) =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
@@ -235,8 +236,11 @@ Cypress.Commands.add('getBodyType', ($car,logFilename) =>{
       cy.request(options).then(
         (response) => {
         expect(response.status).to.eq(200) // true
-        const bodyType = response.body.supportInformation.bodyType
+        let bodyType = response.body.supportInformation.bodyType
         console.log(`supportInformation.bodyType: ${bodyType}.`)
+        if (bodyType == undefined || bodyType == null){
+          bodyType = ''
+        }
         cy.readFile(logFilename).then((text) => {
           const addRow = `vin: ${$car[0]} expected: ${$car[1].padStart(18, ' ')} real: ${bodyType.padStart(18, ' ')} desc: ${$car[3]} \n`
           text += addRow
@@ -246,6 +250,74 @@ Cypress.Commands.add('getBodyType', ($car,logFilename) =>{
         cy.wrap(bodyType).then((bodyType) => {
           return bodyType
         })
+      }) //request(options)
+    }) //get('@questionnaireId'
+  }) //get('@authorization'
+})
+
+Cypress.Commands.add('getQuestionnaireInfo', () =>{
+  const $dev = Cypress.env("dev");
+  const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
+  cy.get('@authorization').then(function (token) {
+    cy.get('@questionnaireId').then(function (questionnaireId) {
+      const options = {
+        method: 'GET',
+        url: `${baseUrl_lp}questionnaire/${questionnaireId}`,
+        headers:  {
+          'Accept': '*/*',
+          'Accept-Encoding':'gzip, deflate, br',
+          'Content-Type': 'application/json',
+          token,
+          'timeout' : c_requestTimeout
+        }
+      };
+      cy.request(options).then(
+        (response) => {
+        expect(response.status).to.eq(200) // true
+        let spearheadVehicle = ''
+        let iBoxResult = ''
+        let valuationResult = ''
+        let iBoxResultSummary = ''
+        let repairCost = ''
+        if (response.body.internalInformation == undefined || response.body.internalInformation == null){
+          spearheadVehicle = 'no internalInformation'
+        } else {
+          if (response.body.internalInformation.spearheadVehicle == undefined || response.body.internalInformation.spearheadVehicle == null){
+            spearheadVehicle = 'no spearheadVehicle'
+          } else {
+            spearheadVehicle = 'has spearheadVehicle'
+          }
+          if (response.body.internalInformation.iBoxResult == undefined || response.body.internalInformation.iBoxResult == null){
+            iBoxResult = 'no iBoxResult'
+          } else {
+            iBoxResult = 'has iBoxResult'
+            if (response.body.internalInformation.iBoxResult.valuationResult == undefined || response.body.internalInformation.iBoxResult.valuationResult == null){
+              valuationResult = 'no valuationResult'
+            } else {
+              valuationResult = 'has valuationResult'
+              console.log(`retailValue :${response.body.internalInformation.iBoxResult.valuationResult.retailValue}.`)
+            }
+            if (response.body.internalInformation.iBoxResult.iBoxResultSummary == undefined || response.body.internalInformation.iBoxResult.iBoxResultSummary == null){
+              iBoxResultSummary = 'no iBoxResultSummary'
+            } else {
+              iBoxResultSummary = 'has iBoxResultSummary'
+              if (response.body.internalInformation.iBoxResult.iBoxResultSummary.repairCost == undefined || response.body.internalInformation.iBoxResult.iBoxResultSummaryrepairCost == null){
+                repairCost = 'no repairCost'
+              } else {
+                repairCost = 'has repairCost'
+                console.log(`systemValue :${response.body.internalInformation.iBoxResultSummary.repairCost.systemValue}.`)
+              }
+            }
+          }
+        }
+        console.log(`spearheadVehicle :${spearheadVehicle}.`)
+        console.log(`iBoxResult :${iBoxResult}.`)
+        console.log(`valuationResult :${valuationResult}.`)
+        console.log(`iBoxResultSummary :${iBoxResultSummary}.`)
+        console.log(`repairCost :${repairCost}.`)
+        // cy.wrap(bodyType).then((bodyType) => {
+        //   return bodyType
+        // })
       }) //request(options)
     }) //get('@questionnaireId'
   }) //get('@authorization'
@@ -261,29 +333,16 @@ Cypress.Commands.add('postPost', (xhr, hasDialog = true) =>{
   const notificationId = xhr.response.body.notification.id;
   Cypress.env('notificationId', notificationId)
   console.log(`notificationId: ${notificationId}`);
-  const requestedInformation = xhr.response.body.notification.body.requestedInformation;
-  console.log(`requestedInformation: ${requestedInformation}`);
-  if (requestedInformation != null && requestedInformation.length > 0){
-    requestedInformation.forEach((element, index) => {
-      console.log(`requestedInformation[${index}]:`);
-      console.log(`questionnaireId: ${element.questionnaireId}`);
-      console.log(`workflowType: ${element.workflowType}`);
-      console.log(`templateId: ${element.templateId}`);
-      console.log(`requestUrl: ${element.requestUrl}`);
-    });
-    if (false) {
-      cy.visit(requestedInformation[0].requestUrl)
-      cy.get('.loader')
-      .should('not.exist')
-      cy.wait(1000)
-    }
-  }
+  cy.printRequestedInformation(xhr.response.body.notification.body.requestedInformation)
   if (hasDialog){
     const buttonRetry = 'button[type="button"][data-test="error-alert-button-retry"]'
     cy.get(buttonRetry, { timeout: c_requestTimeout }).should('be.visible');
     // close modal-dialog
     cy.get(buttonRetry).click()
   }
+  cy.wrap(notificationId).then((notificationId) => {
+    return notificationId
+  })
 })
 
 Cypress.Commands.add('generatePdf', function (baseUrl_lp, pdfPath, pdf_template) {
@@ -365,6 +424,18 @@ Cypress.Commands.add(`GeneratePDFs`, function (pdf_templates) {
   })
 })
 
+Cypress.Commands.add('printRequestedInformation', function (requestedInformation) {
+  if (requestedInformation != null && requestedInformation.length > 0){
+    requestedInformation.forEach((element, index) => {
+      console.log(`ri[${index}]:`);
+      console.log(`questionnaireId:${element.questionnaireId}`);
+      console.log(`workflowType:${element.workflowType}`);
+      console.log(`templateId:${element.templateId}`);
+      console.log(`requestUrl:${element.requestUrl}`);
+    });
+  }
+
+})
 
 
 

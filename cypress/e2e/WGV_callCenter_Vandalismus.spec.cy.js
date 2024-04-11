@@ -2,314 +2,312 @@
 
 import { getRandomInt } from "../support/utils/common.js";
 import { makeid } from "../support/utils/common.js";
+import file from '../fixtures/vinsArray.json'
+import b2bBody from '../fixtures/templates/b2bBodyWGV.json'
+import emailBody from '../fixtures/templates/emailBody.json'
+
+const goingPage = { pageId: '', elements: []}
+const questionnaire = { Id:'', authorization : '', bodyType: ''  }
+const logFilename = 'cypress/fixtures/wgvCallCenter.log'
 
 describe('Execute b2b/integration/wgv/callCenter', () => {
-  beforeEach('Login to the app', () => {
-    //cy.loginToApplication()
-    console.clear()
+  before('clear log file', () => {
+    cy.writeFile(logFilename, '')
   })
 
-  it('Execute b2b/integration/wgv/callCenter Vandalismus', () => {
+  beforeEach('Setting up intercepts and common variables', () =>{
+    //cy.loginToHukStandalone()
+    console.clear()
+    cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
+    cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
+    cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
+    cy.intercept('GET', `/questionnaire/*//picture/clickableCar*`).as('clickableCar')
+    cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
+      if (req.url.includes('navigateTo')) {
+        req.alias = "nextPage"
+      } else {
+        req.alias = "savePage"
+      }
+    })
+    cy.intercept('POST', `/member/oauth/token`).as('token')
+    cy.wrap(goingPage).its('pageId').as('goingPageId')
+    cy.wrap(goingPage).its('elements').as('goingPageElements')
+    cy.wrap(questionnaire).its('Id').as('questionnaireId')
+    cy.wrap(questionnaire).its('authorization').as('authorization')
+    cy.wrap(questionnaire).its('bodyType').as('bodyType')
+  })
 
+  const $dev = Cypress.env("dev");
+  const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
+  const $requestTimeout = 60000;
+  const executePost = false
 
-    const $dev = Cypress.env("dev");
-    const userCredentials = {
-      "password": Cypress.env("passwordHukS"),
-      "remoteUser": "",
-      "sessionLanguage": "en",
-      "userName": Cypress.env("usernameHukS")
+  function _waitFor(waitFor) {
+    if (waitFor == '@nextPage'){
+      cy.get('@nextBtn').click({ force: true })
     }
-
-    let claim1 = makeid(5)
-    let claim2 = getRandomInt(10000, 99999)
-
-
-    cy.request('POST', `https://${$dev}.spearhead-ag.ch/member/authenticate`, userCredentials)
-      .its('body').then(body => {
-        const token = body.accessToken
-        cy.wrap(token).as('token')
-
-        let claimNumber = claim1 + claim2
-        //claimNumber = 'tP44l36300' // reopen
-
-        const $vins = ['WDB1704351F077666','WBAUB310X0VN69014','WVWZZZ6RZGY304402','WAUZZZ4B73N015435','VF3VEAHXKLZ080921', 'W0L0XCR975E026845'];
-        const vin_random = getRandomInt(0,$vins.length);
-        //const vin_random = 5;
-        // 'WVWZZZ6RZGY304402' works
-        // 'WDB1704351F077666' works
-        // 'VF3VEAHXKLZ080921' works
-        // 'WBAUB310X0VN69014' works
-        // 'WAUZZZ4B73N015435' works
-        // 'W0L0XCR975E026845' works
-        //const $vin = $vins[vin_random];
-        const vin = $vins[vin_random];
-        console.log(vin)
-
-        //"claimType": "01", - "liability"          templateId: "wgv_liability_call_center"
-        //"claimType": "02", - "fullCoverage"       templateId: "wgv_comprehensive_call_center"
-        //"claimType": "03", - "partialCoverage"    templateId: "wgv_comprehensive_call_center"
-
-        const b2bBody = {
-          "claimNumber": `${claimNumber}`,
-          "claimType": "53IV",  //01, 02, 03, 53IV
-          "damageCause": "glass", // see "fixtures/damage_cause_mapping.json"
-          "countryVehicleIdentification": "HSN/TSN",
-          "vin": `${ vin }`,
-          "firstRegistrationDate": "2012-04-20",
-          "licensePlate": `EH${claim2}BT`, //"EH1234BT"
-          "notificationDetails1": {
-            "equipmentList": [
-              {}
-            ],
-            "gearType": "manual",
-            "pointOfImpact": "1",
-            "priorDamage": "no",
-            "repairShopContract": false,
-            "vehicleCondition": "bad",
-            "vehicleManufacturer": "BMW",
-            "vehicleModel": "3 Kombi"
-          },
-          "repairLocationZipCode": "1234",
-          "responsibleClerk": {
-            "firstName": "John",
-            "lastName": "Wick",
-            "phoneNumber": "0879123456",
-            "salutation": "Mr",
-            "type": "individual",
-            "email": "sivanchevski@soft2run.com"
-          }
-        }
-
-        const authorization = `Bearer ${token}`;
-        const contentType = `application/json`;
-        //const accept =`*/*`;
-        const options = {
-          method: 'POST',
-          url: `https://${$dev}.spearhead-ag.ch:443/b2b/integration/wgv/callCenter`,
-          body: b2bBody,
-          headers: {
-            'Accept': '*/*',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Content-Type': 'application/json',
-            authorization,
-          }
-        };
-
-        cy.request(options).then(
-          (response) => {
-            // response.body is automatically serialized into JSON
-            expect(response.status).to.eq(200) // true
-
-            cy.visit(response.body.callCenterQuestionnaireUrl)
-            cy.get('.loader')
-              .should('not.exist')
-            cy.wait(1000)
-
-            const selector = 'div[title="Vandalismus"]'
-            cy.get("body").then($body => {
-              if ($body.find(selector).length > 0) {
-
-                //pageId:"page-01"
-
-                console.log('find(selector)')
-                cy.get(selector).then($radio => {
-                  if (!$radio.hasClass('radio--checked')) {
-                    cy.wrap($radio).click()
-                  }
-                  cy.get('button[type="submit"]').click()
-                })
-              }
-            })
-          })
-        cy.wait(1000)
-
-        //pageId:"page-02"
-
-        cy.get('input#accident-date-input').type('20.04.2022')
-
-        //"Innerorts"
-        cy.get('div#accident-location').find('label[for="accident-location_0"]').click()
-
-        //Vandalismus / Diebstahl / böswillige Beschädigung
-        cy.get('div#loss-circumstances-details').find('label[for="loss-circumstances-details_0"]').click()
-
-        const mileage = '1' + claim2;
-        cy.get('div#vehicle-mileage').find('input#vehicle-mileage-input').type(mileage)
-
-        if (vin == 'VF3VEAHXKLZ080921') {
-          cy.get('div#equipment-slide-door').find('label[for="equipment-slide-door_1"]').click({ force: true })
-          cy.get('div#equipment-2-loading-doors').find('label[for="equipment-2-loading-doors_0"]').click({ force: true })
-          cy.get('div#equipment-length').find('label[for="equipment-length_0"]').click({ force: true })
-          cy.get('div#equipment-height').find('label[for="equipment-height_0"]').click({ force: true })
-          cy.get('div#equipment-vehicle-rear-glassed').find('label[for="equipment-vehicle-rear-glassed_0"]').click({ force: true })
-          cy.get('div#vehicle-customized-interior').find('label[for="vehicle-customized-interior_0"]').click({ force: true })
-        }
-
-        cy.get('button[type="submit"]')
-          .contains('Weiter').click()
-
-        //pageId:"page-03"
-
-        //hood
-        cy.get('svg').find('#hood').click()
-        cy.get('div#hood-damage-type').find('label[for="hood-damage-type_0"]').click({ force: true })
-
-        //roof
-        cy.get('svg').find('#roof').click()
-        cy.get('div#roof-damage-type').find('label[for="roof-damage-type_0"]').click({ force: true })
-        if (vin == 'WDB1704351F077666' || vin == 'W0L0XCR975E026845') {
-          cy.get('div#roof-equipment-convertible-roof-material').find('label[for="roof-equipment-convertible-roof-material_0"]').click({ force: true })
-        }
-        if (vin == 'WBAUB310X0VN69014') {
-          cy.get('div#roof-equipment-panorama-roof').find('label[for="roof-equipment-panorama-roof_0"]').click({ force: true })
-        }
-
-        //windshield
-        cy.get('svg').find('#windshield').click({ force: true })
-        cy.wait(500)
-
-        if (vin == 'VF3VEAHXKLZ080921') {
-          cy.get('div#loading-floor-area-bend').find('label[for="loading-floor-area-bend_0"]').click({ force: true })
-        }
-
-        cy.get('section#collapseExamplesection-windshield')
-          .find('div#windshield-equipment-windshield-electric')
-          .find('label[for="windshield-equipment-windshield-electric_0"]')
-          .click()
-        cy.get('section#collapseExamplesection-windshield')
-          .find('div#windshield-damage-type')
-          .find('label[for="windshield-damage-type_0"]')
-          .click()
-        cy.get('section#collapseExamplesection-windshield')
-          .find('div#windshield-damage-type')
-          .find('label[for="windshield-damage-type_2"]')
-          .click()
-        cy.get('g#windshield[data-name="2d_hb_windshield"]')
-          .find('g#zone-b[data-name="2d_hb_windshield_b"]')
-          .find('path#zone-b-overlay')
-          .click({ force: true })
-        cy.get('g#windshield[data-name="2d_hb_windshield"]')
-          .find('g#zone-d[data-name="2d_hb_windshield_d"]')
-          .click({ force: true })
-        cy.get('section#collapseExamplesection-windshield')
-          .find('div#windshield-damage-quantity')
-          .find('label[for="windshield-damage-quantity_3"]')
-          .click()
-        cy.get('section#collapseExamplesection-windshield')
-          .find('div#windshield-damage-size-scratch-bigger-5cm')
-          .find('label[for="windshield-damage-size-scratch-bigger-5cm_0"]')
-          .click()
-        cy.get('section#collapseExamplesection-windshield')
-          .find('div#windshield-damage-size-crack-bigger-2cm')
-          .find('label[for="windshield-damage-size-crack-bigger-2cm_0"]')
-          .click()
-
-        cy.wait(500)
-        cy.get('button[type="submit"]')
-        cy.wait(500)
-          .contains('Weiter').click({ force: true })
-        cy.wait(500)
-
-        //pageId:"page-04"
-
-        cy.get('select#dropdown-selection-mmi-previous-damage').select('geringer Vorschaden').should('have.value', '4: 0.8')
-        cy.get('div#triage-recommendation').find('label[for="triage-recommendation_0"]').click({ force: true })
-        cy.get('input#client-zip-code-input').type('10115');
-        cy.get('div#self-service-link').find('label[for="self-service-link_0"]').click({ force: true })
-        cy.get('input[data-test="dropdown-selection-enabled-text-input_client-city"]').should('have.value', 'Berlin')
-        cy.get('div#self-service-link').find('label[for="self-service-link_0"]').click({ force: true })
-
-        cy.get('button[type="submit"]')
-          .contains('Weiter').click()
-
-        cy.intercept('POST', `https://${$dev}.spearhead-ag.ch/questionnaire/*/post?locale=de`).as('postPost')
-
-        //pageId:"summary-page"
-        cy.get('button[type="submit"]')
-          .contains('Senden').click()
-
-        cy.wait('@postPost').then(xhr => {
-          //console.log(xhr)
-          expect(xhr.response.statusCode).to.equal(200)
-          const notificationId = xhr.response.body.notification.id;
-          console.log(`notificationId:${notificationId}`);
-
-          if (false) {
-            const b3bBody = {
-              "receiver": "sivanchevski@soft2run.com",
-              "contact": {
-                "firstName": "Ssss",
-                "lastName": "Iiiii",
-                "email": "sivanchevski@soft2run.com",
-                "mobileNumber": "",
-                "type": "PERSON"
-              },
-              "emailTemplate": "wgv_request_email"
+    cy.wait(waitFor,{requestTimeout : $requestTimeout}).then(xhr => {
+        expect(xhr.response.statusCode).to.equal(200)
+        const gPage = xhr.response.body.pageId
+        let title = xhr.response.body.pageTitle
+        if ((title.length <= 2)){
+          title = xhr.response.body.uiBlocks[0].label.content
+          if ((title.length <= 2)){
+            if (title = xhr.response.body.uiBlocks[0].elements.sections.length > 0){
+              title = xhr.response.body.uiBlocks[0].elements.sections[0].label.content
             }
+          }
+        }
+        console.log(`Comming page ${gPage} - ${title}.`)
+        cy.then(function () {
+          goingPage.elements = []
+        })
+        //printQuestionnaireIds(xhr.response.body.elements)
+        cy.then(function () {
+          goingPage.pageId = gPage
+        })
+        if (false && waitFor == '@currentPage'){
+          const nextUrl = xhr.response.body.links.next
+          //"https://dev02.spearhead-ag.ch:443/questionnaire/7uRjDM92M9eWEhZVkBrSr/page/page-01?navigateTo=next"
+          const startStr = '/questionnaire/'
+          const endStr = '/page/page'
+          const pos = nextUrl.indexOf(startStr) + startStr.length;
+          const questionnaireId =  nextUrl.substring(pos, nextUrl.indexOf(endStr, pos));
+          cy.then(function () {
+            questionnaire.Id = questionnaireId
+          })
+          console.log(`questionnaireId: ${questionnaireId}`)
+        }
+    })
+  }
 
-            let _headers = {
+  function nextBtn() {
+    _waitFor('@nextPage')
+  }
+
+  function currentPage() {
+    _waitFor('@currentPage')
+  }
+
+  const file1 = [
+
+    [
+      "WDB2083441T069719",
+      "Coupe",
+      "01.01.2008",
+      "MER CLK Coupe (partial identification, build period to be defined manually)"
+    ]
+  ]
+
+  file.forEach($car => {
+    it(`Execute b2b/integration/wgv/callCenter Vandalismus with vin:${$car[0]}`, () => {
+
+      const vin = $car[0]
+      console.log(`vin : ${vin}`)
+
+      const userCredentials = {
+        "password": Cypress.env("passwordHukS"),
+        "remoteUser": "",
+        "sessionLanguage": "en",
+        "userName": Cypress.env("usernameHukS")
+      }
+
+      let claim1 = makeid(5)
+      let claim2 = getRandomInt(10000, 99999)
+
+
+      cy.request('POST', `https://${$dev}.spearhead-ag.ch/member/authenticate`, userCredentials)
+        .its('body').then(body => {
+          const token = body.accessToken
+          const authorization = `Bearer ${ token }`;
+          cy.then(function () {
+            questionnaire.authorization = authorization
+          })
+
+          let claimNumber = claim1 + claim2
+          //claimNumber = 'tP44l36300' // reopen
+
+          //"claimType": "01", - "liability"          templateId: "wgv_liability_call_center"
+          //"claimType": "02", - "fullCoverage"       templateId: "wgv_comprehensive_call_center"
+          //"claimType": "03", - "partialCoverage"    templateId: "wgv_comprehensive_call_center"
+
+          b2bBody.claimNumber = claimNumber
+          b2bBody.claimType = "03"  //01, 02, 03, 53IV
+          b2bBody.damageCause =  "glass" // see "fixtures/damage_cause_mapping.json"
+          b2bBody.vin =  vin
+          b2bBody.licensePlate = `EH${claim2}BT` //"EH1234BT"
+
+          const options = {
+            method: 'POST',
+            url: `https://${$dev}.spearhead-ag.ch:443/b2b/integration/wgv/callCenter`,
+            body: b2bBody,
+            headers: {
               'Accept': '*/*',
               'Accept-Encoding': 'gzip, deflate, br',
               'Content-Type': 'application/json',
               authorization,
             }
+          };
 
+          cy.request(options).then(
+            (response) => {
+              // response.body is automatically serialized into JSON
+              expect(response.status).to.eq(200) // true
 
-            const options2 = {
-              method: 'POST',
-              url: `https://${$dev}.spearhead-ag.ch:443//damage/notification/${notificationId}/requestInformation/wgv_comprehensive_self_service_app`,
-              body: b3bBody,
-              headers: _headers
-            };
-
-            cy.request(options2).then(
-              (response) => {
-                // response.body is automatically serialized into JSON
-                expect(response.status).to.eq(200) // true
-                console.log(`wgv_comprehensive_self_service_app:`);
-                const requestedInformation = response.body.requestedInformation;
-                if (requestedInformation != null && requestedInformation.length > 0) {
-                  requestedInformation.forEach((element, index) => {
-                    console.log(`ri[${index}]:`);
-                    console.log(`questionnaireId:${element.questionnaireId}`);
-                    console.log(`workflowType:${element.workflowType}`);
-                    console.log(`templateId:${element.templateId}`);
-                    console.log(`requestUrl:${element.requestUrl}`);
-                  });
-
-                }
-                const qsr = response.body.qsr;
-                //console.log(qsr)
+              const questionnaireId = response.body.callCenterQuestionnaireId;
+              cy.then(function () {
+                questionnaire.Id = questionnaireId
               })
+              console.log(`questionnaireId: ${questionnaireId}`)
+              const uiUrl = response.body.callCenterQuestionnaireUrl;
+              console.log(`uiUrl: ${uiUrl}`);
 
-            const options3 = {
-              method: 'POST',
-              url: `https://${$dev}.spearhead-ag.ch:443//damage/notification/${notificationId}/requestInformation/wgv_liability_self_service_app`,
-              body: b3bBody,
-              headers: _headers
-            };
+              cy.visit(uiUrl)
+              cy.wait(1000)
 
-            cy.request(options3).then(
-              (response) => {
-                // response.body is automatically serialized into JSON
-                expect(response.status).to.eq(200) // true
-                console.log(`wgv_liability_self_service_app:`);
-                const requestedInformation = response.body.requestedInformation;
-                if (requestedInformation != null && requestedInformation.length > 0) {
-                  requestedInformation.forEach((element, index) => {
-                    console.log(`ri[${index}]:`);
-                    console.log(`questionnaireId:${element.questionnaireId}`);
-                    console.log(`workflowType:${element.workflowType}`);
-                    console.log(`templateId:${element.templateId}`);
-                    console.log(`requestUrl:${element.requestUrl}`);
-                  });
+              const nextButtonLabel ='Weiter'
+              const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
+              cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
+              const selector = 'div[title="Vandalismus"]'
 
+              cy.get("body").then($body => {
+                if ($body.find(selector).length > 0) {
+                  //pageId:"page-01"
+                  console.log('find(selector)')
+                  currentPage()
+                  cy.get('@goingPageId').then(function (aliasValue) {
+                    if (aliasValue == 'page-01'){
+                      cy.selectSingleList('damage-cause',6)
+                      //cy.get('button[type="submit"]').click()
+                      nextBtn()
+                    }
+                  })
                 }
-                const qsr = response.body.qsr;
-                //console.log(qsr)
               })
-          }
-        })
-      })
-  })
-})
+            })
+          cy.wait(1000)
+
+          cy.getBodyType($car,logFilename).then(function (bodyType) {
+            cy.then(function () {
+              questionnaire.bodyType = bodyType
+            })
+          })
+
+          //pageId:"page-02"
+          cy.get('@goingPageId').then(function (aliasValue) {
+            if (aliasValue == 'page-02'){
+              cy.get('input#accident-date-input').type('20.04.2022')
+              //"Innerorts"
+              cy.selectSingleList('accident-location',0)
+
+              //Vandalismus / Diebstahl / böswillige Beschädigung
+              cy.selectSingleList('loss-circumstances-details',0)
+
+              const mileage = '1' + claim2;
+              cy.get('div#vehicle-mileage').find('input#vehicle-mileage-input').type(mileage)
+
+              cy.get('@bodyType').then(function (bodyType) {
+                if (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine'){
+                  cy.selectSingleList('equipment-loading-area-cover-type',1)
+                }
+                if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
+                  cy.selectSingleList('equipment-slide-door',1)
+                  cy.selectSingleList('equipment-2-loading-doors',0)
+                  cy.selectSingleList('equipment-length',0)
+                  cy.selectSingleList('equipment-height',0)
+                  cy.selectSingleList('equipment-vehicle-rear-glassed',0)
+                  cy.selectSingleList('vehicle-customized-interior',0)
+                }
+              })
+              //cy.get('button[type="submit"]').contains('Weiter').click()
+              nextBtn()
+            }
+          })
+
+
+          //pageId:"page-03"
+          cy.get('@goingPageId').then(function (aliasValue) {
+            if (aliasValue == 'page-03'){
+              cy.wait('@clickableCar',{requestTimeout : $requestTimeout}).then(xhr => {
+                expect(xhr.response.statusCode).to.equal(200)
+                console.log(`Comming SVG with clickableCar`)
+                const SVGbody = xhr.response.body;
+
+                //hood
+                cy.selectSVG('hood')
+                cy.selectMultipleList('hood-damage-type',0)
+
+
+                //roof
+                cy.selectSVG('roof')
+                cy.selectMultipleList('roof-damage-type',0)
+
+                //windshield
+                cy.selectSVG('windshield')
+                cy.wait(500)
+
+                cy.get('@bodyType').then(function (bodyType) {
+                  if (bodyType == 'Cabrio'){
+                    cy.selectSingleList('roof-equipment-convertible-roof-material',0)
+                  }
+                  if (bodyType == 'Coupe' || bodyType == 'Hatch3' || bodyType == 'Sedan' || bodyType == 'Hatch5' || bodyType == 'Station' || bodyType == 'SUV' || bodyType == 'MPV'){
+                    cy.selectSingleList('roof-equipment-panorama-roof',0)
+                  }
+
+                  if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
+                    cy.selectSingleList('loading-floor-area-bend',0)
+                  }
+                })
+
+
+                cy.selectSingleList('windshield-equipment-windshield-electric',0)
+                cy.selectMultipleList('windshield-damage-type',0)
+                cy.selectMultipleList('windshield-damage-type',2)
+                cy.selectSVG('zone-b')
+                cy.selectSVG('zone-d')
+                cy.selectSingleList('windshield-damage-quantity',3)
+                cy.selectSingleList('windshield-damage-size-scratch-bigger-5cm',0)
+                cy.selectSingleList('windshield-damage-size-crack-bigger-2cm',0)
+
+                cy.wait(500)
+                //cy.get('button[type="submit"]')
+                //cy.wait(500).contains('Weiter').click({ force: true })
+                nextBtn()
+                cy.wait(500)
+              }) //clickableCar
+            } // if
+          })
+
+
+
+          //pageId:"page-04"
+          cy.get('@goingPageId').then(function (aliasValue) {
+            if (aliasValue == 'page-04'){
+              //cy.selectDropDown('dropdown-selection-mmi-previous-damage',1)
+              cy.get('select#dropdown-selection-mmi-previous-damage').select('geringer Vorschaden').should('have.value', '4: 0.8')
+              cy.selectSingleList('triage-recommendation',0)
+              cy.get('input#client-zip-code-input').type('10115').blur();
+              cy.selectSingleList('self-service-link',0)
+              cy.get('input[data-test="dropdown-selection-enabled-text-input_client-city"]').should('have.value', 'Berlin')
+              nextBtn()
+            }
+          })
+
+
+
+
+          //pageId:"summary-page"
+          cy.get('@goingPageId').then(function (aliasValue) {
+            if (aliasValue == 'summary-page'){
+              if (executePost) {
+                cy.get('button[type="submit"]').contains('Senden').click()
+                cy.wait('@postPost').then(xhr => {
+                  cy.postPost(xhr)
+                })
+              }
+            }
+          })
+        }) //authenticate
+    }) // it
+  }) // forEach
+}) //describe

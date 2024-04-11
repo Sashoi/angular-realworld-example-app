@@ -7,6 +7,7 @@ const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
 const logFilename = 'cypress/fixtures/hukClickableCar.log'
 const pdfPath = 'cypress/fixtures/Pdf/'
+const PathTo ='cypress/fixtures/'
 
 describe('Huk_comprehensive_self_service_clickable_car', () =>{
 
@@ -16,6 +17,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
 
   beforeEach('Setting up integrations and common variables', () =>{
     //cy.loginToApplication()
+    cy.viewport('samsung-note9')
     console.clear()
     cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPage')
@@ -41,7 +43,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
-  const executePost = true
+  const executePost = false
   const generatePdfCondition = true
 
   function _waitFor(waitFor) {
@@ -92,11 +94,11 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   }
 
   const file1 = [
-    ["6FPGXXMJ2GEL59891","PickUpSingleCabine",  "01.01.2012","Ford Ranger single cabine, Pick-up"]
+    ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"]
   ]
 
   file1.forEach($car => {
-    it(`Huk-comprehensive-self-service-clickable-car vin :  ${$car[0]}`, function () {
+    it.only(`Huk-comprehensive-self-service-clickable-car vin :  ${$car[0]}`, function () {
 
       const vin = $car[0]
 
@@ -133,100 +135,6 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
         b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licenseplate
         b2bBody.qas.find(q => {return q.questionId === "part-selection-type"}).answer = 'clickable-car'
 
-        const b2bBody1 =  {
-          "qas": [
-              {
-                  "questionId": "role-type",
-                  "answer": ["client"]
-              },
-              {
-                  "questionId": "accident-date",
-                  "answer": ["2020-01-01"]
-              },
-              {
-                  "questionId": "loss-cause",
-                  "answer": ["animal"]
-              },
-              {
-                  "questionId": "loss-circumstances",
-                  "answer": ["rear-end-collision"]
-              },
-              {
-                  "questionId": "client-insurance-claim-number",
-                  "answer": [claimNumber]
-              },
-              {
-                  "questionId": "animal-species",
-                  "answer": ["fox"]
-              },
-              {
-                  "questionId": "huk-coburg-triage-category",
-                  "answer": ["total-loss"]
-              },
-              {
-                  "questionId": "client-insurance-policy-number",
-                  "answer": ["123456789X"]
-              },
-              {
-                  "questionId": "insurance-policy-type",
-                  "answer": "select"
-              },
-              {
-                  "questionId": "insurance-name",
-                  "answer": ["huk-coburg"]
-              },
-              {
-                  "questionId": "client-zip-code",
-                  "answer": ["96450"]
-              },
-              {
-                  "questionId": "client-country",
-                  "answer": ["DE"]
-              },
-              {
-                  "questionId": "vehicle-vin",
-                  "answer": [vin]
-              },
-              {
-                  "questionId": "vehicle-first-registration-date",
-                  "answer": ["2019-10-01"]
-              },
-              {
-                  "questionId": "client-vehicle-license-plate",
-                  "answer": [licenseplate]
-              },
-              {
-                  "questionId": "vehicle-financed",
-                  "answer": ["yes"]
-              },
-              {
-                  "questionId": "vehicle-leased",
-                  "answer": ["no"]
-              },
-              {
-                  "questionId": "vehicle-owner-entitled-for-pre-tax-deduction",
-                  "answer": ["no"]
-              },
-              {
-                  "questionId": "client-email",
-                  "answer": ["yourEmail@soft2run.com"]
-              },
-              {
-                  "questionId": " vehicle-location-zip-code",
-                  "answer": ["22222"]
-              },
-              {
-                  "questionId": "client-mobile-phone-number",
-                  "answer": ["123654789"]
-              },
-              {
-                  "questionId": "part-selection-type",
-                  "answer": ["clickable-car"]
-              }
-          ],
-          "supportInformation": null,
-          "readOnlyQuestions": null
-        }
 
         //const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
         const authorization = `Bearer ${token}`;
@@ -550,8 +458,6 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
                   nextBtn()
                 }
               })
-
-              const PathTo ='D://Projects/Cypress/bondar-artem/angular-realworld-example-app/cypress/fixtures/'
 
               //"page-06"
               cy.get('@goingPageId').then(function (aliasValue) {

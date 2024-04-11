@@ -3,6 +3,7 @@
 import { getRandomInt } from "../support/utils/common.js";
 import { makeid } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
+import b2bBody from '../fixtures/b2bBodyToni_1.json'
 
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: ''  }
@@ -15,7 +16,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
     cy.writeFile(logFilename, '')
   })
 
-  beforeEach('Setting up integrations and common variables', () =>{
+  beforeEach('Setting up intercepts and common variables', () =>{
     //cy.loginToHukStandalone()
     console.clear()
     cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
@@ -107,9 +108,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
   }
 
   const file1 = [
-    ["W1V44760313930767", "Van", "01.01.2017", "Mercedes Vito 09/2021"],
-    ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"],
-    ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
+    ["W1V44760313930767", "Van", "01.01.2017", "Mercedes Vito 09/2021"]
   ]
 
   file1.forEach($car => {
@@ -144,151 +143,9 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
               questionnaire.authorization = authorization
             })
 
-          const b2bBody = {
-              "qas": [
-                  {
-                      "questionId": "questionnaire-locale",
-                      "answer": [
-                          "en"
-                      ]
-                  },
-                  {
-                      "questionId": "insurance-type",
-                      "answer": [
-                          "motorcycle"
-                      ]
-                  },
-                  {
-                      "questionId": "workflow-type",
-                      "answer": [
-                          "call-center"
-                      ]
-                  },
-                  {
-                      "questionId": "coverage-type",
-                      "answer": [
-                          "liability"
-                      ]
-                  },
-                  {
-                      "questionId": "coverage-type-info",
-                      "answer": [
-                          "collision"
-                      ]
-                  },
-                  {
-                      "questionId": "eMail-insurance-client",
-                      "answer": [
-                          "sivanchevski@soft2run.com"
-                      ]
-                  },
-                  {
-                      "questionId": "firstName-insurance-client",
-                      "answer": [
-                          "Moritz"
-                      ]
-                  },
-                  {
-                      "questionId": "lastName-insurance-client",
-                      "answer": [
-                          "Chapuisat"
-                      ]
-                  },
-                  {
-                      "questionId": "mobilePhoneNumber-insurance-client",
-                      "answer": [
-                          "0791234567"
-                      ]
-                  },
-                  {
-                      "questionId": "zipCode-insurance-client",
-                      "answer": [
-                          "1202"
-                      ]
-                  },
-                  {
-                      "questionId": "loss-cause",
-                      "answer": "collision"
-                  },
-                  {
-                      "questionId": "number-of-vehicles",
-                      "answer": "two"
-                  },
-                  {
-                      "questionId": "incident-reporter-country",
-                      "answer": "DE"
-                  },
-                  {
-                      "questionId": "vehicle-first-registration-date",
-                      "answer": "2024-02-01"
-                  },
-                  {
-                      "questionId": "vehicle-mileage",
-                      "answer": {
-                          "unit": "km",
-                          "value": 23525,
-                          "fileUploaded": "false"
-                      }
-                  },
-                  {
-                      "questionId": "incident-reporter-type",
-                      "answer": "private-person"
-                  },
-                  {
-                      "questionId": "collision-type-others-description",
-                      "answer": "3534"
-                  },
-                  {
-                      "questionId": "loss-circumstances-details-claimant",
-                      "answer": "collision-parking-leaving"
-                  },
-                  {
-                      "questionId": "loss-circumstances-details-counterparty",
-                      "answer": "collision-private-incoming"
-                  },
-                  {
-                      "questionId": "client-vehicle-license-plate",
-                      "answer": licenseplate
-                  },
-                  {
-                      "questionId": "incident-reporter-first-name",
-                      "answer": "Jhon"
-                  },
-                  {
-                      "questionId": "incident-reporter-last-name",
-                      "answer": "Smith"
-                  },
-                  {
-                      "questionId": "incident-reporter-phone-number",
-                      "answer": "555555"
-                  },
-                  {
-                      "questionId": "incident-reporter-street-name",
-                      "answer": "Street name"
-                  },
-                  {
-                      "questionId": "incident-reporter-street-number",
-                      "answer": "333"
-                  },
-                  {
-                      "questionId": "incident-reporter-zip-code",
-                      "answer": "10115"
-                  },
-                  {
-                      "questionId": "incident-reporter-place",
-                      "answer": "Sofia"
-                  },
-                  {
-                      "questionId": "incident-reporter-email",
-                      "answer": "sivanchevski@soft2run.com"
-                  }
-              ],
-              "supportInformation": {
-                  "vin": vin,
-                  "claimNumber": claimNumber,
-                  "workflowType": "hdiLiabilityCallCenter"
-              }
-          }
+            b2bBody.supportInformation.claimNumber = claimNumber
+            b2bBody.supportInformation.vin =  vin
+            b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licenseplate
 
 
           const options = {

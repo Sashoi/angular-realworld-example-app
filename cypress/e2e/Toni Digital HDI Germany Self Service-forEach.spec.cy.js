@@ -5,6 +5,7 @@
 import { getRandomInt } from "../support/utils/common.js";
 import { makeid } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
+import b2bBody from '../fixtures/b2bBodyToni_1.json'
 
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: ''  }
@@ -154,152 +155,14 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
             questionnaire.authorization = authorization
           })
 
-          const b2bBody = {
-            "qas": [
-                {
-                    "questionId": "questionnaire-locale",
-                    "answer": [
-                        "en"
-                    ]
-                },
-                {
-                    "questionId": "insurance-type",
-                    "answer": [
-                        "motorcycle"
-                    ]
-                },
-                {
-                    "questionId": "workflow-type",
-                    "answer": [
-                        "call-center"
-                    ]
-                },
-                {
-                    "questionId": "coverage-type",
-                    "answer": [
-                        "liability"
-                    ]
-                },
-                {
-                    "questionId": "coverage-type-info",
-                    "answer": [
-                        "collision"
-                    ]
-                },
-                {
-                    "questionId": "eMail-insurance-client",
-                    "answer": [
-                      eMail
-                    ]
-                },
-                {
-                    "questionId": "firstName-insurance-client",
-                    "answer": [
-                        "Moritz"
-                    ]
-                },
-                {
-                    "questionId": "lastName-insurance-client",
-                    "answer": [
-                        "Chapuisat"
-                    ]
-                },
-                {
-                    "questionId": "mobilePhoneNumber-insurance-client",
-                    "answer": [
-                        "0791234567"
-                    ]
-                },
-                {
-                    "questionId": "zipCode-insurance-client",
-                    "answer": [
-                        "1202"
-                    ]
-                },
-                {
-                    "questionId": "loss-cause",
-                    "answer": "collision"
-                },
-                {
-                    "questionId": "number-of-vehicles",
-                    "answer": "more-than-two"
-                },
-                {
-                    "questionId": "incident-reporter-country",
-                    "answer": "DE"
-                },
-                {
-                    "questionId": "vehicle-first-registration-date",
-                    "answer": "2024-02-01"
-                },
-                {
-                    "questionId": "vehicle-mileage",
-                    "answer": {
-                        "unit": "km",
-                        "value": 23525,
-                        "fileUploaded": "false"
-                    }
-                },
-                {
-                    "questionId": "incident-reporter-type",
-                    "answer": "private-person"
-                },
-                {
-                    "questionId": "collision-type-others-description",
-                    "answer": "3534"
-                },
-                {
-                    "questionId": "loss-circumstances-details-claimant",
-                    "answer": "collision-parking-leaving"
-                },
-                {
-                    "questionId": "loss-circumstances-details-counterparty",
-                    "answer": "collision-private-incoming"
-                },
-                {
-                    "questionId": "client-vehicle-license-plate",
-                    "answer": licensePlate
-                },
-                {
-                    "questionId": "incident-reporter-first-name",
-                    "answer": "Jhon"
-                },
-                {
-                    "questionId": "incident-reporter-last-name",
-                    "answer": "Smith"
-                },
-                {
-                    "questionId": "incident-reporter-phone-number",
-                    "answer": "555555"
-                },
-                {
-                    "questionId": "incident-reporter-street-name",
-                    "answer": "Street name"
-                },
-                {
-                    "questionId": "incident-reporter-street-number",
-                    "answer": "333"
-                },
-                {
-                    "questionId": "incident-reporter-zip-code",
-                    "answer": "10115"
-                },
-                {
-                    "questionId": "incident-reporter-place",
-                    "answer": "55555555"
-                },
-                {
-                    "questionId": "incident-reporter-email",
-                    "answer": eMail
-                }
-            ],
-            "supportInformation": {
-                "vin": vin,
-                "claimNumber": claimNumber,
-                "workflowType": "hdiLiabilitySelfService"
-            }
-          }
+          b2bBody.supportInformation.claimNumber = claimNumber
+          b2bBody.supportInformation.vin =  vin
+          b2bBody.supportInformation.workflowType = 'hdiLiabilitySelfService'
+          b2bBody.qas.find(q => {return q.questionId === "incident-reporter-email"}).answer = eMail
+          b2bBody.qas.find(q => {return q.questionId === "number-of-vehicles"}).answer = 'more-than-two'
+          b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licensePlate
 
+          
           const options = {
             method: 'POST',
             url: `https://${$dev}.spearhead-ag.ch:443/b2b/integration/toni-digital/hdiLiabilitySelfService`,

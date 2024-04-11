@@ -9,6 +9,7 @@ const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
 const logFilename = 'cypress/fixtures/hukVehicleZone-short.log'
 const pdfPath = 'cypress/fixtures/Pdf/'
+const PathTo ='cypress/fixtures/'
 
 describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
 
@@ -19,6 +20,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   beforeEach('Login to the app', () =>{
     //cy.loginToApplication()
     console.clear()
+    cy.viewport('samsung-note9')
     cy.intercept('GET', `/questionnaire/*/picture/vehicleZones?colour=007d40&areas=&locale=de`).as('vehicleZones')
     //cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
     //cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
@@ -44,7 +46,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
   const $requestTimeout = 60000;
-  const executePost = true
+  const executePost = false
   const generatePdfCondition = true
 
 
@@ -114,10 +116,10 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   const file1 = [
-    ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
+    ["W1V44760313930767", "Van", "01.01.2017", "Mercedes Vito 09/2021"]
   ]
   file1.forEach($car => {
-    it(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
+    it.only(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
 
       const $vin = $car[0]
 
@@ -153,93 +155,6 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
         b2bBody.qas.find(q => {return q.questionId === "client-insurance-claim-number"}).answer = claimNumber
         b2bBody.qas.find(q => {return q.questionId === "vehicle-vin"}).answer = $vin
         b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licenseplate
-
-        const b2bBody1 =  {
-            "qas": [
-                {
-                    "questionId": "role-type",
-                    "answer": ["client"]
-                },
-                {
-                    "questionId": "accident-date",
-                    "answer": ["2020-01-01"]
-                },
-                {
-                    "questionId": "loss-cause",
-                    "answer": ["animal"]
-                },
-                {
-                    "questionId": "loss-circumstances",
-                    "answer": ["rear-end-collision"]
-                },
-                {
-                    "questionId": "client-insurance-claim-number",
-                    "answer": [`${ claimNumber }`]
-                },
-                {
-                    "questionId": "animal-species",
-                    "answer": ["fox"]
-                },
-                {
-                    "questionId": "insurance-name",
-                    "answer": ["huk-coburg"]
-                },
-                {
-                    "questionId": "huk-coburg-triage-category",
-                    "answer": ["total-loss"]
-                },
-                {
-                    "questionId": "client-insurance-policy-number",
-                    "answer": ["123456789X"]
-                },
-                {
-                    "questionId": "insurance-policy-type",
-                    "answer": [""]
-                },
-                {
-                    "questionId": "client-zip-code",
-                    "answer": ["96450"]
-                },
-                {
-                    "questionId": "client-country",
-                    "answer": ["DE"]
-                },
-                {
-                    "questionId": "vehicle-vin",
-                    "answer": [`${ $vin }`]
-                },
-                {
-                    "questionId": "vehicle-first-registration-date",
-                    "answer": ["2019-10-01"]
-                },
-                {
-                    "questionId": "client-vehicle-license-plate",
-                    "answer": [`${licenseplate}`]
-                },
-                {
-                    "questionId": "client-email",
-                    "answer": ["sivanchevski1@soft2run.com"]
-                },
-                {
-                    "questionId": "client-mobile-phone-number",
-                    "answer": ["123654789"]
-                },
-                {
-                    "questionId": "vehicle-mileage",
-                    "answer": {
-                        "unit": "km",
-                        "value": 300123,
-                        "fileUploaded": "false"
-                    }
-                },
-                {
-                    "questionId": "part-selection-type",
-                    "answer": ["vehicle-zones"]
-                }
-            ],
-            "supportInformation": null,
-            "readOnlyQuestions": null
-        }
 
 
         //const contentType = `application/json`;
@@ -379,7 +294,6 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                 }
               })
 
-              const PathTo ='D://Projects/Cypress/bondar-artem/angular-realworld-example-app/cypress/fixtures/'
               //"page-08"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-08'){
