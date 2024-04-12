@@ -1,7 +1,8 @@
 /// <reference types="cypress" />
 import { getRandomInt } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
-import b2bBody from '../fixtures/b2bBody.json'
+import b2bBody from '../fixtures/templates/b2bBody.json'
+import header from '../fixtures/header.json'
 
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
@@ -16,13 +17,13 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   })
 
   beforeEach('Setting up integrations and common variables', () =>{
-    //cy.loginToApplication()
-    cy.viewport('samsung-note9')
+
     console.clear()
+    cy.viewport('samsung-note9')
     cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPage')
     cy.intercept('GET', `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
-    cy.intercept('GET', `/questionnaire/*//picture/clickableCar*`).as('clickableCar')
+    cy.intercept('GET', `/questionnaire/*/picture/clickableCar*`).as('clickableCar')
     cy.intercept('GET', `/questionnaire/generic_elements/attachment/*-example*`).as('generic_elements')
     cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
       if (req.url.includes('navigateTo')) {
@@ -31,7 +32,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
         req.alias = "savePage"
       }
     })
-    cy.intercept('POST', `/member/oauth/token`).as('token')
+    //cy.intercept('POST', `/member/oauth/token`).as('token')
     cy.wrap(goingPage).its('pageId').as('goingPageId')
     cy.wrap(goingPage).its('elements').as('goingPageElements')
     cy.wrap(questionnaire).its('Id').as('questionnaireId')
@@ -43,10 +44,11 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
-  const executePost = false
+  const executePost = true
   const generatePdfCondition = true
 
   function _waitFor(waitFor) {
+    console.log(`waitFor: ${waitFor}`)
     if (waitFor == '@nextPage'){
       cy.get('@nextBtn').click({ force: true })
     }
@@ -57,7 +59,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
         if ((title.length <= 2)){
           title = xhr.response.body.uiBlocks[0].label.content
           if ((title.length <= 2)){
-            if (title = xhr.response.body.uiBlocks[0].elements.sections.length > 0){
+            if (xhr.response.body.uiBlocks[0].elements.sections.length > 0){
               title = xhr.response.body.uiBlocks[0].elements.sections[0].label.content
             }
           }
@@ -98,16 +100,16 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   ]
 
   file1.forEach($car => {
-    it.only(`Huk-comprehensive-self-service-clickable-car vin :  ${$car[0]}`, function () {
+    it(`Huk-comprehensive-self-service-clickable-car vin :  ${$car[0]}`, function () {
 
       const vin = $car[0]
 
-      const userCredentials =  {
-        "password": Cypress.env("passwordHukS"),
-        "remoteUser": "",
-        "sessionLanguage": "en",
-        "userName": Cypress.env("usernameHukS")
-      }
+      // const userCredentials1 =  {
+      //   "password": Cypress.env("passwordHukS"),
+      //   "remoteUser": "",
+      //   "sessionLanguage": "en",
+      //   "userName": Cypress.env("usernameHukS")
+      // }
 
       let ran1 =  getRandomInt(10,99)
       let ran2 =  getRandomInt(100,999)
@@ -122,12 +124,14 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
 
 
       console.log(`vin:${vin}`)
-      cy.request('POST',`https://${$dev}.spearhead-ag.ch/member/authenticate`,userCredentials)
-      .its('body').then(body => {
+      // cy.request('POST',`https://${$dev}.spearhead-ag.ch/member/authenticate`,userCredentials)
+      // .its('body').then(body => {
+      cy.authenticate().then(function (authorization) {
 
-        const token = body.accessToken
+        //const token = body.accessToken
+        //const authorization = `Bearer ${token}`;
         cy.then(function () {
-          questionnaire.authorization = `Bearer ${token}`
+          questionnaire.authorization = authorization
         })
 
         b2bBody.qas.find(q => {return q.questionId === "client-insurance-claim-number"}).answer = claimNumber
@@ -136,19 +140,18 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
         b2bBody.qas.find(q => {return q.questionId === "part-selection-type"}).answer = 'clickable-car'
 
 
-        //const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
-        const authorization = `Bearer ${token}`;
-        const headers_1 = {
-          'Accept': '*/*',
-          'Accept-Encoding':'gzip, deflate, br',
-          'Content-Type': 'application/json',
-          authorization,
-        }
+        Cypress._.merge(header, {'authorization' : authorization});
+        // const headers_1 = {
+        //   'Accept': '*/*',
+        //   'Accept-Encoding':'gzip, deflate, br',
+        //   'Content-Type': 'application/json',
+        //   authorization,
+        // }
         const options = {
               method: 'POST',
               url: `${baseUrl_lp}b2b/integration/huk/huk-comprehensive-self-service-init`,
               body: b2bBody,
-              headers: headers_1
+              headers: header
         };
         cy.request(options).then(
           (response) => {
@@ -160,7 +163,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
           const options2 = {
             method: 'GET',
             url: `${baseUrl_lp}questionnaire/${questionnaireId}`,
-            headers: headers_1
+            headers: header
           };
           cy.wait(5000) // time to create DN and send link via e-mail
           cy.request(options2).then(
@@ -176,7 +179,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
             const options3 = {
               method: 'GET',
               url: `${baseUrl_lp}damage/notification/${damageNotificationId}`,
-              headers: headers_1
+              headers: header
             }
             cy.request(options3).then(
               (response3) => {
@@ -188,7 +191,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
                 questionnaire.Id = questionnaireId2
               })
               console.log(`questionnaireUrl: ${questionnaireUrl}`)
-              cy.visit(questionnaireUrl)
+              cy.visit(questionnaireUrl,{log : false})
 
               const nextButtonLabel ='Speichern und Weiter'
               const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
@@ -199,6 +202,11 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-01'){
                   cy.selectMultipleList('terms-of-service-acknowledgement-huk-coburg',0)
+                  cy.getBodyType2($car,logFilename).then(function (bodyType) {
+                    cy.then(function () {
+                      questionnaire.bodyType = bodyType
+                    })
+                  })
                   nextBtn()
                 }
               })
@@ -216,18 +224,16 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
                   cy.wait(['@','@generic_elements','@generic_elements','@generic_elements','@generic_elements',
                   '@generic_elements','@generic_elements','@generic_elements','@generic_elements','@generic_elements','@generic_elements'],
                   {requestTimeout : $requestTimeout}).then(xhr => {
-                    cy.get('div[title="VAN"]').find('g#Layer_4').click({ force: true })
-                    cy.wait(3000)
+                    cy.get('div[title="VAN"]').find('g#Layer_4').click({ force: true, timeout: 3000 })
+                  })
+                  cy.then(function () {
+                    questionnaire.bodyType = 'Van'
                   })
                   nextBtn()
                 }
               })
 
-              cy.getBodyType($car,logFilename).then(function (bodyType) {
-                cy.then(function () {
-                  questionnaire.bodyType = bodyType
-                })
-              })
+
 
               //pageId: before "page-04" must check (supportInformation('bodyType')
               cy.get('@goingPageId').then(function (aliasValue) {
@@ -531,8 +537,6 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
                       cy.selectSingleList('loading-floor-area-bend',0)
                     }
                   })
-
-
                   nextBtn()
                 }
               })
@@ -593,38 +597,23 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
 
     it.skip(`Generate PDFs for ${$car[0]}`, function () {
 
-      const userCredentials =  {
-        "password": Cypress.env("passwordHukS"),
-        "remoteUser": "",
-        "sessionLanguage": "en",
-        "userName": Cypress.env("usernameHukS")
-      }
+      cy.authenticate().then(function (authorization) {
 
-      cy.request('POST',`https://${$dev}.spearhead-ag.ch/member/authenticate`,userCredentials)
-      .its('body').then(body => {
-
-        const token = body.accessToken
-        const authorization = `Bearer ${token}`;
         cy.then(function () {
           questionnaire.authorization = authorization
         })
-
-        const headers_1 = {
-          'Accept': '*/*',
-          'Accept-Encoding':'gzip, deflate, br',
-          'Content-Type': 'application/json',
-          authorization,
-        }
 
         const damageNotificationId = Cypress.env('notificationId')
         cy.then(function () {
           questionnaire.notificationId = damageNotificationId
         })
 
+        Cypress._.merge(header, {'authorization' : authorization});
+
         const options3 = {
           method: 'GET',
           url: `${baseUrl_lp}damage/notification/${damageNotificationId}`,
-          headers: headers_1
+          headers: header
         }
         cy.request(options3).then(
           (response3) => {

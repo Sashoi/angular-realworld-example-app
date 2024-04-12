@@ -2,7 +2,7 @@
 
 import { getRandomInt } from "../support/utils/common.js";
 import { makeid } from "../support/utils/common.js";
-import b2bBody from '../fixtures/b2bBody.json'
+import b2bBody from '../fixtures/templates/b2bBody.json'
 
 
 

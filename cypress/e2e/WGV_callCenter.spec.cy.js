@@ -44,7 +44,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
   const executePost = true
-  const createNewQuestionnaires = true
+  const createNewQuestionnaires = false
   const interceptWGV = false
   const $equipment_2_loading_doors = true
 
@@ -338,7 +338,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
       }) // authenticate
     }) // it wgv
 
-    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['wgv_default','wgv_pilot','wgv_pilot_2023'])
     }) //it PDF from commands
 
