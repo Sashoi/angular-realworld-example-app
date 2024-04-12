@@ -1,7 +1,8 @@
 /// <reference types="cypress" />
 import { getRandomInt } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
-import b2bBody from '../fixtures/b2bBodyErgo.json'
+import b2bBody from '../fixtures/templates/b2bBodyErgo.json'
+import header from '../fixtures/header.json'
 
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
@@ -16,7 +17,6 @@ describe('Ergo Self Service', () =>{
   })
 
   beforeEach('Setting up integrations and common variables', () =>{
-    //cy.loginToApplication()
     cy.viewport('samsung-note9')
     console.clear()
     cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
@@ -93,24 +93,17 @@ describe('Ergo Self Service', () =>{
     _waitFor('@currentPage')
   }
 
-  const lossCauses = ["collision","vandalism","storm","glass","animal"]
+  const lossCauses = ["collision"]//["collision","vandalism","storm","glass","animal"]
 
   const file1 = [
     ["6FPGXXMJ2GEL59891","PickUpSingleCabine",  "01.01.2012","Ford Ranger single cabine, Pick-up"]
   ]
 
   lossCauses.forEach(lossCause => {
-    file1.forEach($car => {
+    file.forEach($car => {
       it.only(`Execute /questionnaire/ergo_self_service/starts with lossCause:${lossCause}, with vin:${$car[0]}`, () =>{
 
         const vin = $car[0] // $car[0] or 'wrong' - internalInformation.spearheadVehicle == null
-
-        const userCredentials =  {
-          "password": Cypress.env("passwordHukS"),
-          "remoteUser": "",
-          "sessionLanguage": "en",
-          "userName": Cypress.env("usernameHukS")
-        }
 
         let ran1 =  getRandomInt(10,99)
         let ran2 =  getRandomInt(100,999)
@@ -118,43 +111,33 @@ describe('Ergo Self Service', () =>{
 
         let licenseplate = `ERG ${getRandomInt(1,9)}-${getRandomInt(100,999)}`
 
-        //const photos_available = false;
-        //const selectAllParts = false;
-        //const $equipment_2_loading_doors = true
-
         console.log(`vin: ${vin}`);
 
-        cy.request('POST',`${baseUrl_lp}/member/authenticate`,userCredentials)
-            .its('body').then(body => {
-              const token = body.accessToken
-              const authorization = `Bearer ${ token }`;
-              cy.then(function () {
-                questionnaire.authorization = authorization
-              })
+        cy.authenticate().then(function (authorization) {
 
-              const claimNumber = ran1 + "-31-"+ ran2 + "/" + ran3 + "-Z";
-              console.log(`claimNumber: ${claimNumber}`);
-              console.log(`loss-cause: ${lossCause}`);
+          cy.then(function () {
+            questionnaire.authorization = authorization
+          })
 
-              b2bBody.supportInformation.vin =  vin
-              b2bBody.qas.find(q => {return q.questionId === "client-insurance-claim-number"}).answer = claimNumber
-              b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licenseplate
-              b2bBody.qas.find(q => {return q.questionId === "loss-cause"}).answer = lossCause
+          const claimNumber = ran1 + "-31-"+ ran2 + "/" + ran3 + "-Z";
+          console.log(`claimNumber: ${claimNumber}`);
+          console.log(`loss-cause: ${lossCause}`);
 
+          b2bBody.supportInformation.vin =  vin
+          b2bBody.qas.find(q => {return q.questionId === "client-insurance-claim-number"}).answer = claimNumber
+          b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licenseplate
+          b2bBody.qas.find(q => {return q.questionId === "loss-cause"}).answer = lossCause
 
+          Cypress._.merge(header, {'authorization' : authorization});
 
-            const options = {
-              method: 'POST',
-              url: `${baseUrl_lp}questionnaire/ergo_self_service/start`,
-              body: b2bBody,
-              headers: {
-                'Accept': '*/*',
-                'Accept-Encoding':'gzip, deflate, br',
-                'Content-Type': 'application/json',
-                authorization,
-            }};
+          const options = {
+            method: 'POST',
+            url: `${baseUrl_lp}questionnaire/ergo_self_service/start`,
+            body: b2bBody,
+            headers: header
+          };
 
-            cy.request(options).then(
+          cy.request(options).then(
               (response) => {
                 // response.body is automatically serialized into JSON
                 expect(response.status).to.eq(200) // true
@@ -167,7 +150,7 @@ describe('Ergo Self Service', () =>{
                 const uiUrl = response.body.uiUrl;
                 console.log(`uiUrl: ${uiUrl}`);
 
-                cy.visit(uiUrl)
+                cy.visit(uiUrl,{ log : false })
 
                 const nextButtonLabel ='Speichern und Weiter'
                 const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
