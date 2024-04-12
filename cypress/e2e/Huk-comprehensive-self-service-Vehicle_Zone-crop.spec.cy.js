@@ -8,7 +8,7 @@ import header from '../fixtures/header.json'
 
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
-const logFilename = 'cypress/fixtures/hukVehicleZone-short.log'
+const logFilename = 'cypress/fixtures/logs/hukVehicleZone-short.log'
 const pdfPath = 'cypress/fixtures/Pdf/'
 const PathTo ='cypress/fixtures/'
 

@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 import file from '..//../fixtures/vinsArray.json'
 
-const logFilename = 'cypress/fixtures/testText.log'
+const logFilename = 'cypress/fixtures/logs/testText.log'
 
 describe('each', () =>{
 

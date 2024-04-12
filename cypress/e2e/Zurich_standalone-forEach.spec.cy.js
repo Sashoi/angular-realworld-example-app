@@ -6,7 +6,7 @@ import file from '../fixtures/vinsArray.json'
 
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: ''  }
-const logFilename = 'cypress/fixtures/zurichStandalone.log'
+const logFilename = 'cypress/fixtures/logs/zurichStandalone.log'
 
 describe('Start and complete zurich standalone questionnaire - urichz_call_center', () =>{
 

@@ -5,7 +5,7 @@ import file from '../fixtures/vinsArray.json'
 
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
-const logFilename = 'cypress/fixtures/wuestenrot.log'
+const logFilename = 'cypress/fixtures/logs/wuestenrot.log'
 const pdfPath = 'cypress/fixtures/Pdf/'
 
 describe('Start and complete wuestenrot standalone questionnaire', () => {

@@ -9,7 +9,7 @@ import header from '../fixtures/header.json'
 
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: ''  }
-const logFilename = 'cypress/fixtures/wgvCallCenter.log'
+const logFilename = 'cypress/fixtures/logs/wgvCallCenter.log'
 
 describe('Execute b2b/integration/wgv/callCenter', () => {
   before('clear log file', () => {

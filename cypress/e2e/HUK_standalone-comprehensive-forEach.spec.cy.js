@@ -6,7 +6,7 @@ import file from '../fixtures/vinsArray.json'
 
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: ''  }
-const logFilename = 'cypress/fixtures/hukComprehensiveCallCenter.log'
+const logFilename = 'cypress/fixtures/logs/hukComprehensiveCallCenter.log'
 
 describe('Start and complete huk standalone questionnaire - huk_comprehensive_call_center', () =>{
 
