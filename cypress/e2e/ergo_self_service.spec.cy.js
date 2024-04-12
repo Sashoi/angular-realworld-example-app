@@ -44,7 +44,6 @@ describe('Ergo Self Service', () =>{
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
   const executePost = false
-  const generatePdfCondition = true
 
   function _waitFor(waitFor) {
     if (waitFor == '@nextPage'){

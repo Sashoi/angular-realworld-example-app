@@ -3,11 +3,12 @@
 import { getRandomInt } from "../support/utils/common.js";
 import { makeid } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
-import b2bBody from '../fixtures/b2bBodyToni_1.json'
+import b2bBody from '../fixtures/templates/b2bBodyToni_1.json'
+import header from '../fixtures/header.json'
 
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: ''  }
-const logFilename = 'cypress/fixtures/hdiLiabilityCC.log'
+const logFilename = 'cypress/fixtures/logs/hdiLiabilityCC.log'
 
 
 describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
@@ -116,13 +117,6 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
 
       const vin = $car[0]
 
-      const userCredentials =  {
-        "password": Cypress.env("passwordHukS"),
-        "remoteUser": "",
-        "sessionLanguage": "en",
-        "userName": Cypress.env("usernameHukS")
-      }
-
       let claim1 = makeid(7)
       let claim2 = getRandomInt(10000,99999)
 
@@ -135,31 +129,27 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
 
       console.log(`vin: ${vin}`);
 
-      cy.request('POST',`${baseUrl_lp}/member/authenticate`,userCredentials)
-          .its('body').then(body => {
-            const token = body.accessToken
-            const authorization = `Bearer ${ token }`;
-            cy.then(function () {
-              questionnaire.authorization = authorization
-            })
+      cy.authenticate().then(function (authorization) {
 
-            b2bBody.supportInformation.claimNumber = claimNumber
-            b2bBody.supportInformation.vin =  vin
-            b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licenseplate
+        cy.then(function () {
+          questionnaire.authorization = authorization
+        })
+
+        b2bBody.supportInformation.claimNumber = claimNumber
+        b2bBody.supportInformation.vin =  vin
+        b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licenseplate
 
 
-          const options = {
-            method: 'POST',
-            url: `${baseUrl_lp}b2b/integration/toni-digital/hdiLiabilityCallCenter`,
-            body: b2bBody,
-            headers: {
-              'Accept': '*/*',
-              'Accept-Encoding':'gzip, deflate, br',
-              'Content-Type': 'application/json',
-              authorization,
-          }};
+        Cypress._.merge(header, {'authorization' : authorization});
 
-          cy.request(options).then(
+        const options = {
+          method: 'POST',
+          url: `${baseUrl_lp}b2b/integration/toni-digital/hdiLiabilityCallCenter`,
+          body: b2bBody,
+          headers: header
+        };
+
+        cy.request(options).then(
             (response) => {
               // response.body is automatically serialized into JSON
               expect(response.status).to.eq(200) // true
@@ -172,7 +162,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
               const uiUrl = response.body.uiUrl;
               console.log(`uiUrl: ${uiUrl}`);
 
-              cy.visit(uiUrl)
+              cy.visit(uiUrl,{ log : false })
               //cy.get('.loader').should('not.exist')
 
 

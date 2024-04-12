@@ -124,8 +124,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
 
 
       console.log(`vin:${vin}`)
-      // cy.request('POST',`https://${$dev}.spearhead-ag.ch/member/authenticate`,userCredentials)
-      // .its('body').then(body => {
+      
       cy.authenticate().then(function (authorization) {
 
         //const token = body.accessToken

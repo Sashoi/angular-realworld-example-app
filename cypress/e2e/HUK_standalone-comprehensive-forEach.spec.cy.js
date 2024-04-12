@@ -147,8 +147,9 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
       const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
       cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
 
+      // //Fahrzeugbeschreibung und Schadenhergang - page-01
       cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-01'){  //Fahrzeugbeschreibung und Schadenhergang - page-01
+        if (aliasValue == 'page-01'){
           cy.get('#accident-date-input').type('01.11.2023')
           cy.get('#vehicle-first-registration-date-input').type(first_registration_date)
           cy.get('#vehicle-mileage-input').clear().type('123456')
