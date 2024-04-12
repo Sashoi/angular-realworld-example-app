@@ -4,6 +4,7 @@
 import { getRandomInt } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 import b2bBody from '../fixtures/templates/b2bBody.json'
+import header from '../fixtures/header.json'
 
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
@@ -18,7 +19,6 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   })
 
   beforeEach('Setting up intercepts and common variables', () =>{
-    //cy.loginToApplication()
     cy.viewport('samsung-note9')
     console.clear()
     cy.intercept('GET', `/questionnaire/*/picture/vehicleZones?colour=007d40&areas=&locale=de`).as('vehicleZones')
@@ -46,8 +46,8 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
   const $requestTimeout = 60000;
-  const executePost = false
-  const generatePdfCondition = true
+  const executePost = true
+  //const generatePdfCondition = true
 
   function _waitFor(waitFor) {
     if (waitFor == '@nextPage'){
@@ -86,21 +86,13 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
     ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
   ]
   file1.forEach($car => {
-    it.only(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
+    it(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
 
       const $vin = $car[0]
-
-      const userCredentials =  {
-        "password": Cypress.env("passwordHukS"),
-        "remoteUser": "",
-        "sessionLanguage": "en",
-        "userName": Cypress.env("usernameHukS")
-      }
 
       let ran1 =  getRandomInt(10,99)
       let ran2 =  getRandomInt(100,999)
       let ran3 =  getRandomInt(100000,999999)
-
 
       console.log(`vin: ${$vin}`);
       const licenseplate = `SOF ${getRandomInt(1000,9999)}`
@@ -108,12 +100,9 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
 
       const $equipment_2_loading_doors = true
 
-    cy.request('POST',`${baseUrl_lp}member/authenticate`,userCredentials)
-    .its('body').then(body => {
-
-      const token = body.accessToken
+      cy.authenticate().then(function (authorization) {
         cy.then(function () {
-          questionnaire.authorization = `Bearer ${token}`
+          questionnaire.authorization =authorization
         })
         const claimNumber = ran1 + "-13-"+ ran2 + "/" + ran3 + "-Z";
         console.log(`claimNumber: ${claimNumber}`);
@@ -122,21 +111,12 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
         b2bBody.qas.find(q => {return q.questionId === "vehicle-vin"}).answer = $vin
         b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licenseplate
 
-
-        const authorization = `Bearer ${token}`;
-        //const contentType = `application/json`;
-        const headers_1 = {
-          'Accept': '*/*',
-          'Accept-Encoding':'gzip, deflate, br',
-          'Content-Type': 'application/json',
-          authorization,
-        }
-
+        Cypress._.merge(header, {'authorization' : authorization});
         const options = {
           method: 'POST',
           url: `${baseUrl_lp}b2b/integration/huk/huk-comprehensive-self-service-init`,
           body: b2bBody,
-          headers: headers_1
+          headers: header
         };
 
         cy.request(options).then(
@@ -147,7 +127,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
           const options1 = {
             method: 'GET',
             url: `${baseUrl_lp}questionnaire/${questionnaireId}`,
-            headers: headers_1
+            headers: header
           };
           cy.wait(2000)
           cy.request(options1).then(
@@ -159,9 +139,9 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
             Cypress.env('notificationId', damageNotificationId)
             console.log(`damageNotificationId: ${damageNotificationId}`);
             const options2 = {
-                        method: 'GET',
-                        url: `${baseUrl_lp}damage/notification/${damageNotificationId}`,
-                        headers: headers_1
+              method: 'GET',
+              url: `${baseUrl_lp}damage/notification/${damageNotificationId}`,
+              headers: header
             };
             cy.wait(2000)
             cy.request(options2).then(
@@ -174,14 +154,15 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                 questionnaire.Id = questionnaireId2
               })
 
-              cy.visit(requestUrl);
-              cy.get('.loader').should('not.exist');
+              cy.visit(requestUrl,{ log : false });
+              //cy.get('.loader').should('not.exist');
               currentPage()
 
               const nextButtonLabel ='Speichern und Weiter'
               const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
               cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
 
+              //"page-01"
               cy.selectMultipleList('terms-of-service-acknowledgement-huk-coburg',0)
               nextBtn()
 
@@ -203,7 +184,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                 }
               })
 
-              cy.getBodyType($car,logFilename).then(function (bodyType) {
+              cy.getBodyType2($car,logFilename).then(function (bodyType) {
                 cy.then(function () {
                   questionnaire.bodyType = bodyType
                 })
@@ -242,7 +223,6 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                 }
               })
 
-
               //"page-06"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-06'){
@@ -251,7 +231,6 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                   nextBtn()
                 }
               })
-
 
               //"page-07"
               cy.get('@goingPageId').then(function (aliasValue) {
@@ -270,8 +249,6 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                 }
               })
 
-
-
               //"page-09" - new
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-09'){
@@ -286,7 +263,6 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                   })
                 }
               })
-
 
               //"page-10"
               cy.get('@goingPageId').then(function (aliasValue) {
@@ -333,7 +309,6 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                 }
               })
 
-
               //"page-14" "pageShowCriteria" 'loss-cause': 'glass'
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-14'){
@@ -373,16 +348,15 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"summary-page"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'summary-page'){
+                  cy.get('section#summary_unrepaired-pre-damages-section').scrollIntoView()
                   if(executePost){
                     //cy.postQuestionnaire() does not work
                     cy.get('button[type="submit"][data-test="questionnaire-complete-button"]').click({ force: true, timeout: 5000 });
 
                     cy.wait('@postPage',{requestTimeout : $requestTimeout, responseTimeout: $requestTimeout}).then(xhr => {
                       cy.postPost(xhr,false)
-                      if (generatePdfCondition){
-                        console.log(`Cypress.env('notificationId') = ${Cypress.env('notificationId')}`)
-                      } //if
-                    }) //cy
+                      console.log(`Cypress.env('notificationId') = ${Cypress.env('notificationId')}`)
+                    }) //cy.wait
                   }
                 }
               })
@@ -394,38 +368,23 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
 
     it.skip(`Generate PDFs for ${$car[0]}`, function () {
 
-      const userCredentials =  {
-        "password": Cypress.env("passwordHukS"),
-        "remoteUser": "",
-        "sessionLanguage": "en",
-        "userName": Cypress.env("usernameHukS")
-      }
+      cy.authenticate().then(function (authorization) {
 
-      cy.request('POST',`https://${$dev}.spearhead-ag.ch/member/authenticate`,userCredentials)
-      .its('body').then(body => {
-
-        const token = body.accessToken
-        const authorization = `Bearer ${token}`;
         cy.then(function () {
           questionnaire.authorization = authorization
         })
-
-        const headers_1 = {
-          'Accept': '*/*',
-          'Accept-Encoding':'gzip, deflate, br',
-          'Content-Type': 'application/json',
-          authorization,
-        }
 
         const damageNotificationId = Cypress.env('notificationId')
         cy.then(function () {
           questionnaire.notificationId = damageNotificationId
         })
 
+        Cypress._.merge(header, {'authorization' : authorization});
+
         const options3 = {
           method: 'GET',
           url: `${baseUrl_lp}damage/notification/${damageNotificationId}`,
-          headers: headers_1
+          headers: header
         }
         cy.request(options3).then(
           (response3) => {
@@ -440,7 +399,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
       })
     }) //it PDF
 
-    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['dekra_schadenbilder','dekra_abschlussbericht'])
     }) //it PDF from commands
 
