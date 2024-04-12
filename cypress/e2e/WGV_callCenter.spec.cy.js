@@ -138,7 +138,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
               })
               console.log(`uiUrl: ${callCenterQuestionnaireUrl}`)
 
-              cy.visit(callCenterQuestionnaireUrl)
+              cy.visit(callCenterQuestionnaireUrl,{ log : false })
               //cy.get('.loader').should('not.exist')
               //cy.wait(1000)
           })

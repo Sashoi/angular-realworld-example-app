@@ -103,12 +103,6 @@ describe('Test with backend', () =>{
 
   it('Delete a new article in a global feed', () => {
 
-  //  const userCredentials =  {
-  //     "user": {
-  //         "email": "artem.bondar16@gmail.com",
-  //         "password": "CypressTest1"
-  //     }
-  //  }
 
    const requestBody = {
      "article": {
@@ -118,10 +112,6 @@ describe('Test with backend', () =>{
         "tagList": []
      }
    }
-
-    // cy.request('POST',Cypress.env("apiUrl") + '/api/users/login',userCredentials)
-    // .its('body').then(body => {
-    //   const token = body.user.token
 
     cy.get('@token').then(token => {
 

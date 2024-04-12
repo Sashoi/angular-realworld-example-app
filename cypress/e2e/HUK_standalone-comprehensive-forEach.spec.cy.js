@@ -95,7 +95,7 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
 
       const $vin = $car[0]
 
-      cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/zurich/#/login?theme=huk`)
+      cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/zurich/#/login?theme=huk`,{ log : false })
       // login
       cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
       cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))

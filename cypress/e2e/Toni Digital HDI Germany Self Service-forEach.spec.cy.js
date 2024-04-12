@@ -5,11 +5,13 @@
 import { getRandomInt } from "../support/utils/common.js";
 import { makeid } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
-import b2bBody from '../fixtures/b2bBodyToni_1.json'
+import b2bBody from '../fixtures/templates/b2bBodyToni_1.json'
+import header from '../fixtures/header.json'
 
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: ''  }
-const logFilename = 'cypress/fixtures/hdiLiabilitySS.log'
+const logFilename = 'cypress/fixtures/logs/hdiLiabilitySS.log'
+const PathTo ='cypress/fixtures/'
 
 describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
 
@@ -41,7 +43,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
 
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
-  const $requestTimeout = 50000;
+  const $requestTimeout = 60000;
   const executePost = true
 
   const printQuestionnaireIds = (obj) => {
@@ -131,13 +133,6 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
 
       const vin = $car[0]
 
-      const userCredentials =  {
-        "password": Cypress.env("passwordHukS"),
-        "remoteUser": "",
-        "sessionLanguage": "en",
-        "userName": Cypress.env("usernameHukS")
-      }
-
       const claim1 = makeid(7)
       const claim2 = getRandomInt(10000,99999)
 
@@ -147,10 +142,8 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
       const claimNumber = claim1 + claim2  // "21PFQ017602MR" works for reopen
       console.log(`vin: ${vin}`);
 
-      cy.request('POST',`https://${$dev}.spearhead-ag.ch/member/authenticate`,userCredentials)
-          .its('body').then(body => {
-          const token = body.accessToken
-          const authorization = `Bearer ${ token }`;
+      cy.authenticate().then(function (authorization) {
+
           cy.then(function () {
             questionnaire.authorization = authorization
           })
@@ -162,17 +155,13 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
           b2bBody.qas.find(q => {return q.questionId === "number-of-vehicles"}).answer = 'more-than-two'
           b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licensePlate
 
-          
+          Cypress._.merge(header, {'authorization' : authorization});
           const options = {
             method: 'POST',
             url: `https://${$dev}.spearhead-ag.ch:443/b2b/integration/toni-digital/hdiLiabilitySelfService`,
             body: b2bBody,
-            headers: {
-              'Accept': '*/*',
-              'Accept-Encoding':'gzip, deflate, br',
-              'Content-Type': 'application/json',
-              authorization,
-          }};
+            headers: header
+          };
           cy.request(options).then(
             (response) => {
               // response.body is automatically serialized into JSON
@@ -186,7 +175,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
               const uiUrl = response.body.uiUrl;
               console.log(`uiUrl: ${uiUrl}`);
 
-              cy.visit(uiUrl)
+              cy.visit(uiUrl,{ log : false })
               //cy.get('.loader').should('not.exist')
 
               const nextButtonLabel ='Weiter'
@@ -288,8 +277,6 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                   nextBtn()
                 }
               })
-
-              const PathTo ='../angular-realworld-example-app/cypress/fixtures/'
 
               //pageId: "page-05"
               cy.get('@goingPageId').then(function (aliasValue) {
@@ -399,12 +386,11 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
               })
 
         })  //hdiLiabilitySelfService
-      })  ///member/authenticate
+      })  //cy.authenticate
     }) //it
 
     it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['toni_hdi_tele_check','toni_tele_check','toni_tele_expert'])
     }) //it PDF from commands
-
   })  //forEach
 }) //describe

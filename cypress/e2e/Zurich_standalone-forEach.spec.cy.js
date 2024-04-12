@@ -95,7 +95,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
 
       const $vin = $car[0]
 
-      cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/zurich/#/login?theme=zurich`)
+      cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/zurich/#/login?theme=zurich`,{ log : false })
       // login
       cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
       cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))

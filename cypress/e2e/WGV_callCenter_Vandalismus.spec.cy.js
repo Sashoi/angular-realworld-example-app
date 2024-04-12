@@ -145,7 +145,7 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
               const uiUrl = response.body.callCenterQuestionnaireUrl;
               console.log(`uiUrl: ${uiUrl}`);
 
-              cy.visit(uiUrl)
+              cy.visit(uiUrl,{ log : false })
               cy.wait(1000)
 
               const nextButtonLabel ='Weiter'

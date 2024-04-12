@@ -85,7 +85,7 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
 
       const $vin = $car[0]
 
-      cy.visit(`${baseUrl_lp}ui/questionnaire/zurich/#/login?theme=wuestenrot`)
+      cy.visit(`${baseUrl_lp}ui/questionnaire/zurich/#/login?theme=wuestenrot`,{ log : false })
       cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
       cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
       cy.get('form').submit()

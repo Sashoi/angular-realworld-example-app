@@ -89,7 +89,7 @@ describe('Start and complete vlv standalone questionnaire', () => {
 
       const $vin = $car[0]
 
-      cy.visit(`${baseUrl_lp}ui/questionnaire/zurich/#/login?theme=vlv`)
+      cy.visit(`${baseUrl_lp}ui/questionnaire/zurich/#/login?theme=vlv`,{ log : false })
       // login
       cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
       cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))

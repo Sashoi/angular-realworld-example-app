@@ -104,13 +104,6 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
 
       const vin = $car[0]
 
-      // const userCredentials1 =  {
-      //   "password": Cypress.env("passwordHukS"),
-      //   "remoteUser": "",
-      //   "sessionLanguage": "en",
-      //   "userName": Cypress.env("usernameHukS")
-      // }
-
       let ran1 =  getRandomInt(10,99)
       let ran2 =  getRandomInt(100,999)
       let ran3 =  getRandomInt(100000,999999)
@@ -124,11 +117,9 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
 
 
       console.log(`vin:${vin}`)
-      
+
       cy.authenticate().then(function (authorization) {
 
-        //const token = body.accessToken
-        //const authorization = `Bearer ${token}`;
         cy.then(function () {
           questionnaire.authorization = authorization
         })
@@ -140,12 +131,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
 
 
         Cypress._.merge(header, {'authorization' : authorization});
-        // const headers_1 = {
-        //   'Accept': '*/*',
-        //   'Accept-Encoding':'gzip, deflate, br',
-        //   'Content-Type': 'application/json',
-        //   authorization,
-        // }
+
         const options = {
               method: 'POST',
               url: `${baseUrl_lp}b2b/integration/huk/huk-comprehensive-self-service-init`,
@@ -231,8 +217,6 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
                   nextBtn()
                 }
               })
-
-
 
               //pageId: before "page-04" must check (supportInformation('bodyType')
               cy.get('@goingPageId').then(function (aliasValue) {
