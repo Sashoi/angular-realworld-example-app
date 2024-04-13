@@ -79,9 +79,14 @@ describe('Start and complete vlv standalone questionnaire', () => {
   }
 
   const loss_causeArray = ["Unfall", "Vandalismus", "Sturm", "Glasbruch", "Tierschaden"]
-  const loss_cause = loss_causeArray[4]
+  const loss_cause = loss_causeArray[0]
   const file1 = [
-    ["WVWZZZ7NZDV041367","MPV",                 "01.01.2011","VW Sharan MPV"]
+    [
+      "WDB2083441T069719",
+      "Coupe",
+      "01.01.2009",
+      "MER CLK Coupe (partial identification, build period to be defined manually)"
+    ]
   ]
 
   file1.forEach($car => {
@@ -163,10 +168,14 @@ describe('Start and complete vlv standalone questionnaire', () => {
             cy.selectSingleList('police-ranger-informed',0)
           }
           cy.get('#vehicle-mileage-input').clear().type('123456')
-          if ($vin == 'WDB2083441T069719'){
-            cy.selectDropDown('select_buildPeriod',1)
-            cy.wait(2000)
-          }
+          cy.selectorHasAttrClass('select#select_buildPeriod','field-invalid').then(res =>{
+            if (res){
+              cy.selectDropDown('select_buildPeriod',2)
+              cy.wait(2000)
+            }
+          })
+          // if ($vin == 'WDB2083441T069719'){
+          // }
           cy.get('@bodyType').then(function (bodyType) {
             if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
               cy.wait(2000)

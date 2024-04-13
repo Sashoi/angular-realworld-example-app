@@ -17,7 +17,6 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
   })
 
   beforeEach('Setting up intercepts and common variables', () =>{
-    //cy.loginToHukStandalone()
     console.clear()
     cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')

@@ -7,7 +7,6 @@ import header from '../fixtures/header.json'
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
 const logFilename = 'cypress/fixtures/logs/ErgoSelfService.log'
-//const pdfPath = 'cypress/fixtures/Pdf/'
 const PathTo ='cypress/fixtures/'
 
 describe('Ergo Self Service', () =>{

@@ -20,7 +20,6 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
   })
 
   beforeEach('Setting up intercepts and common variables', () =>{
-    //cy.loginToHukStandalone()
     console.clear()
     cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
@@ -125,7 +124,12 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
   const eMail = 'sivanchevski@soft2run.com'
 
   const file1 = [
-    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"]
+    [
+      "WDB2083441T069719",
+      "Coupe",
+      "01.01.2009",
+      "MER CLK Coupe (partial identification, build period to be defined manually)"
+    ]
   ]
 
   file1.forEach($car => {
@@ -208,7 +212,12 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                   })
                   cy.selectSingleList('collision-type',0)
                   cy.selectSingleList('loss-circumstances',0)
-                  cy.selectDropDown('select_buildPeriod',1)
+                  cy.selectorHasAttrClass('select#select_buildPeriod','field-invalid').then(res =>{
+                    if (res){
+                      cy.selectDropDown('select_buildPeriod',2)
+                      cy.wait(2000)
+                    }
+                  })
                   cy.wait(2000)
                   nextBtn()
                 }

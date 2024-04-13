@@ -10,7 +10,6 @@ import header from '../fixtures/header.json'
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
 const logFilename = 'cypress/fixtures/logs/wgv.log'
-const pdfPath = 'cypress/fixtures/Pdf/'
 
 describe('Execute b2b/integration/wgv/callCenter', () =>{
   before('clear log file', () => {
@@ -18,7 +17,6 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   })
 
   beforeEach('Setting up intercepts and common variables', () => {
-    //cy.loginToHukStandalone()
     console.clear()
     //cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')

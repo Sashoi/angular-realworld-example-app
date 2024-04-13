@@ -6,13 +6,11 @@ const logFilename = 'cypress/fixtures/logs/testText.log'
 describe('each', () =>{
 
   before('Login to the app', () => {
-    //cy.loginToHukStandalone()
     console.clear()
     cy.writeFile(logFilename, '')
   })
 
   beforeEach('Login to the app', () => {
-    //cy.loginToHukStandalone()
     //console.clear()
   })
 

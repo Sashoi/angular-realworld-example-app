@@ -101,6 +101,12 @@ Cypress.Commands.add('selectDropDown', (selectorId, option) =>{
   })
 })
 
+Cypress.Commands.add('selectorHasAttrClass', (selector, attr) =>{
+  cy.get(selector).invoke('attr', 'class').then($classNames => {
+    return cy.wrap($classNames.includes(attr))
+  })
+})
+
 Cypress.Commands.add('uploadImage', (selectorId,toPath,fileName) =>{
   cy.intercept('POST', `/questionnaire/*/attachment/answer/${selectorId}/index-*?locale=de`).as(`attachmentAnswer-${selectorId}`)
   cy.get(`form#${selectorId}`).find('button').selectFile(`${toPath}${fileName}`, {

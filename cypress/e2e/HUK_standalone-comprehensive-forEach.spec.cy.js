@@ -15,12 +15,11 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
   })
 
   beforeEach('Setting up integrations and common variables', () => {
-    //cy.loginToHukStandalone()
     console.clear()
     cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
     cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
-    cy.intercept('GET', `/questionnaire/*//picture/clickableCar*`).as('clickableCar')
+    cy.intercept('GET', `/questionnaire/*//picture/clickableCar*`,{ log: false }).as('clickableCar')
     cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
       if (req.url.includes('navigateTo')) {
         req.alias = "nextPage"
@@ -87,10 +86,14 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
   }
 
   const file1 = [
-    ["WDB1704351F077666","Cabrio",              "01.01.2004","MER SLK Cabrio"],
-    ["WBAUB310X0VN69014","Hatch3",              "01.01.2012","BMW 1 Series Hatch3"]
+    [
+      "WDB2083441T069719",
+      "Coupe",
+      "01.01.2009",
+      "MER CLK Coupe (partial identification, build period to be defined manually)"
+    ]
 ]
-  file.forEach($car => {
+  file1.forEach($car => {
     it(`huk standalone - huk_comprehensive_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
@@ -154,7 +157,12 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
           cy.get('#vehicle-first-registration-date-input').type(first_registration_date)
           cy.get('#vehicle-mileage-input').clear().type('123456')
           cy.selectSingleList('odometer-reading-source-display',0)
-          cy.selectDropDown('select_buildPeriod',1)
+          cy.selectorHasAttrClass('select#select_buildPeriod','field-invalid').then(res =>{
+            if (res){
+              cy.selectDropDown('select_buildPeriod',2)
+              cy.wait(2000)
+            }
+          })
           cy.selectSingleList('loss-cause',0)
           cy.selectSingleList('loss-circumstances-details',0)
           cy.selectSingleList('switch-to-self-service-workflow',1)

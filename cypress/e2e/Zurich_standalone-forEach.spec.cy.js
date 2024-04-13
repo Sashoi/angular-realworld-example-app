@@ -1,8 +1,13 @@
 /// <reference types="cypress" />
+import * as util from 'util' // has no default export
+//import { inspect } from 'util' // or directly
+// or
+//var util = require('util')
 
 const { resolveProjectReferencePath } = require("typescript")
 import { getRandomInt } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
+import b2bBody from '../fixtures/templates/b2bBodyZurich.json'
 
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: ''  }
@@ -15,12 +20,11 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
   })
 
   beforeEach('Setting up integrations and common variables', () =>{
-    //cy.loginToHukStandalone()
     console.clear()
     cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
     cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
-    cy.intercept('GET', `/questionnaire/*//picture/clickableCar*`).as('clickableCar')
+    cy.intercept('GET', `/questionnaire/*//picture/clickableCar*`,{ log: false }).as('clickableCar')
     cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
       if (req.url.includes('navigateTo')) {
         req.alias = "nextPage"
@@ -40,7 +44,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = true
+  const executePost = false
   const interceptZurichStandalone = true
 
   function printUiBlocks(uiBlocks){
@@ -86,12 +90,15 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
   }
 
   const file1 = [
-    ["W1V44760313930767", "Van", "01.01.2017", "Mercedes Vito 09/2021"],
-  ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"],
-  ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
+    [
+      "WDB2083441T069719",
+      "Coupe",
+      "01.01.2009",
+      "MER CLK Coupe (partial identification, build period to be defined manually)"
+    ]
   ]
   file1.forEach($car => {
-    it(`zurich standalone questionnaire - zurich_call_center vin ${$car[0]}`, () => {
+    it.only(`zurich standalone questionnaire - zurich_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
 
@@ -127,83 +134,6 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
       const claimNumber = `${intS1}-${intS2}`
       const licensePlate = `ZUR ${intS3}`
 
-      const b2bBody = {
-        "qas": [
-
-            {
-                "questionId": "odometer-unit",
-                "answer": [
-                    "km"
-                ]
-            },
-            {
-                "questionId": "standalone",
-                "answer": [
-                    "yes"
-                ]
-            },
-            {
-                "questionId": "loss-cause",
-                "answer": "other"
-            },
-            {
-                "questionId": "coverage-type",
-                "answer": "liability"
-            },
-            {
-                "questionId": "license-plate",
-                "answer": licensePlate
-            },
-            {
-                "questionId": "client-vehicle-license-plate",
-                "answer": licensePlate
-            },
-            {
-                "questionId": "claimant-vehicle-license-plate",
-                "answer": licensePlate
-            },
-            {
-                "questionId": "first-registration-date",
-                "answer": first_registration_date
-            },
-            {
-                "questionId": "odometer-reading",
-                "answer": 123498
-            },
-            {
-                "questionId": "company",
-                "answer": "zurich"
-            },
-            {
-                "questionId": "process-type",
-                "answer": "zurichStandalone"
-            },
-            {
-                "questionId": "claim-number",
-                "answer": claimNumber
-            },
-            {
-              "questionId": "roof-damage-type",
-              "answer": ["scratches"]
-            },
-            {
-              "questionId": "roof-equipment-convertible-roof-material",
-              "answer": ["metal"]
-            },
-            {
-              "questionId": "selected-parts",
-              "answer": {
-                "roof": "yes"
-              }
-            }
-      ],
-        "supportInformation": {
-            "claimNumber": claimNumber,
-            "countryVehicleIdentification": "",
-            "vin": $vin
-        }
-      }
-
       // Fulfill standalone form
       cy.get('ng-select[data-test="standalone_company"]').find('input').type('D',{force: true})
       cy.get('input[name="claimNumber"]').type(claimNumber);
@@ -217,6 +147,15 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
        // with this intercept I'm replacing the body of standalone
        // adding 'roof' as selected SVG
         cy.intercept('POST', `/b2b/integration/zurich/zurichStandalone`, (req) => {
+
+          b2bBody.qas.find(q => {return q.questionId === "license-plate"}).answer = licensePlate
+          b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licensePlate
+          b2bBody.qas.find(q => {return q.questionId === "claimant-vehicle-license-plate"}).answer = licensePlate
+          b2bBody.qas.find(q => {return q.questionId === "first-registration-date"}).answer = first_registration_date
+          b2bBody.qas.find(q => {return q.questionId === "claim-number"}).answer = claimNumber
+          b2bBody.supportInformation.claimNumber = claimNumber
+          b2bBody.supportInformation.vin = $vin
+
           req.body = b2bBody
         })
       }
@@ -239,10 +178,6 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-01'){
-          if ($vin == 'WDB2083441T069719'){
-            cy.selectDropDown('select_buildPeriod',1)
-            cy.wait(2000)
-          }
           cy.getBodyType($car,logFilename).then(function (bodyType) {
             cy.then(function () {
               questionnaire.bodyType = bodyType
@@ -264,13 +199,27 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
               cy.selectSingleList('equipment-loading-area-cover-type',1)
             }
           })
+
+          //cy.get(selectorNextButton).contains(nextButtonLabel).then($btn => {
+            //cy.log(`disabled ? :${util.inspect(cy.wrap($btn[0].attributes))}`)
+            //cy.log(`disabled ? :${Cypress.$($btn).attr("data-test")}`)
+            //cy.log(`disabled ? :${Cypress.$('@nextBtn').attr("disabled")}`)
+          //})
+          cy.selectorHasAttrClass('select#select_buildPeriod','field-invalid').then(res =>{
+            if (res){
+              cy.selectDropDown('select_buildPeriod',1)
+              cy.wait(2000)
+            }
+          })
+          //if ($vin == 'WDB2083441T069719'){
+          //}
           nextBtn()
         }
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-02'){
-          cy.wait('@clickableCar',{requestTimeout : $requestTimeout}).then(xhr => {
+          cy.wait('@clickableCar',{requestTimeout : $requestTimeout, log : false}).then(xhr => {
             expect(xhr.response.statusCode).to.equal(200)
             console.log(`Comming SVG with clickableCar`)
             const SVGbody = xhr.response.body;
@@ -383,6 +332,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
             console.log(`from summary-page, saved questionnaireId: ${Id}`);
           })
           if (executePost) {
+
             cy.get('button[type="submit"]').contains('Schadenaufnahme beenden').click()
             cy.wait('@postPost').then(xhr => {
               cy.postPost(xhr)

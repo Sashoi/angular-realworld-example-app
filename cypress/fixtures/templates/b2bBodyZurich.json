@@ -1,0 +1,71 @@
+{
+  "qas": [
+    {
+      "questionId": "odometer-unit",
+      "answer": ["km"]
+    },
+    {
+      "questionId": "standalone",
+      "answer": ["yes"]
+    },
+    {
+      "questionId": "loss-cause",
+      "answer": "other"
+    },
+    {
+      "questionId": "coverage-type",
+      "answer": "liability"
+    },
+    {
+      "questionId": "license-plate",
+      "answer": "licensePlate"
+    },
+    {
+      "questionId": "client-vehicle-license-plate",
+      "answer": "licensePlate"
+    },
+    {
+      "questionId": "claimant-vehicle-license-plate",
+      "answer": "licensePlate"
+    },
+    {
+      "questionId": "first-registration-date",
+      "answer": "first_registration_date"
+    },
+    {
+      "questionId": "odometer-reading",
+      "answer": 123498
+    },
+    {
+      "questionId": "company",
+      "answer": "zurich"
+    },
+    {
+      "questionId": "process-type",
+      "answer": "zurichStandalone"
+    },
+    {
+      "questionId": "claim-number",
+      "answer": "claimNumber"
+    },
+    {
+      "questionId": "roof-damage-type",
+      "answer": ["scratches"]
+    },
+    {
+      "questionId": "roof-equipment-convertible-roof-material",
+      "answer": ["metal"]
+    },
+    {
+      "questionId": "selected-parts",
+      "answer": {
+        "roof": "yes"
+      }
+    }
+  ],
+  "supportInformation": {
+    "claimNumber": "claimNumber",
+    "countryVehicleIdentification": "",
+    "vin": "$vin"
+  }
+}

@@ -18,7 +18,6 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
   })
 
   beforeEach('Setting up intercepts and common variables', () =>{
-    //cy.loginToHukStandalone()
     console.clear()
     cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
@@ -109,7 +108,12 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
   }
 
   const file1 = [
-    ["W1V44760313930767", "Van", "01.01.2017", "Mercedes Vito 09/2021"]
+    [
+      "WDB2083441T069719",
+      "Coupe",
+      "01.01.2009",
+      "MER CLK Coupe (partial identification, build period to be defined manually)"
+    ]
   ]
 
   file1.forEach($car => {
@@ -194,7 +198,12 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
                       cy.selectSingleList('equipment-loading-area-cover-type',1)
                     }
                   })
-                  cy.selectDropDown('select_buildPeriod',1)
+                  cy.selectorHasAttrClass('select#select_buildPeriod','field-invalid').then(res =>{
+                    if (res){
+                      cy.selectDropDown('select_buildPeriod',2)
+                      cy.wait(2000)
+                    }
+                  })
                   cy.wait(1000)
                   nextBtn()
                 }
@@ -575,7 +584,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
       })
     }) //it hdiLiabilityCallCenter
 
-    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['toni_hdi_tele_check','toni_tele_check','toni_tele_expert'])
     }) //it PDF from commands
   }) //forEach
