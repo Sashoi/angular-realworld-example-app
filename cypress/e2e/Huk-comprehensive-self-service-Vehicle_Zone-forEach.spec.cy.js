@@ -10,7 +10,7 @@ const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
 const logFilename = 'cypress/fixtures/logs/hukVehicleZone.log'
 const pdfPath = 'cypress/fixtures/Pdf/'
-const PathTo ='cypress/fixtures/images/'
+const PathToImages ='cypress/fixtures/images/'
 
 describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
 
@@ -83,7 +83,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   const file1 = [
-    ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
+    ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"]
   ]
   file1.forEach($car => {
     it(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
@@ -244,7 +244,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-08"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-08'){
-                  cy.uploadImage('vehicle-registration-part-1-photo-upload',PathTo,`registration-part-1.jpg`)
+                  cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,`registration-part-1.jpg`)
                   nextBtn()
                 }
               })
@@ -267,8 +267,8 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-10"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-10'){
-                  cy.uploadImage('vehicle-interior-front-photo-upload',PathTo,`interior-front.jpg`)
-                  cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathTo,`image dashboard-odometer.jpg`)
+                  cy.uploadImage('vehicle-interior-front-photo-upload',PathToImages,`interior-front.jpg`)
+                  cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathToImages,`image dashboard-odometer.jpg`)
                   cy.get('input[data-test="vehicle-mileage-question-type-vehicle-mileage"]').type('123456')
                   nextBtn()
                 }
@@ -277,8 +277,8 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-11"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-11'){
-                  cy.uploadImage('vehicle-right-front-photo-upload',PathTo,`vehicle-right-front-photo.jpg`)
-                  cy.uploadImage('vehicle-left-rear-photo-upload',PathTo,`vehicle-left-rear-photo1.jpg`)
+                  cy.uploadImage('vehicle-right-front-photo-upload',PathToImages,`vehicle-right-front-photo.jpg`)
+                  cy.uploadImage('vehicle-left-rear-photo-upload',PathToImages,`vehicle-left-rear-photo1.jpg`)
                   nextBtn()
                 }
               })
@@ -286,12 +286,12 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-12"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-12'){
-                  cy.uploadImage('damage-photo-upload-overview-vehicle-front-left-top-side',PathTo,`airbag1.jpg`)
-                  cy.uploadImage('damage-photo-upload-overview-vehicle-front-right-top-side',PathTo,`airbag2.jpg`)
-                  cy.uploadImage('damage-photo-upload-overview-roof-front-left-top-side',PathTo,`airbag3.jpg`)
-                  cy.uploadImage('damage-photo-upload-overview-roof-front-right-top-side',PathTo,`airbag4.jpg`)
-                  cy.uploadImage('damage-photo-upload-overview-roof-rear-right-top-side',PathTo,`airbag5.jpg`)
-                  cy.uploadImage('damage-photo-upload-overview-roof-rear-left-top-side',PathTo,`airbag6.jpg`)
+                  cy.uploadImage('damage-photo-upload-overview-vehicle-front-left-top-side',PathToImages,`airbag1.jpg`)
+                  cy.uploadImage('damage-photo-upload-overview-vehicle-front-right-top-side',PathToImages,`airbag2.jpg`)
+                  cy.uploadImage('damage-photo-upload-overview-roof-front-left-top-side',PathToImages,`airbag3.jpg`)
+                  cy.uploadImage('damage-photo-upload-overview-roof-front-right-top-side',PathToImages,`airbag4.jpg`)
+                  cy.uploadImage('damage-photo-upload-overview-roof-rear-right-top-side',PathToImages,`airbag5.jpg`)
+                  cy.uploadImage('damage-photo-upload-overview-roof-rear-left-top-side',PathToImages,`airbag6.jpg`)
                   nextBtn()
                 }
               })
@@ -299,12 +299,12 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-13"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-13'){
-                  cy.uploadImage('damage-photo-upload-overview-roof',PathTo,`roof.jpg`)
+                  cy.uploadImage('damage-photo-upload-overview-roof',PathToImages,`roof.jpg`)
                   if(false){
                     cy.get('form#damage-photo-upload-overview-roof').find('button').contains(' Beschädigung markieren ').click({ force: true });
                     cy.get('q-image-analytics-popup').find('div.popup-damage-types').find('input[type="checkbox"]').contains('Kratzer ').click({ force: true });
                   }
-                  cy.uploadImage('damage-photo-upload-detail-roof',PathTo,`roof-d.jpg`)
+                  cy.uploadImage('damage-photo-upload-detail-roof',PathToImages,`roof-d.jpg`)
                   nextBtn()
                 }
               })
@@ -319,9 +319,9 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-15"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-15'){
-                  cy.uploadImage('unrepaired-pre-damages-photo-upload',PathTo,`hood-npu1.jpg`)
-                  cy.uploadImage('unrepaired-pre-damages-photo-upload',PathTo,`hood-npu2.jpg`)
-                  cy.uploadImage('unrepaired-pre-damages-photo-upload',PathTo,`hood-npu3.jpg`)
+                  cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,`hood-npu1.jpg`)
+                  cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,`hood-npu2.jpg`)
+                  cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,`hood-npu3.jpg`)
                   nextBtn()
                 }
               })
@@ -329,10 +329,10 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-16"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-16'){
-                  cy.uploadImage('police-ranger-report-photo-upload',PathTo,`police-ranger-report-photo-upload.png`)
-                  cy.uploadImage('incident-location-photo-upload',PathTo,`incident-location-photo-upload-1.jpg`)
-                  cy.uploadImage('incident-location-photo-upload',PathTo,`incident-location-photo-upload-2.jpg`)
-                  cy.uploadImage('incident-location-photo-upload',PathTo,`incident-location-photo-upload-3.jpg`)
+                  cy.uploadImage('police-ranger-report-photo-upload',PathToImages,`police-ranger-report-photo-upload.png`)
+                  cy.uploadImage('incident-location-photo-upload',PathToImages,`incident-location-photo-upload-1.jpg`)
+                  cy.uploadImage('incident-location-photo-upload',PathToImages,`incident-location-photo-upload-2.jpg`)
+                  cy.uploadImage('incident-location-photo-upload',PathToImages,`incident-location-photo-upload-3.jpg`)
                   nextBtn()
                 }
               })

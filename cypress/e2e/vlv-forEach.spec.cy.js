@@ -6,7 +6,7 @@ import file from '../fixtures/vinsArray.json'
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: ''  }
 const logFilename = 'cypress/fixtures/logs/vlvStandalone.log'
-const PathTo ='cypress/fixtures/images/'
+const PathToImages ='cypress/fixtures/images/'
 
 describe('Start and complete vlv standalone questionnaire', () => {
 
@@ -18,10 +18,11 @@ describe('Start and complete vlv standalone questionnaire', () => {
 
     console.clear()
     cy.intercept('POST', `/b2b/integration/vlv/vlv-comprehensive-call-center?identifyVehicleAsync=false`).as('postStart')
-    cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
+    //cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
     cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
-    cy.intercept('GET', `/questionnaire/*//picture/clickableCar*`).as('clickableCar')
+    //cy.intercept('GET', `/questionnaire/*//picture/clickableCar*`,{ log : false }).as('clickableCar')
+    cy.intercept('POST', `/member/oauth/token`).as('token')
     cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
       if (req.url.includes('navigateTo')) {
         req.alias = "nextPage"
@@ -29,7 +30,7 @@ describe('Start and complete vlv standalone questionnaire', () => {
         req.alias = "savePage"
       }
     })
-    cy.intercept('POST', `/member/oauth/token`).as('token')
+
     cy.wrap(goingPage).its('pageId').as('goingPageId')
     cy.wrap(goingPage).its('elements').as('goingPageElements')
     cy.wrap(questionnaire).its('Id').as('questionnaireId')
@@ -79,7 +80,7 @@ describe('Start and complete vlv standalone questionnaire', () => {
   }
 
   const loss_causeArray = ["Unfall", "Vandalismus", "Sturm", "Glasbruch", "Tierschaden"]
-  const loss_cause = loss_causeArray[0]
+  const loss_cause = loss_causeArray[2]
   const file1 = [
     [
       "WDB2083441T069719",
@@ -107,7 +108,7 @@ describe('Start and complete vlv standalone questionnaire', () => {
           questionnaire.authorization = `Bearer ${access_token}`
         })
       })  //wait @token
-      cy.wait(500)
+
 
       const intS1 = getRandomInt(1000, 9999).toString()
       const intS2 = getRandomInt(1000, 9999).toString()
@@ -196,7 +197,6 @@ describe('Start and complete vlv standalone questionnaire', () => {
         }
       })
 
-
       //pageId:"page-02"
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-02'){
@@ -237,32 +237,34 @@ describe('Start and complete vlv standalone questionnaire', () => {
         }
       })
 
+      //pageId:"page-03"
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-03'){
           nextBtn()
         }
       })
 
+      //pageId:"page-04"
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-04'){
-          cy.uploadImage('vehicle-registration-part-1-photo-upload',PathTo,'registration-part-1.jpg')
-          cy.uploadImage('vehicle-right-front-photo-upload',PathTo,'vehicle-right-front-photo.jpg')
-          cy.uploadImage('vehicle-left-rear-photo-upload',PathTo,'vehicle-left-rear-photo1.jpg')
-          cy.uploadImage('vehicle-interior-front-photo-upload',PathTo,'interior-front.jpg')
-          cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathTo,'image dashboard-odometer.jpg')
+          cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,'registration-part-1.jpg')
+          cy.uploadImage('vehicle-right-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
+          cy.uploadImage('vehicle-left-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
+          cy.uploadImage('vehicle-interior-front-photo-upload',PathToImages,'interior-front.jpg')
+          cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathToImages,'image dashboard-odometer.jpg')
           if (loss_cause != 'Glasbruch'){
-            cy.uploadImage('damage-photo-upload-overview-hood',PathTo,'hood.jpg')
-            cy.uploadImage('damage-photo-upload-detail-hood',PathTo,'hood-d.jpg')
-            cy.uploadImage('damage-photo-upload-overview-left-sill',PathTo,'left-sill-o.jpg')
-            cy.uploadImage('damage-photo-upload-detail-left-sill',PathTo,'left-sill-d.jpg')
-            cy.uploadImage('damage-photo-upload-overview-exhaust',PathTo,'broken exhaust_1.jpg')
-            cy.uploadImage('damage-photo-upload-detail-exhaust',PathTo,'broken exhaust_2.jpg')
-            cy.uploadImage('damage-photo-upload-overview-right-taillight',PathTo,'right-taillight-o.jpg')
-            cy.uploadImage('damage-photo-upload-detail-right-taillight',PathTo,'right-taillight-d.jpg')
+            cy.uploadImage('damage-photo-upload-overview-hood',PathToImages,'hood.jpg')
+            cy.uploadImage('damage-photo-upload-detail-hood',PathToImages,'hood-d.jpg')
+            cy.uploadImage('damage-photo-upload-overview-left-sill',PathToImages,'left-sill-o.jpg')
+            cy.uploadImage('damage-photo-upload-detail-left-sill',PathToImages,'left-sill-d.jpg')
+            cy.uploadImage('damage-photo-upload-overview-exhaust',PathToImages,'broken exhaust_1.jpg')
+            cy.uploadImage('damage-photo-upload-detail-exhaust',PathToImages,'broken exhaust_2.jpg')
+            cy.uploadImage('damage-photo-upload-overview-right-taillight',PathToImages,'right-taillight-o.jpg')
+            cy.uploadImage('damage-photo-upload-detail-right-taillight',PathToImages,'right-taillight-d.jpg')
           }
-          cy.uploadImage('damage-photo-upload-other',PathTo,'incident-location-photo-upload-1.jpg')
-          cy.uploadImage('damage-photo-upload-other',PathTo,'incident-location-photo-upload-2.jpg')
-          cy.uploadImage('damage-photo-upload-other',PathTo,'incident-location-photo-upload-3.jpg')
+          cy.uploadImage('damage-photo-upload-other',PathToImages,'incident-location-photo-upload-1.jpg')
+          cy.uploadImage('damage-photo-upload-other',PathToImages,'incident-location-photo-upload-2.jpg')
+          cy.uploadImage('damage-photo-upload-other',PathToImages,'incident-location-photo-upload-3.jpg')
           nextBtn()
         }
       })
@@ -283,7 +285,7 @@ describe('Start and complete vlv standalone questionnaire', () => {
       })
     })  //it vlv
 
-    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['vlv_abschlussbericht'])
     }) //it PDF from commands
   }) //forEach

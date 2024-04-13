@@ -7,7 +7,7 @@ import header from '../fixtures/header.json'
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
 const logFilename = 'cypress/fixtures/logs/ErgoSelfService.log'
-const PathTo ='cypress/fixtures/images/'
+const PathToImages ='cypress/fixtures/images/'
 
 describe('Ergo Self Service', () =>{
 
@@ -94,11 +94,11 @@ describe('Ergo Self Service', () =>{
   const lossCauses = ["collision"]//["collision","vandalism","storm","glass","animal"]
 
   const file1 = [
-    ["6FPGXXMJ2GEL59891","PickUpSingleCabine",  "01.01.2012","Ford Ranger single cabine, Pick-up"]
+    ["","PickUpSingleCabine",  "01.01.2012","Ford Ranger single cabine, Pick-up"]
   ]
 
   lossCauses.forEach(lossCause => {
-    file.forEach($car => {
+    file1.forEach($car => {
       it.only(`Execute /questionnaire/ergo_self_service/starts with lossCause:${lossCause}, with vin:${$car[0]}`, () =>{
 
         const vin = $car[0] // $car[0] or 'wrong' - internalInformation.spearheadVehicle == null
@@ -182,7 +182,7 @@ describe('Ergo Self Service', () =>{
                 //pageId: "page-03" pageShowCriteria 'vehicle-body-type' = 'passenger-car' ||'lcv'
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-03'){
-                    cy.uploadImage('vehicle-registration-part-1-photo-upload-1',PathTo,'registration-part-1.jpg')
+                    cy.uploadImage('vehicle-registration-part-1-photo-upload-1',PathToImages,'registration-part-1.jpg')
                     cy.getQuestionnaireInfo()
                     nextBtn()
                   }

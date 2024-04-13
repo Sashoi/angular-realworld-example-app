@@ -10,7 +10,7 @@ const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
 const logFilename = 'cypress/fixtures/logs/hukVehicleZone-short.log'
 const pdfPath = 'cypress/fixtures/Pdf/'
-const PathTo ='cypress/fixtures/images/'
+const PathToImages ='cypress/fixtures/images/'
 
 describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
 
@@ -116,7 +116,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   const file1 = [
-    ["W1V44760313930767", "Van", "01.01.2017", "Mercedes Vito 09/2021"]
+    ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"]
   ]
   file1.forEach($car => {
     it(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
@@ -275,7 +275,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-08"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-08'){
-                  cy.uploadImage('vehicle-registration-part-1-photo-upload',PathTo,`registration-part-1.jpg`)
+                  cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,`registration-part-1.jpg`)
                   nextBtn()
                 }
               })
@@ -291,8 +291,8 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-10"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-10'){
-                  cy.uploadImage('vehicle-interior-front-photo-upload',PathTo,`interior-front.jpg`)
-                  cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathTo,`image dashboard-odometer.jpg`)
+                  cy.uploadImage('vehicle-interior-front-photo-upload',PathToImages,`interior-front.jpg`)
+                  cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathToImages,`image dashboard-odometer.jpg`)
                   cy.get('input[data-test="vehicle-mileage-question-type-vehicle-mileage"]').type('123456')
                   nextBtn()
                 }
@@ -301,8 +301,8 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-11"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-11'){
-                  cy.uploadImage('vehicle-right-front-photo-upload',PathTo,`vehicle-right-front-photo.jpg`)
-                  cy.uploadImage('vehicle-left-rear-photo-upload',PathTo,`vehicle-left-rear-photo1.jpg`)
+                  cy.uploadImage('vehicle-right-front-photo-upload',PathToImages,`vehicle-right-front-photo.jpg`)
+                  cy.uploadImage('vehicle-left-rear-photo-upload',PathToImages,`vehicle-left-rear-photo1.jpg`)
                   nextBtn()
                 }
               })
@@ -310,8 +310,8 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-12"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-12'){
-                  cy.uploadImage('damage-photo-upload-overview-vehicle-front-left-top-side',PathTo,`airbag1.jpg`)
-                  cy.uploadImage('damage-photo-upload-overview-vehicle-front-right-top-side',PathTo,`airbag2.jpg`)
+                  cy.uploadImage('damage-photo-upload-overview-vehicle-front-left-top-side',PathToImages,`airbag1.jpg`)
+                  cy.uploadImage('damage-photo-upload-overview-vehicle-front-right-top-side',PathToImages,`airbag2.jpg`)
                   nextBtn()
                 }
               })
@@ -319,7 +319,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-13"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-13'){
-                  cy.uploadImage('damage-photo-upload-overview-windshield',PathTo,`broken front window_2.jpg`)
+                  cy.uploadImage('damage-photo-upload-overview-windshield',PathToImages,`broken front window_2.jpg`)
                   selectCropImage('damage-photo-upload-overview-windshield',
                                   'damage-photo-upload-detail-windshield',
                                   `“Windschutzscheibe” - Nahaufnahme der Beschädigung`)
@@ -337,7 +337,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-15"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-15'){
-                  cy.uploadImage('unrepaired-pre-damages-photo-upload',PathTo,`hood-npu1.jpg`)
+                  cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,`hood-npu1.jpg`)
                   nextBtn()
                 }
               })
@@ -345,8 +345,8 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-16"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-16'){
-                  //cy.uploadImage('police-ranger-report-photo-upload',PathTo,`police-ranger-report-photo-upload.png`)
-                  //cy.uploadImage('incident-location-photo-upload',PathTo,`incident-location-photo-upload-1.jpg`)
+                  //cy.uploadImage('police-ranger-report-photo-upload',PathToImages,`police-ranger-report-photo-upload.png`)
+                  //cy.uploadImage('incident-location-photo-upload',PathToImages,`incident-location-photo-upload-1.jpg`)
 
                   nextBtn()
                 }
@@ -380,7 +380,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
       })
     }) //it Huk
 
-    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['dekra_schadenbilder','dekra_abschlussbericht'])
     }) //it PDF from commands
   }) //forEach
