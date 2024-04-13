@@ -11,7 +11,7 @@ import header from '../fixtures/header.json'
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: ''  }
 const logFilename = 'cypress/fixtures/logs/hdiLiabilitySS.log'
-const PathTo ='cypress/fixtures/'
+const PathTo ='cypress/fixtures/images/'
 
 describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
 

@@ -10,7 +10,7 @@ const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
 const logFilename = 'cypress/fixtures/logs/hukVehicleZone-short.log'
 const pdfPath = 'cypress/fixtures/Pdf/'
-const PathTo ='cypress/fixtures/'
+const PathTo ='cypress/fixtures/images/'
 
 describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
 

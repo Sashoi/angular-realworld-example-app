@@ -6,7 +6,7 @@ import file from '../fixtures/vinsArray.json'
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: ''  }
 const logFilename = 'cypress/fixtures/logs/vlvStandalone.log'
-const PathTo ='cypress/fixtures/'
+const PathTo ='cypress/fixtures/images/'
 
 describe('Start and complete vlv standalone questionnaire', () => {
 

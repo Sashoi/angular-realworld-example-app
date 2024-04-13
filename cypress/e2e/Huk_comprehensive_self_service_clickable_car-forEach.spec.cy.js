@@ -8,7 +8,7 @@ const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
 const logFilename = 'cypress/fixtures/logs/hukClickableCar.log'
 const pdfPath = 'cypress/fixtures/Pdf/'
-const PathTo ='cypress/fixtures/'
+const PathTo ='cypress/fixtures/images/'
 
 describe('Huk_comprehensive_self_service_clickable_car', () =>{
 
