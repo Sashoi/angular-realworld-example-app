@@ -1,20 +1,19 @@
-/// <reference types="cypress" />
 import { getRandomInt } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
-import b2bBody from '../fixtures/templates/b2bBodyErgo.json'
-import header from '../fixtures/header.json'
+//import b2bBody from '../fixtures/templates/ergoBody.xml'
+import header from '../fixtures/headerXML.json'
 
 const goingPage = { pageId: '', elements: []}
 const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
-const logFilename = 'cypress/fixtures/logs/ErgoSelfService.log'
+const logFilename = 'cypress/fixtures/logs/ErgoSelfServiceInit.log'
 const PathToImages ='cypress/fixtures/images/'
+const b2bBody = 'cypress/fixtures/templates/ergoBody.xml'
 
-describe('Ergo Self Service', () =>{
+describe('Ergo Self Service ini', () =>{
 
   before('clear log file', () => {
     cy.writeFile(logFilename, '')
   })
-
   beforeEach('Setting up integrations and common variables', () =>{
     cy.viewport('samsung-note9')
     console.clear()
@@ -93,69 +92,83 @@ describe('Ergo Self Service', () =>{
     _waitFor('@currentPage')
   }
 
-  const lossCauses = ["collision"]//["collision","vandalism","storm","glass","animal"]
-
   const file1 = [
+
     [
-      "VF3VEAHXKLZ080921",
+      "",
       "MiniBusMidPanel",
       "01.01.2017",
       "Peugeot Expert 09/2020"
     ]
   ]
 
-  lossCauses.forEach(lossCause => {
-    file1.forEach($car => {
-      it.only(`Execute /questionnaire/ergo_self_service/starts with lossCause:${lossCause}, with vin:${$car[0]}`, () =>{
-
-        const vin = $car[0] // $car[0] or 'wrong' - internalInformation.spearheadVehicle == null
-
-        let ran1 =  getRandomInt(10,99)
-        let ran2 =  getRandomInt(100,999)
-        let ran3 =  getRandomInt(100000,999999)
-
-        let licenseplate = `ERG ${getRandomInt(1,9)}-${getRandomInt(100,999)}`
-
+  file1.forEach($car => {
+    it.only(`Execute /questionnaire/ergo_self_service_init with vin:${$car[0]}`, () =>{
+      cy.readFile(b2bBody).then(xml => {
+        const xmlDocument = new DOMParser().parseFromString(xml,'text/xml')
+        let vin = xmlDocument.querySelector("Fin").textContent
         console.log(`vin: ${vin}`);
+        let claimNumber = xmlDocument.querySelector("SchadenNummer").textContent
+        console.log(`claimNumber: ${claimNumber}`);
+        xmlDocument.querySelector("Fin").textContent = $car[0]
+        xmlDocument.querySelector("SchadenNummer").textContent = `KS${getRandomInt(10000000,99999999)}-${getRandomInt(1000,9999)}`
+        //<Bezeichnung>sivanchevski@soft2run.com</Bezeichnung>
+        xmlDocument.querySelector("Bezeichnung").textContent = `sivanchevski1@soft2run.com`
+        console.log(`vin: ${xmlDocument.querySelector("Fin").textContent}`);
+        console.log(`claimNumber: ${xmlDocument.querySelector("SchadenNummer").textContent}`);
+        const xmlString = new XMLSerializer().serializeToString(xmlDocument);
+
 
         cy.authenticate().then(function (authorization) {
-
           cy.then(function () {
             questionnaire.authorization = authorization
           })
-
-          const claimNumber = ran1 + "-31-"+ ran2 + "/" + ran3 + "-Z";
-          console.log(`claimNumber: ${claimNumber}`);
-          console.log(`loss-cause: ${lossCause}`);
-
-          b2bBody.supportInformation.vin =  vin
-          b2bBody.qas.find(q => {return q.questionId === "client-insurance-claim-number"}).answer = claimNumber
-          b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licenseplate
-          b2bBody.qas.find(q => {return q.questionId === "loss-cause"}).answer = lossCause
 
           Cypress._.merge(header, {'authorization' : authorization});
 
           const options = {
             method: 'POST',
-            url: `${baseUrl_lp}questionnaire/ergo_self_service/start`,
-            body: b2bBody,
+            url: `${baseUrl_lp}b2b/integration/dekra/ergo-self-service-init`,
+            body: xmlString,
             headers: header
           };
-
           cy.request(options).then(
-              (response) => {
-                // response.body is automatically serialized into JSON
-                expect(response.status).to.eq(200) // true
-
-                const questionnaireId = response.body.questionnaireId;
+            (response) => {
+            // response.body is automatically serialized into JSON
+            expect(response.status).to.eq(201) // true
+            const questionnaireId = response.body.questionnaireId
+            console.log(`self-service-init questionnaireId: ${questionnaireId}`)
+            const options2 = {
+              method: 'GET',
+              url: `${baseUrl_lp}questionnaire/${questionnaireId}`,
+              headers: header
+            };
+            cy.wait(1000) // 5000 time to create DN and send link via e-mail
+            cy.request(options2).then(
+              (response2) => {
+              expect(response2.status).to.eq(200) // true
+              console.log('supportInformation: '+JSON.stringify(response2.body.supportInformation))
+              const damageNotificationId = response2.body.supportInformation.damageNotificationId
+              cy.then(function () {
+                questionnaire.notificationId = damageNotificationId
+              })
+              Cypress.env('notificationId', damageNotificationId)
+              const options3 = {
+                method: 'GET',
+                url: `${baseUrl_lp}damage/notification/${damageNotificationId}`,
+                headers: header
+              }
+              cy.request(options3).then(
+                (response3) => {
+                expect(response3.status).to.eq(200) // true
+                const questionnaireUrl = response3.body.body.requestedInformation[0].requestUrl;
+                const questionnaireId2 = response3.body.body.requestedInformation[0].questionnaireId;
+                console.log(`Real questionnaireId: ${questionnaireId2}`)
                 cy.then(function () {
-                  questionnaire.Id = questionnaireId
+                  questionnaire.Id = questionnaireId2
                 })
-                console.log(`questionnaireId: ${questionnaireId}`)
-                const uiUrl = response.body.uiUrl;
-                console.log(`uiUrl: ${uiUrl}`);
-
-                cy.visit(uiUrl,{ log : false })
+                console.log(`questionnaireUrl: ${questionnaireUrl}`)
+                cy.visit(questionnaireUrl,{log : false})
 
                 const nextButtonLabel ='Speichern und Weiter'
                 const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
@@ -165,23 +178,22 @@ describe('Ergo Self Service', () =>{
 
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-01'){
-                    cy.getBodyType($car,logFilename).then(function (bodyType) {
+                    cy.getBodyType2($car,logFilename).then(function (bodyType) {
                       cy.then(function () {
                         questionnaire.bodyType = bodyType
                       })
                     })
                     cy.selectMultipleList('terms-of-service-acknowledgement',0)
-                    cy.getQuestionnaireInfo()
+                    //cy.getQuestionnaireInfo()
                     cy.wait(1000)
                     nextBtn()
                   }
                 })
-
                 //pageId: "page-02" pageShowCriteria 'client-vehicle-license-plate' != null && internalInformation.spearheadVehicle == null
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-02'){
                     cy.selectSingleList('vehicle-body-type',0)
-                    cy.getQuestionnaireInfo()
+                    //cy.getQuestionnaireInfo()
                     nextBtn()
                   }
                 })
@@ -190,15 +202,14 @@ describe('Ergo Self Service', () =>{
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-03'){
                     cy.uploadImage('vehicle-registration-part-1-photo-upload-1',PathToImages,'registration-part-1.jpg')
-                    cy.getQuestionnaireInfo()
+                    //cy.getQuestionnaireInfo()
                     nextBtn()
                   }
                 })
-
                 //pageId: "page-04" pageShowCriteria internalInformation.spearheadVehicle == null
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-04'){
-                    cy.getQuestionnaireInfo()
+                    //cy.getQuestionnaireInfo()
                     nextBtn()
                   }
                 })
@@ -212,7 +223,7 @@ describe('Ergo Self Service', () =>{
                     cy.selectMultipleList('damaged-glass-parts-lights',2)
                     cy.selectMultipleList('damaged-glass-parts-lights',3)
                     cy.selectMultipleList('damaged-glass-parts-lights',4)
-                    cy.getQuestionnaireInfo()
+                    //cy.getQuestionnaireInfo()
                     nextBtn()
                   }
                 })
@@ -243,8 +254,7 @@ describe('Ergo Self Service', () =>{
                     cy.get('div#vehicle-mileage').find('input#vehicle-mileage-input').type('123321')
                     cy.selectSingleList('hail-damage-size',2)
                     cy.selectSingleList('entire-vehicle-damaged-by-hail',1)
-                    cy.getQuestionnaireInfo()
-                    cy.get('div#hail-damage-size').find('span.info-icon').click({ force: true })
+                    //cy.getQuestionnaireInfo()
                     nextBtn()
                   }
                 })
@@ -255,7 +265,7 @@ describe('Ergo Self Service', () =>{
                     cy.selectSVG('hood')
                     cy.selectSVG('roof')
                     cy.selectSVG('windshield')
-                    cy.getQuestionnaireInfo()
+                    //cy.getQuestionnaireInfo()
                     nextBtn()
                   }
                 })
@@ -264,7 +274,7 @@ describe('Ergo Self Service', () =>{
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-09'){
                     cy.selectSingleList('hail-damage-intensity',2)
-                    cy.getQuestionnaireInfo()
+                    //cy.getQuestionnaireInfo()
                     nextBtn()
                   }
                 })
@@ -275,10 +285,7 @@ describe('Ergo Self Service', () =>{
                     cy.selectSingleList('damaged-vehicle-area-left-hail-damage-intensity',0)
                     cy.selectSingleList('damaged-vehicle-area-top-hail-damage-intensity',2)
                     cy.selectSingleList('damaged-vehicle-area-right-hail-damage-intensity',0)
-                    cy.getQuestionnaireInfo()
-                    cy.get('div#damaged-vehicle-area-left-hail-damage-intensity').find('span.info-icon').click({ force: true })
-                    cy.get('div#damaged-vehicle-area-top-hail-damage-intensity').find('span.info-icon').click({ force: true })
-                    cy.get('div#damaged-vehicle-area-right-hail-damage-intensity').find('span.info-icon').click({ force: true })
+                    //cy.getQuestionnaireInfo()
                     nextBtn()
                   }
                 })
@@ -288,68 +295,55 @@ describe('Ergo Self Service', () =>{
                   if (aliasValue == 'page-13'){
                     cy.selectMultipleList('windshield-hail-damage-type',0)
                     cy.selectMultipleList('windshield-hail-damage-type',1)
-                    cy.getQuestionnaireInfo()
-                    nextBtn()
-                  }
-                })
-
-                //pageId: "page-23"
-                cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-23'){
+                    //cy.getQuestionnaireInfo()
                     nextBtn()
                   }
                 })
 
                 //pageId: "page-23" pageShowCriteria = true
                 cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-23-2'){
+                  if (aliasValue == 'page-23'){
                     cy.selectSingleList('client-salutation',1)
-                    //const nextButtonLabel23 ='Schadenmeldung senden'
-                    //cy.get(selectorNextButton).contains(nextButtonLabel23).click()
-                    //_waitFor('@nextPage')
-                    nextBtn()
+                    cy.get('div#client-first-name').find('input#client-first-name-input').type('firstName')
+                    cy.get('div#client-last-name').find('input#client-last-name-input').type('lastName')
+                    cy.get('div#client-phone-number').find('input#client-phone-number-input').type('1234567890')
+                    cy.get('div#client-email').find('input#client-email-input').type('test@test.bg').blur()
+                    const nextButtonLabel23 ='Schadenmeldung senden'
+                    cy.get(selectorNextButton).contains(nextButtonLabel23).click()
+                    _waitFor('@nextPage')
                   }
                 })
 
                 //pageId: "page-24" pageShowCriteria some glass part'-damage-type' == 'glass-broken') || some glass part'-still-working' == 'no'
                 cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-24-1'){
+                  if (aliasValue == 'page-24'){
                     nextBtn()
                   }
                 })
 
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'summary-page'){
-                    cy.selectSingleList('client-salutation',1)
                     cy.get('@questionnaireId').then(function (Id) {
                       console.log(`from summary-page, saved questionnaireId: ${Id}`);
                     })
                     if (executePost) {
                       cy.get('button[type="submit"]').contains('Senden').click()
-                      cy.wait('@postPage',{timeout : $requestTimeout}).then(xhr => {
-                        cy.postPost(xhr,false)
-                        console.log(`Cypress.env('notificationId') = ${Cypress.env('notificationId')}`)
-                      }) //cy.wait
-
-                      // cy.wait('@updatePage').then(xhr => {
-                      //   if (xhr.response.statusCode != 200){
-                      //     console.log(`status: ${xhr.response.statusCode}`);
-                      //     console.log(`internalErrorCode: ${xhr.response.internalErrorCode}`);
-                      //     console.log(`message: ${xhr.response.message}`);
-                      //   }
-                      //   expect(xhr.response.statusCode).to.equal(200)
-                      // })
+                      cy.wait('@updatePage').then(xhr => {
+                        if (xhr.response.statusCode != 200){
+                          console.log(`status: ${xhr.response.statusCode}`);
+                          console.log(`internalErrorCode: ${xhr.response.internalErrorCode}`);
+                          console.log(`message: ${xhr.response.message}`);
+                        }
+                        expect(xhr.response.statusCode).to.equal(200)
+                      })
                     }
                   }
                 })
-          })
-        })
-      }) //it ergo_self_service/start
-
-      it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
-        cy.GeneratePDFs(['toni_hdi_tele_check','toni_tele_check','toni_tele_expert'])
-      }) //it PDF from commands
-
-    }) //forEach
+              }) //response3
+            }) //response2
+          })  //response
+        }) //authorization
+      })//readFile xml
+    }) //it
   }) //forEach
-})  //describe
+})

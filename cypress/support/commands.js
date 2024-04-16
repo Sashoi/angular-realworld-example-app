@@ -282,6 +282,7 @@ Cypress.Commands.add('postPost', (xhr, hasDialog = true) =>{
   })
 })
 
+
 Cypress.Commands.add('generatePdf', function (baseUrl_lp, pdfPath, pdf_template) {
   cy.get('@authorization').then(function (authorization) {
     const notificationId = Cypress.env('notificationId')

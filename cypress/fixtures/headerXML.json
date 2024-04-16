@@ -1,0 +1,5 @@
+{
+  "Accept": "*/*",
+  "Accept-Encoding": "gzip, deflate, br",
+  "Content-Type": "application/xml"
+}
