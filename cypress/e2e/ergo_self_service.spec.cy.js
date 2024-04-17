@@ -311,13 +311,6 @@ describe('Ergo Self Service', () =>{
                   }
                 })
 
-                //pageId: "page-24" pageShowCriteria some glass part'-damage-type' == 'glass-broken') || some glass part'-still-working' == 'no'
-                cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-24-1'){
-                    nextBtn()
-                  }
-                })
-
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'summary-page'){
                     cy.selectSingleList('client-salutation',1)

@@ -83,9 +83,9 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   function _waitFor(waitFor) {
-    if (waitFor == '@nextPage'){
-      cy.get('@nextBtn').click({ force: true })
-    }
+    // if (waitFor == '@nextPage'){
+    //   cy.get('@nextBtn').click({ force: true })
+    // }
     cy.wait(waitFor,{timeout : $requestTimeout}).then(xhr => {
         expect(xhr.response.statusCode).to.equal(200)
         const gPage = xhr.response.body.pageId
@@ -108,6 +108,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   function nextBtn() {
+    cy.get('@nextBtn').click({ force: true })
     _waitFor('@nextPage')
   }
 
@@ -116,12 +117,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   const file1 = [
-    [
-      "WDB2083441T069719",
-      "Coupe",
-      "01.01.2009",
-      "MER CLK Coupe (partial identification, build period to be defined manually)"
-    ]
+    ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
   ]
   file1.forEach($car => {
     it(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
@@ -385,7 +381,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
       })
     }) //it Huk
 
-    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['dekra_schadenbilder','dekra_abschlussbericht'])
     }) //it PDF from commands
   }) //forEach

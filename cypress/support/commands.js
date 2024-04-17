@@ -260,11 +260,77 @@ Cypress.Commands.add('getQuestionnaireInfo', () =>{
   }) //get('@authorization'
 })
 
+Cypress.Commands.add('getQuestionnaireInfo2', () =>{
+  const $dev = Cypress.env("dev");
+  const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
+  //cy.get('@authorization').then(function (authorization) {
+  cy.authenticate(false).then(function (authorization) {
+    cy.get('@questionnaireId').then(function (questionnaireId) {
+      Cypress._.merge(header, {'authorization':authorization});
+      Cypress._.merge(header, {'timeout':c_requestTimeout});
+      const options = {
+        method: 'GET',
+        url: `${baseUrl_lp}questionnaire/${questionnaireId}`,
+        headers: header
+      };
+      cy.request(options).then(
+        (response) => {
+        expect(response.status).to.eq(200) // true
+        let spearheadVehicle = ''
+        let iBoxResult = ''
+        let valuationResult = ''
+        let iBoxResultSummary = ''
+        let repairCost = ''
+        if (response.body.internalInformation == undefined || response.body.internalInformation == null){
+          spearheadVehicle = 'no internalInformation'
+        } else {
+          if (response.body.internalInformation.spearheadVehicle == undefined || response.body.internalInformation.spearheadVehicle == null){
+            spearheadVehicle = 'no spearheadVehicle'
+          } else {
+            spearheadVehicle = 'has spearheadVehicle'
+          }
+          if (response.body.internalInformation.iBoxResult == undefined || response.body.internalInformation.iBoxResult == null){
+            iBoxResult = 'no iBoxResult'
+          } else {
+            iBoxResult = 'has iBoxResult'
+            if (response.body.internalInformation.iBoxResult.valuationResult == undefined || response.body.internalInformation.iBoxResult.valuationResult == null){
+              valuationResult = 'no valuationResult'
+            } else {
+              valuationResult = 'has valuationResult'
+              console.log(`retailValue :${response.body.internalInformation.iBoxResult.valuationResult.retailValue}.`)
+            }
+            if (response.body.internalInformation.iBoxResult.iBoxResultSummary == undefined || response.body.internalInformation.iBoxResult.iBoxResultSummary == null){
+              iBoxResultSummary = 'no iBoxResultSummary'
+            } else {
+              iBoxResultSummary = 'has iBoxResultSummary'
+              if (response.body.internalInformation.iBoxResult.iBoxResultSummary.repairCost == undefined || response.body.internalInformation.iBoxResult.iBoxResultSummaryrepairCost == null){
+                repairCost = 'no repairCost'
+              } else {
+                repairCost = 'has repairCost'
+                console.log(`systemValue :${response.body.internalInformation.iBoxResultSummary.repairCost.systemValue}.`)
+              }
+            }
+          }
+        }
+        console.log(`spearheadVehicle :${spearheadVehicle}.`)
+        console.log(`iBoxResult :${iBoxResult}.`)
+        console.log(`valuationResult :${valuationResult}.`)
+        console.log(`iBoxResultSummary :${iBoxResultSummary}.`)
+        console.log(`repairCost :${repairCost}.`)
+        // cy.wrap(bodyType).then((bodyType) => {
+        //   return bodyType
+        // })
+      }) //request(options)
+    }) //get('@questionnaireId'
+  }) //get('@authorization'
+})
+
 Cypress.Commands.add('postPost', (xhr, hasDialog = true) =>{
   if (xhr.response.statusCode != 200){
     console.log(`status: ${xhr.response.statusCode}`);
-    console.log(`internalErrorCode: ${xhr.response.internalErrorCode}`);
-    console.log(`message: ${xhr.response.message}`);
+    console.log(`internalErrorCode: ${xhr.response.body.internalErrorCode}`);
+    console.log(`message: ${xhr.response.body.message}`);
+    throw new Error(`test fails : ${xhr.response.body.message}`)
   }
   expect(xhr.response.statusCode).to.equal(200)
   const notificationId = xhr.response.body.notification.id;

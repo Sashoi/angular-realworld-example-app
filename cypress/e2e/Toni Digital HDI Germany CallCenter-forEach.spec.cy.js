@@ -99,7 +99,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
     cy.get(`div#${question}`).find(`input#${question}-zip-code__--__${instance}-input`).type(`1011${instance + 6}`)
     cy.get(`div#${question}`).find(`input#${question}-city__--__${instance}-input`).type(`Sofia ${instance + 1}`)
     cy.get(`div#${question}`).find(`input#${question}-phone-number__--__${instance}-input`).type(`08880${instance + 1}`)
-    cy.get(`div#${question}`).find(`input#${question}-email__--__${instance}-input`).type(`sivanchevski@soft2run.com`)
+    cy.get(`div#${question}`).find(`input#${question}-email__--__${instance}-input`).type(Cypress.env("client_email"))
     cy.get(`div#${question}`).find(`input#${question}-objects-description__--__${instance}-input`).type(`objects-description ${instance + 1}`)
     if (!lastInstance) {
       cy.get(`div#${question}`).find(`input#${question}-email__--__${instance}-input`).focus()
@@ -116,7 +116,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
     ]
   ]
 
-  file1.forEach($car => {
+  file.forEach($car => {
     it(`Execute b2b/integration/toni-digital/hdiLiabilityCallCenter with vin:${$car[0]}`, () =>{
 
       const vin = $car[0]
@@ -557,7 +557,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
                   if (photos_available){
                     cy.selectSingleList('photos-available', 0)
                     cy.selectSingleList('receive-upload-link-by', 0)
-                    cy.get('input#claimant-email-for-upload-link-input').type('sivanchevski@soft2run.com')
+                    cy.get('input#claimant-email-for-upload-link-input').type(Cypress.env("client_email"))
                   } else {
                     cy.selectSingleList('photos-available', 1)
                       const reason = getRandomInt(0,4)
@@ -584,7 +584,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
       })
     }) //it hdiLiabilityCallCenter
 
-    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['toni_hdi_tele_check','toni_tele_check','toni_tele_expert'])
     }) //it PDF from commands
   }) //forEach

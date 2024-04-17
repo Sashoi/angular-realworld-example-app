@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <messages>
     <message type="text">
         <headers>
@@ -85,7 +86,7 @@
                             <VorgangsCbxCode>12</VorgangsCbxCode>
                             <VorgangsNummer>001-0000002</VorgangsNummer>
                             <SchadenArt>
-                                <SchadenartCbxCode>3</SchadenartCbxCode>
+                                <SchadenartCbxCode>1</SchadenartCbxCode>
                                 <SchadenerweiterungCbxCode>5</SchadenerweiterungCbxCode>
                                 <VertragsGrundlagenCbx>AKB</VertragsGrundlagenCbx>
                                 <VertragsGrundlagenCbxCode>1</VertragsGrundlagenCbxCode>
@@ -115,52 +116,31 @@
                 </SVDienstleistung>
                 <AuftragspositionsPartner XSIType="Person">
                     <Adresse>
-                        <Ort>Kassel</Ort>
-                        <Land>DE</Land>
-                        <PLZ>34117</PLZ>
-                        <Postfach/>
-                        <StrasseUndHausNr>Kölnische Str. 81</StrasseUndHausNr>
-                        <Telefon1>0561/9706121</Telefon1>
-                        <Telefax/>
                         <Email>
-                          <Bezeichnung>sivanchevski1@soft2run.com</Bezeichnung>
-                          <DefaultAdresse/>
-                          <StandardEmpfaenger/>
-                          <SuchFeld/>
+                            <Bezeichnung>sivanchevski1@soft2run.com</Bezeichnung>
+                            <DefaultAdresse/>
+                            <StandardEmpfaenger/>
+                            <SuchFeld/>
                         </Email>
+                        <Ort>Test client-city</Ort>
+                        <Land>DE</Land>
+                        <Plz>77777</Plz>
+                        <Postfach/>
+                        <StrasseUndHausNr>Tintqva 24</StrasseUndHausNr>
+                        <Telefon1>+359884259623</Telefon1>
+                        <Telefax/>
                     </Adresse>
                     <Anrede/>
-                    <Name>Miroslav</Name>
+                    <Name>ver.di Bezirk Nordhessen</Name>
                     <RollenTyp>ZN</RollenTyp>
                     <Titel1/>
-                    <Name2>Ilyovski</Name2>
-                    <Name3>Test-Name3</Name3>
-                    <Name4/>
+                    <Name>TestClientLastName</Name>
+                    <Name2>TestClientFirstName</Name2>
+                    <Name3>Test client-name-3</Name3>
+                    <Name4>Test client-name-4</Name4>
                 </AuftragspositionsPartner>
-                <AuftragspositionsPartner XSIType="Person">
-                    <Adresse>
-                        <Ort>Kassel</Ort>
-                        <Land>DE</Land>
-                        <Plz>34123</Plz>
-                        <Postfach/>
-                        <StrasseUndHausNr>Ochshäuser Straße 37 - 39</StrasseUndHausNr>
-                        <Telefon1>0561/500455102</Telefon1>
-                        <Telefax/>
-                        <Email>
-                          <Bezeichnung>sivanchevski1@soft2run.com</Bezeichnung>
-                          <DefaultAdresse/>
-                          <StandardEmpfaenger/>
-                          <SuchFeld/>
-                        </Email>
-                    </Adresse>
-                    <Anrede/>
-                    <Name>Hr. Thöne</Name>
-                    <RollenTyp>ZX</RollenTyp>
-                    <Titel1/>
-                    <Name2>Name2</Name2>
-                    <Name3>Glinicke Großkunden Leistungsz</Name3>
-                    <Name4/>
-                </AuftragspositionsPartner>
+
+
                 <DispositionsDaten>
                     <GewBesichtigungsDatum>2023-12-07</GewBesichtigungsDatum>
                 </DispositionsDaten>

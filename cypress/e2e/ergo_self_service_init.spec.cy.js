@@ -9,7 +9,7 @@ const logFilename = 'cypress/fixtures/logs/ErgoSelfServiceInit.log'
 const PathToImages ='cypress/fixtures/images/'
 const b2bBody = 'cypress/fixtures/templates/ergoBody.xml'
 
-describe('Ergo Self Service ini', () =>{
+describe('Ergo Self Service init', () =>{
 
   before('clear log file', () => {
     cy.writeFile(logFilename, '')
@@ -43,6 +43,10 @@ describe('Ergo Self Service ini', () =>{
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
   const executePost = true
+  const entire_vehicle_damaged_by_hail = false
+  const glass_parts_damaged_by_hail = true
+  const client_email = Cypress.env("client_email")
+
 
   function _waitFor(waitFor) {
     // if (waitFor == '@nextPage'){
@@ -93,16 +97,10 @@ describe('Ergo Self Service ini', () =>{
   }
 
   const file1 = [
-
-    [
-      "",
-      "MiniBusMidPanel",
-      "01.01.2017",
-      "Peugeot Expert 09/2020"
-    ]
+    ["WVWZZZ3CZME020680","Station","01.09.2020","Passat Variant 1.4 TSI Plug-In-Hybrid DSG GTE"]
   ]
 
-  file1.forEach($car => {
+  file.forEach($car => {
     it.only(`Execute /questionnaire/ergo_self_service_init with vin:${$car[0]}`, () =>{
       cy.readFile(b2bBody).then(xml => {
         const xmlDocument = new DOMParser().parseFromString(xml,'text/xml')
@@ -161,9 +159,20 @@ describe('Ergo Self Service ini', () =>{
               cy.request(options3).then(
                 (response3) => {
                 expect(response3.status).to.eq(200) // true
-                const questionnaireUrl = response3.body.body.requestedInformation[0].requestUrl;
-                const questionnaireId2 = response3.body.body.requestedInformation[0].questionnaireId;
-                console.log(`Real questionnaireId: ${questionnaireId2}`)
+                let questionnaireUrl = ''
+                let questionnaireId2 = ''
+                const requestedInformation = response3.body.body.requestedInformation
+                if (requestedInformation != undefined && requestedInformation != null && requestedInformation.length > 0)
+                {
+                  console.log(`requestedInformation: ${response3.body.body.requestedInformation}`)
+                  questionnaireUrl = response3.body.body.requestedInformation[0].requestUrl;
+                  questionnaireId2 = response3.body.body.requestedInformation[0].questionnaireId;
+                  console.log(`Real questionnaireId: ${questionnaireId2}`)
+                } else {
+                  console.log(`requestedInformation: ${response3.body.body.requestedInformation}`)
+                  console.log(`body: ${JSON.stringify(response3.body.body)}`)
+                  throw new Error("test fails to read requestedInformation")
+                }
                 cy.then(function () {
                   questionnaire.Id = questionnaireId2
                 })
@@ -253,7 +262,7 @@ describe('Ergo Self Service ini', () =>{
                   if (aliasValue == 'page-07'){
                     cy.get('div#vehicle-mileage').find('input#vehicle-mileage-input').type('123321')
                     cy.selectSingleList('hail-damage-size',2)
-                    cy.selectSingleList('entire-vehicle-damaged-by-hail',1)
+                    cy.selectSingleList('entire-vehicle-damaged-by-hail',Number(entire_vehicle_damaged_by_hail))
                     //cy.getQuestionnaireInfo()
                     nextBtn()
                   }
@@ -282,10 +291,25 @@ describe('Ergo Self Service ini', () =>{
                 //pageId: "page-10" pageShowCriteria 'entire-vehicle-damaged-by-hail' = 0
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-10'){
-                    cy.selectSingleList('damaged-vehicle-area-left-hail-damage-intensity',0)
+                    cy.selectSingleList('damaged-vehicle-area-left-hail-damage-intensity',2)
                     cy.selectSingleList('damaged-vehicle-area-top-hail-damage-intensity',2)
-                    cy.selectSingleList('damaged-vehicle-area-right-hail-damage-intensity',0)
+                    cy.selectSingleList('damaged-vehicle-area-right-hail-damage-intensity',2)
                     //cy.getQuestionnaireInfo()
+                    nextBtn()
+                  }
+                })
+
+                cy.get('@goingPageId').then(function (aliasValue) {
+                  if (aliasValue == 'page-11'){
+                    cy.selectSingleList('glass-parts-damaged-by-hail',Number(glass_parts_damaged_by_hail))
+                    nextBtn()
+                  }
+                })
+
+                cy.get('@goingPageId').then(function (aliasValue) {
+                  if (aliasValue == 'page-12'){
+                    cy.selectSVG('roof')
+                    cy.selectSVG('windshield')
                     nextBtn()
                   }
                 })
@@ -295,7 +319,80 @@ describe('Ergo Self Service ini', () =>{
                   if (aliasValue == 'page-13'){
                     cy.selectMultipleList('windshield-hail-damage-type',0)
                     cy.selectMultipleList('windshield-hail-damage-type',1)
+                    //"visibleExpression": "answer('glass-parts-damaged-by-hail') == 'yes' && answer('selected-parts-glass-parts-only')['roof'] == 'yes'",
+                    if (!glass_parts_damaged_by_hail){
+                      cy.selectSingleList('roof-equipment-panorama-roof',1)
+                    }
                     //cy.getQuestionnaireInfo()
+                    nextBtn()
+                  }
+                })
+
+                cy.get('@goingPageId').then(function (aliasValue) {
+                  if (aliasValue == 'page-14'){
+                    cy.selectSingleList('unrepaired-pre-damages',0)
+                    cy.selectSingleList('water-entered-vehicle',0)
+                    nextBtn()
+                  }
+                })
+
+                cy.get('@goingPageId').then(function (aliasValue) {
+                  if (aliasValue == 'page-15'){
+                    cy.selectSingleList('cash-on-hand-preferred',0)
+                    nextBtn()
+                  }
+                })
+
+                cy.get('@goingPageId').then(function (aliasValue) {
+                  if (aliasValue == 'page-16'){
+                    nextBtn()
+                  }
+                })
+
+                cy.get('@goingPageId').then(function (aliasValue) {
+                  if (aliasValue == 'page-17'){
+                    cy.uploadImage('vehicle-registration-part-1-photo-upload-2',PathToImages,'registration-part-1.jpg')
+                    nextBtn()
+                  }
+                })
+
+                cy.get('@goingPageId').then(function (aliasValue) {
+                  if (aliasValue == 'page-18'){
+                    cy.uploadImage('vehicle-interior-front-photo-upload',PathToImages,'interior-front.jpg')
+                    nextBtn()
+                  }
+                })
+
+                cy.get('@goingPageId').then(function (aliasValue) {
+                  if (aliasValue == 'page-19'){
+                    cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathToImages,'image dashboard-odometer.jpg')
+                    nextBtn()
+                  }
+                })
+
+                cy.get('@goingPageId').then(function (aliasValue) {
+                  if (aliasValue == 'page-20'){
+                    cy.uploadImage('vehicle-right-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
+                    cy.uploadImage('vehicle-left-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
+                    cy.uploadImage('vehicle-left-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
+                    cy.uploadImage('vehicle-right-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
+                    nextBtn()
+                  }
+                })
+
+                cy.get('@goingPageId').then(function (aliasValue) {
+                  if (aliasValue == 'page-21'){
+                    cy.uploadImage('damage-photo-upload-overview-windshield',PathToImages,'broken front window_2.jpg')
+                    cy.uploadImage('damage-photo-upload-overview-roof',PathToImages,'roof.jpg')
+                    nextBtn()
+                  }
+                })
+
+                cy.get('@goingPageId').then(function (aliasValue) {
+                  if (aliasValue == 'page-22'){
+                    cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu1.jpg')
+                    cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu2.jpg')
+                    cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu3.jpg')
                     nextBtn()
                   }
                 })
@@ -303,39 +400,38 @@ describe('Ergo Self Service ini', () =>{
                 //pageId: "page-23" pageShowCriteria = true
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-23'){
-                    cy.selectSingleList('client-salutation',1)
-                    cy.get('div#client-first-name').find('input#client-first-name-input').type('firstName')
-                    cy.get('div#client-last-name').find('input#client-last-name-input').type('lastName')
-                    cy.get('div#client-phone-number').find('input#client-phone-number-input').type('1234567890')
-                    cy.get('div#client-email').find('input#client-email-input').type('test@test.bg').blur()
-                    const nextButtonLabel23 ='Schadenmeldung senden'
-                    cy.get(selectorNextButton).contains(nextButtonLabel23).click()
-                    _waitFor('@nextPage')
-                  }
-                })
-
-                //pageId: "page-24" pageShowCriteria some glass part'-damage-type' == 'glass-broken') || some glass part'-still-working' == 'no'
-                cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-24'){
+                    cy.getQuestionnaireInfo2()
+                    // const nextButtonLabel23 ='Schadenmeldung senden'
+                    // cy.get(selectorNextButton).contains(nextButtonLabel23).click()
+                    // _waitFor('@nextPage')
                     nextBtn()
                   }
                 })
 
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'summary-page'){
+                    cy.selectSingleList('client-salutation',1)
+                    cy.get('div#client-first-name').find('input#client-first-name-input').type('firstName')
+                    cy.get('div#client-last-name').find('input#client-last-name-input').type('lastName')
+                    cy.get('div#client-phone-number').find('input#client-phone-number-input').type('1234567890')
+                    cy.get('div#client-email').find('input#client-email-input').type(client_email).blur()
                     cy.get('@questionnaireId').then(function (Id) {
                       console.log(`from summary-page, saved questionnaireId: ${Id}`);
                     })
                     if (executePost) {
                       cy.get('button[type="submit"]').contains('Senden').click()
-                      cy.wait('@updatePage').then(xhr => {
-                        if (xhr.response.statusCode != 200){
-                          console.log(`status: ${xhr.response.statusCode}`);
-                          console.log(`internalErrorCode: ${xhr.response.internalErrorCode}`);
-                          console.log(`message: ${xhr.response.message}`);
-                        }
-                        expect(xhr.response.statusCode).to.equal(200)
-                      })
+                      cy.wait('@postPage',{timeout : $requestTimeout}).then(xhr => {
+                        cy.postPost(xhr,false)
+                        console.log(`Cypress.env('notificationId') = ${Cypress.env('notificationId')}`)
+                      }) //cy.wait
+                      // cy.wait('@updatePage').then(xhr => {
+                      //   if (xhr.response.statusCode != 200){
+                      //     console.log(`status: ${xhr.response.statusCode}`);
+                      //     console.log(`internalErrorCode: ${xhr.response.internalErrorCode}`);
+                      //     console.log(`message: ${xhr.response.message}`);
+                      //   }
+                      //   expect(xhr.response.statusCode).to.equal(200)
+                      // })
                     }
                   }
                 })

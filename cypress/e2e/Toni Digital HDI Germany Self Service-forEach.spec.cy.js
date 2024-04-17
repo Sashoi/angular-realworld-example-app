@@ -121,7 +121,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
   }
 
   const $equipment_2_loading_doors = false
-  const eMail = 'sivanchevski@soft2run.com'
+  const eMail = Cypress.env("client_email")
 
   const file1 = [
     [
@@ -132,7 +132,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
     ]
   ]
 
-  file1.forEach($car => {
+  file.forEach($car => {
     it(`Execute b2b/integration/toni-digital/hdiLiabilitySelfService for vin: ${$car[0]}`, () =>{
 
       const vin = $car[0]
@@ -398,7 +398,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
       })  //cy.authenticate
     }) //it
 
-    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['toni_hdi_tele_check','toni_tele_check','toni_tele_expert'])
     }) //it PDF from commands
   })  //forEach

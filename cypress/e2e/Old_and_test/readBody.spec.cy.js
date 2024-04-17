@@ -1,8 +1,8 @@
 /// <reference types="cypress" />
 
-import { getRandomInt } from "../support/utils/common.js";
-import { makeid } from "../support/utils/common.js";
-import b2bBody from '../fixtures/templates/b2bBody.json'
+import { getRandomInt } from "../../support/utils/common.js";
+import { makeid } from "../../support/utils/common.js";
+import b2bBody from '../../fixtures/templates/b2bBody.json'
 
 
 

@@ -42,7 +42,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
   const executePost = true
-  const createNewQuestionnaires = false
+  const createNewQuestionnaires = true
   const interceptWGV = false
   const $equipment_2_loading_doors = true
 
@@ -84,7 +84,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   const file1 = [
     ["W1V44760313930767", "Van", "01.01.2017", "Mercedes Vito 09/2021"]
   ]
-  file1.forEach($car => {
+  file.forEach($car => {
     it(`wgv callCenter for vin: ${$car[0]}`, () =>{
 
       const $vin = $car[0]

@@ -93,7 +93,7 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
     ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"]
   ]
 
-  file1.forEach($car => {
+  file.forEach($car => {
     it(`Execute b2b/integration/wgv/callCenter Vandalismus with vin:${$car[0]}`, () => {
 
       const vin = $car[0]
