@@ -43,7 +43,7 @@ describe('Ergo Self Service init', () =>{
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
   const executePost = true
-  const entire_vehicle_damaged_by_hail = false
+  const entire_vehicle_damaged_by_hail = true
   const glass_parts_damaged_by_hail = true
   const client_email = Cypress.env("client_email")
 
@@ -65,6 +65,11 @@ describe('Ergo Self Service init', () =>{
           }
         }
         console.log(`Comming page ${gPage} - ${title}.`)
+        cy.readFile(logFilename).then((text) => {
+          const addRow = `${gPage.padStart(18, ' ')}\n`
+          text += addRow
+          cy.writeFile(logFilename, text)
+        })
         cy.then(function () {
           goingPage.elements = []
         })
@@ -184,6 +189,7 @@ describe('Ergo Self Service init', () =>{
                 cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
 
                 currentPage()
+                //cy.getQuestionnaireInfo2($car[0], logFilename)
 
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-01'){
@@ -193,7 +199,7 @@ describe('Ergo Self Service init', () =>{
                       })
                     })
                     cy.selectMultipleList('terms-of-service-acknowledgement',0)
-                    //cy.getQuestionnaireInfo()
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     cy.wait(1000)
                     nextBtn()
                   }
@@ -202,7 +208,7 @@ describe('Ergo Self Service init', () =>{
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-02'){
                     cy.selectSingleList('vehicle-body-type',0)
-                    //cy.getQuestionnaireInfo()
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
                 })
@@ -211,14 +217,14 @@ describe('Ergo Self Service init', () =>{
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-03'){
                     cy.uploadImage('vehicle-registration-part-1-photo-upload-1',PathToImages,'registration-part-1.jpg')
-                    //cy.getQuestionnaireInfo()
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
                 })
                 //pageId: "page-04" pageShowCriteria internalInformation.spearheadVehicle == null
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-04'){
-                    //cy.getQuestionnaireInfo()
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
                 })
@@ -232,7 +238,7 @@ describe('Ergo Self Service init', () =>{
                     cy.selectMultipleList('damaged-glass-parts-lights',2)
                     cy.selectMultipleList('damaged-glass-parts-lights',3)
                     cy.selectMultipleList('damaged-glass-parts-lights',4)
-                    //cy.getQuestionnaireInfo()
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
                 })
@@ -253,6 +259,7 @@ describe('Ergo Self Service init', () =>{
                     cy.selectMultipleList('taillights-damage-type',0)
                     cy.selectMultipleList('taillights-damage-type',1)
                     cy.selectSingleList('taillights-still-working',1)
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
                 })
@@ -263,7 +270,7 @@ describe('Ergo Self Service init', () =>{
                     cy.get('div#vehicle-mileage').find('input#vehicle-mileage-input').type('123321')
                     cy.selectSingleList('hail-damage-size',2)
                     cy.selectSingleList('entire-vehicle-damaged-by-hail',Number(entire_vehicle_damaged_by_hail))
-                    //cy.getQuestionnaireInfo()
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
                 })
@@ -274,7 +281,7 @@ describe('Ergo Self Service init', () =>{
                     cy.selectSVG('hood')
                     cy.selectSVG('roof')
                     cy.selectSVG('windshield')
-                    //cy.getQuestionnaireInfo()
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
                 })
@@ -283,7 +290,7 @@ describe('Ergo Self Service init', () =>{
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-09'){
                     cy.selectSingleList('hail-damage-intensity',2)
-                    //cy.getQuestionnaireInfo()
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
                 })
@@ -294,7 +301,7 @@ describe('Ergo Self Service init', () =>{
                     cy.selectSingleList('damaged-vehicle-area-left-hail-damage-intensity',2)
                     cy.selectSingleList('damaged-vehicle-area-top-hail-damage-intensity',2)
                     cy.selectSingleList('damaged-vehicle-area-right-hail-damage-intensity',2)
-                    //cy.getQuestionnaireInfo()
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
                 })
@@ -302,6 +309,7 @@ describe('Ergo Self Service init', () =>{
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-11'){
                     cy.selectSingleList('glass-parts-damaged-by-hail',Number(glass_parts_damaged_by_hail))
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
                 })
@@ -310,6 +318,7 @@ describe('Ergo Self Service init', () =>{
                   if (aliasValue == 'page-12'){
                     cy.selectSVG('roof')
                     cy.selectSVG('windshield')
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
                 })
@@ -323,7 +332,7 @@ describe('Ergo Self Service init', () =>{
                     if (!glass_parts_damaged_by_hail){
                       cy.selectSingleList('roof-equipment-panorama-roof',1)
                     }
-                    //cy.getQuestionnaireInfo()
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
                 })
@@ -332,6 +341,7 @@ describe('Ergo Self Service init', () =>{
                   if (aliasValue == 'page-14'){
                     cy.selectSingleList('unrepaired-pre-damages',0)
                     cy.selectSingleList('water-entered-vehicle',0)
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
                 })
@@ -339,12 +349,14 @@ describe('Ergo Self Service init', () =>{
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-15'){
                     cy.selectSingleList('cash-on-hand-preferred',0)
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
                 })
 
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-16'){
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
                 })
@@ -352,6 +364,7 @@ describe('Ergo Self Service init', () =>{
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-17'){
                     cy.uploadImage('vehicle-registration-part-1-photo-upload-2',PathToImages,'registration-part-1.jpg')
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
                 })
@@ -359,6 +372,7 @@ describe('Ergo Self Service init', () =>{
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-18'){
                     cy.uploadImage('vehicle-interior-front-photo-upload',PathToImages,'interior-front.jpg')
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
                 })
@@ -366,6 +380,7 @@ describe('Ergo Self Service init', () =>{
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-19'){
                     cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathToImages,'image dashboard-odometer.jpg')
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
                 })
@@ -376,6 +391,7 @@ describe('Ergo Self Service init', () =>{
                     cy.uploadImage('vehicle-left-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
                     cy.uploadImage('vehicle-left-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
                     cy.uploadImage('vehicle-right-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
                 })
@@ -384,6 +400,7 @@ describe('Ergo Self Service init', () =>{
                   if (aliasValue == 'page-21'){
                     cy.uploadImage('damage-photo-upload-overview-windshield',PathToImages,'broken front window_2.jpg')
                     cy.uploadImage('damage-photo-upload-overview-roof',PathToImages,'roof.jpg')
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
                 })
@@ -393,6 +410,7 @@ describe('Ergo Self Service init', () =>{
                     cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu1.jpg')
                     cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu2.jpg')
                     cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu3.jpg')
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
                 })
@@ -400,16 +418,17 @@ describe('Ergo Self Service init', () =>{
                 //pageId: "page-23" pageShowCriteria = true
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-23'){
-                    cy.getQuestionnaireInfo2()
                     // const nextButtonLabel23 ='Schadenmeldung senden'
                     // cy.get(selectorNextButton).contains(nextButtonLabel23).click()
                     // _waitFor('@nextPage')
+                    cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
                 })
 
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'summary-page'){
+                    //cy.getQuestionnaireInfo2($car[0], logFilename)
                     cy.selectSingleList('client-salutation',1)
                     cy.get('div#client-first-name').find('input#client-first-name-input').type('firstName')
                     cy.get('div#client-last-name').find('input#client-last-name-input').type('lastName')

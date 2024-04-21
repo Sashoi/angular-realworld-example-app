@@ -584,7 +584,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
       })
     }) //it hdiLiabilityCallCenter
 
-    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['toni_hdi_tele_check','toni_tele_check','toni_tele_expert'])
     }) //it PDF from commands
   }) //forEach

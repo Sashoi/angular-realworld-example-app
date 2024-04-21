@@ -187,7 +187,6 @@ Cypress.Commands.add('getBodyType2', ($car,logFilename) =>{
           const addRow = `vin: ${$car[0]} expected: ${$car[1].padStart(18, ' ')} real: ${bodyType.padStart(18, ' ')} desc: ${$car[3]} \n`
           text += addRow
           cy.writeFile(logFilename, text)
-
         })
         cy.wrap(bodyType).then((bodyType) => {
           return bodyType
@@ -260,7 +259,7 @@ Cypress.Commands.add('getQuestionnaireInfo', () =>{
   }) //get('@authorization'
 })
 
-Cypress.Commands.add('getQuestionnaireInfo2', () =>{
+Cypress.Commands.add('getQuestionnaireInfo2', (vin, logFilename) =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
   //cy.get('@authorization').then(function (authorization) {
@@ -317,6 +316,11 @@ Cypress.Commands.add('getQuestionnaireInfo2', () =>{
         console.log(`valuationResult :${valuationResult}.`)
         console.log(`iBoxResultSummary :${iBoxResultSummary}.`)
         console.log(`repairCost :${repairCost}.`)
+        let pageId = response.body.pageId
+        if (pageId === undefined){
+          pageId = 'undefined'
+        }
+        console.log(`pageId :${pageId}.`)
         // cy.wrap(bodyType).then((bodyType) => {
         //   return bodyType
         // })

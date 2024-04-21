@@ -123,6 +123,9 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
       const intS2 = getRandomInt(1000000,9999999).toString()
       const intS3 = getRandomInt(1000,9999).toString()
       const $equipment_2_loading_doors = true
+      const claimTypeArray = ["VK","TK","KH"]
+      const claimTypeRandom = getRandomInt(0,3)
+      const claimType = claimTypeArray[claimTypeRandom]
 
 
       const first_registration_date = "2024-02-01";
@@ -131,13 +134,13 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
       console.log(`first_registration_date: ${first_registration_date}`)
       const nextButtonLabel ='Weiter'
       const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
-      const claimNumber = `${intS1}-${intS2}`
+      const claimNumber = `${intS1}-${intS2}-${claimType}${intS1}`
       const licensePlate = `ZUR ${intS3}`
 
       // Fulfill standalone form
       cy.get('ng-select[data-test="standalone_company"]').find('input').type('D',{force: true})
       cy.get('input[name="claimNumber"]').type(claimNumber);
-      cy.get('ng-select[data-test="standalone_claimType"]').find('input').type('T',{force: true})
+      //cy.get('ng-select[data-test="standalone_claimType"]').find('input').type('T',{force: true})
       cy.get('input[data-test="standalone_vin"]').type($vin)
       cy.get('input[formcontrolname="firstRegistrationDate"]').type(f_first_registration_date)
       cy.get('input[formcontrolname="mileage"]').type('123.456')
