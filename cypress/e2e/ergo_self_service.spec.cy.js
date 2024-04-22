@@ -22,7 +22,7 @@ describe('Ergo Self Service', () =>{
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPage')
     cy.intercept('POST', `/questionnaire/*/update?locale=de`).as('updatePage')
     cy.intercept('GET', `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
-    cy.intercept('GET', `/questionnaire/*//picture/clickableCar*`).as('clickableCar')
+    cy.intercept('GET', `/questionnaire/*/picture/clickableCar*`).as('clickableCar')
     cy.intercept('GET', `/questionnaire/generic_elements/attachment/*-example*`).as('generic_elements')
     cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
       if (req.url.includes('navigateTo')) {

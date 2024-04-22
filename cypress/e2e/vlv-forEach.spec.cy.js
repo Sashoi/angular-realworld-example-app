@@ -21,7 +21,7 @@ describe('Start and complete vlv standalone questionnaire', () => {
     //cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
     cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
-    //cy.intercept('GET', `/questionnaire/*//picture/clickableCar*`,{ log : false }).as('clickableCar')
+    //cy.intercept('GET', `/questionnaire/*/picture/clickableCar*`,{ log : false }).as('clickableCar')
     cy.intercept('POST', `/member/oauth/token`).as('token')
     cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
       if (req.url.includes('navigateTo')) {

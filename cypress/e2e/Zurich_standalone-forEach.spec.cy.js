@@ -24,7 +24,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
     cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
     cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
-    cy.intercept('GET', `/questionnaire/*//picture/clickableCar*`,{ log: false }).as('clickableCar')
+    cy.intercept('GET', `/questionnaire/*/picture/clickableCar*`,{ log: false }).as('clickableCar')
     cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
       if (req.url.includes('navigateTo')) {
         req.alias = "nextPage"
@@ -45,7 +45,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
   const executePost = false
-  const interceptZurichStandalone = true
+  const interceptZurichStandalone = false
 
   function printUiBlocks(uiBlocks){
     uiBlocks.forEach((uiBlock, index1) => {
@@ -90,12 +90,26 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
   }
 
   const file1 = [
-    [
-      "WDB2083441T069719",
-      "Coupe",
-      "01.01.2009",
-      "MER CLK Coupe (partial identification, build period to be defined manually)"
-    ]
+    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"],
+  ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"],
+  [
+    "WVWZZZ6RZGY304402",
+    "Hatch5",
+    "01.01.2017",
+    "Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
+  ],
+  ["VF7SA5FS0BW550414", "Hatch3", "01.01.2014", "CIT DS3 Hatch3"],
+  ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"],
+  [
+    "WDB2083441T069719",
+    "Coupe",
+    "01.01.2009",
+    "MER CLK Coupe (partial identification, build period to be defined manually)"
+  ],
+  ["W0L0XCR975E026845", "Cabrio", "01.01.2009", "OPE Tigra Cabrio"],
+  ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5"],
+  ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
+  ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
   ]
   file1.forEach($car => {
     it.only(`zurich standalone questionnaire - zurich_call_center vin ${$car[0]}`, () => {
@@ -122,6 +136,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
       const intS1 = getRandomInt(10,99).toString()
       const intS2 = getRandomInt(1000000,9999999).toString()
       const intS3 = getRandomInt(1000,9999).toString()
+      const intS4 = getRandomInt(1,9).toString()
       const $equipment_2_loading_doors = true
       const claimTypeArray = ["VK","TK","KH"]
       const claimTypeRandom = getRandomInt(0,3)
@@ -134,7 +149,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
       console.log(`first_registration_date: ${first_registration_date}`)
       const nextButtonLabel ='Weiter'
       const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
-      const claimNumber = `${intS1}-${intS2}-${claimType}${intS1}`
+      const claimNumber = `${intS1}-${intS2}-${claimType}${intS4}`
       const licensePlate = `ZUR ${intS3}`
 
       // Fulfill standalone form
@@ -273,7 +288,11 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
             }
 
             cy.get('#repair-location-zip-code-input').clear().type('22222')
-            cy.selectSingleList('damage-description-completed',0)
+            cy.selectSingleList('damage-description-completed',1)
+            cy.selectMultipleList('hood-damage-type',0)
+            cy.selectMultipleList('hood-damage-type',1)
+            cy.selectSingleList('hood-damage-size',2)
+            cy.selectSingleList('hidden-damage-front-zone-damage-level',3)
             if (true){
               if (xhr.response.body.search('g id="right-front-wheel"') > 0){
                 cy.selectSVG('right-front-wheel')
@@ -345,7 +364,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
       })
     }) //it
 
-    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['zurich_default','zurich_pg1_schadenbericht','zurich_pg1_schadenprotokoll'])
     }) //it PDF from commands
 
