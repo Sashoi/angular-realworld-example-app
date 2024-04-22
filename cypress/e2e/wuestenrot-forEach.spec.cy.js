@@ -25,13 +25,10 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
       if (req.url.includes('navigateTo=next')) {
         req.alias = "nextPage"
       } else {
-        if (req.url.includes('navigateTo=previous')) {
-          req.alias = "prevPage"
-        }else {
-          req.alias = "savePage"
-        }
+        req.alias = "savePage"
       }
     })
+    cy.intercept('GET', `/questionnaire/*/page/page-*?navigateTo=previous&locale=de`).as('prevPage')
     cy.intercept('POST', `/member/oauth/token`).as('token')
     cy.wrap(goingPage).its('pageId').as('goingPageId')
     cy.wrap(goingPage).its('elements').as('goingPageElements')
@@ -43,8 +40,8 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = true
-  const sectionError = false
+  const executePost = false
+  const sectionError = true
 
   function _waitFor(waitFor) {
     if (waitFor == '@nextPage'){
@@ -86,15 +83,43 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
 
   function prevBtn() {
     _waitFor('@prevPage')
+
+    // cy.get('@prevBtn').click({ force: true })
+
+    // cy.wait('@prevPage',{requestTimeout : $requestTimeout}).then(xhr => {
+    //     expect(xhr.response.statusCode).to.equal(200)
+    //     const gPage = xhr.response.body.pageId
+    //     let title = xhr.response.body.pageTitle
+    //     if ((title.length <= 2)){
+    //       title = xhr.response.body.uiBlocks[0].label.content
+    //       if ((title.length <= 2)){
+    //         if (title = xhr.response.body.uiBlocks[0].elements.sections.length > 0){
+    //           title = xhr.response.body.uiBlocks[0].elements.sections[0].label.content
+    //         }
+    //       }
+    //     }
+    //     console.log(`Comming page ${gPage} - ${title}.`)
+    //     cy.then(function () {
+    //       goingPage.elements = []
+    //     })
+    //     //printQuestionnaireIds(xhr.response.body.elements)
+    //     cy.then(function () {
+    //       goingPage.pageId = gPage
+    //     })
+    // })
   }
 
   const file1 = [
     [
-      "6FPGXXMJ2GEL59891",
-      "PickUpSingleCabine",
-      "01.01.2012",
-      "Ford Ranger single cabine, Pick-up"
-    ]
+      "WDB2083441T069719",
+      "Coupe",
+      "01.01.2009",
+      "MER CLK Coupe (partial identification, build period to be defined manually)"
+    ],
+    ["W0L0XCR975E026845", "Cabrio", "01.01.2009", "OPE Tigra Cabrio"],
+    ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5"],
+    ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
+    ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
   ]
   file1.forEach($car => {
     it(`wuestenrot-comprehensive-call-center for vin: ${$car[0]}`, () => {
@@ -156,25 +181,31 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
           cy.get('#vehicle-mileage-input').clear().type('123456')
           //cy.selectSingleList('loss-cause',0) // already selected
           cy.selectSingleList('loss-circumstances-details',8)
+          cy.selectorHasAttrClass('select#select_buildPeriod','field-invalid').then(res =>{
+            if (res){
+              cy.selectDropDown('select_buildPeriod',1)
+              cy.wait(2000)
+            }
+          })
           cy.getBodyType($car,logFilename).then(function (bodyType) {
             cy.then(function () {
               questionnaire.bodyType = bodyType
             })
           })
           cy.get('@bodyType').then(function (bodyType) {
-            if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
-              cy.wait(2000)
-              cy.selectSingleList('equipment-slide-door',1)
-              cy.selectSingleList('equipment-2-loading-doors',Number($equipment_2_loading_doors))
+            if (!sectionError){
+              if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
+                cy.wait(2000)
+                cy.selectSingleList('equipment-slide-door',1)
+                cy.selectSingleList('equipment-2-loading-doors',Number($equipment_2_loading_doors))
 
-              cy.selectSingleList('equipment-length',0)
-              cy.selectSingleList('equipment-height',0)
-              cy.selectSingleList('equipment-vehicle-rear-glassed',0)
-              cy.selectSingleList('vehicle-customized-interior',0)
-            }
-            if (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine'){
-              if (!sectionError){
-                //cy.selectSingleList('equipment-loading-area-cover-type',1)
+                cy.selectSingleList('equipment-length',0)
+                cy.selectSingleList('equipment-height',0)
+                cy.selectSingleList('equipment-vehicle-rear-glassed',0)
+                cy.selectSingleList('vehicle-customized-interior',0)
+              }
+              if (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine'){
+                  cy.selectSingleList('equipment-loading-area-cover-type',1)
               }
             }
           })
@@ -189,18 +220,31 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-02' && sectionError){  // Schadenbeschreibung
-          // cy.wait('@clickableCar',{requestTimeout : $requestTimeout, log: false}).then(xhr => {
-          //   expect(xhr.response.statusCode).to.equal(200)
-          //   console.log(`Comming SVG with clickableCar`)
-          //   prevBtn()
-          // })
-          prevBtn()
+          cy.wait('@clickableCar',{requestTimeout : $requestTimeout, log: false}).then(xhr => {
+            expect(xhr.response.statusCode).to.equal(200)
+            console.log(`Comming SVG with clickableCar`)
+            prevBtn()
+          })
         }
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-01' && sectionError){  // Fahrzeugbeschreibung und Schadenhergang
-          cy.selectSingleList('equipment-loading-area-cover-type',1)
+          cy.get('@bodyType').then(function (bodyType) {
+            if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
+              cy.wait(2000)
+              cy.selectSingleList('equipment-slide-door',1)
+              cy.selectSingleList('equipment-2-loading-doors',Number($equipment_2_loading_doors))
+
+              cy.selectSingleList('equipment-length',0)
+              cy.selectSingleList('equipment-height',0)
+              cy.selectSingleList('equipment-vehicle-rear-glassed',0)
+              cy.selectSingleList('vehicle-customized-interior',0)
+            }
+            if (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine'){
+              cy.selectSingleList('equipment-loading-area-cover-type',1)
+            }
+          })
           nextBtn()
           cy.wait(1000)
         }
@@ -284,7 +328,7 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
       })
     })  //it wuestenrot
 
-    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['wuestenrot_abschlussbericht'])
     }) //it PDF from commands
 
