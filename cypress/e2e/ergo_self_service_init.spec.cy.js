@@ -30,7 +30,7 @@ describe('Ergo Self Service init', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
-  const executePost = true
+  const executePost = false
   const entire_vehicle_damaged_by_hail = false
   const glass_parts_damaged_by_hail = true
   const client_email = Cypress.env("client_email")
@@ -87,8 +87,7 @@ describe('Ergo Self Service init', () =>{
   }
 
   const file1 = [
-    ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
-  ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
+    ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
   ]
 
   file1.forEach($car => {
@@ -416,10 +415,11 @@ describe('Ergo Self Service init', () =>{
                   if (aliasValue == 'summary-page'){
                     //cy.getQuestionnaireInfo2($car[0], logFilename)
                     cy.selectSingleList('client-salutation',1)
-                    cy.get('div#client-first-name').find('input#client-first-name-input').type('firstName')
-                    cy.get('div#client-last-name').find('input#client-last-name-input').type('lastName')
-                    cy.get('div#client-phone-number').find('input#client-phone-number-input').type('1234567890')
-                    cy.get('div#client-email').find('input#client-email-input').type(client_email).blur()
+                    cy.fulfilInputIfEmpty('div#client-first-name','input#client-first-name-input','firstName')
+                    cy.fulfilInputIfEmpty('div#client-last-name','input#client-last-name-input','lastName')
+                    cy.fulfilInputIfEmpty('div#client-phone-number','input#client-phone-number-input','1234567890')
+                    cy.fulfilInputIfEmpty('div#client-email','input#client-email-input',client_email)
+                    //cy.get('div#client-email').find('input#client-email-input').blur()
                     cy.get('@questionnaireId').then(function (Id) {
                       console.log(`from summary-page, saved questionnaireId: ${Id}`);
                     })

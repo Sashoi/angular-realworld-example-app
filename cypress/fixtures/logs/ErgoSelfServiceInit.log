@@ -1,17 +1,5 @@
            page-01
-vin: WVWZZZ7NZDV041367 expected:                MPV real:                MPV desc: VW Sharan MPV 
+vin: ZFA25000002K44267 expected:    MiniBusMidPanel real:        VanMidPanel desc: Fiat Ducato 
            page-07
            page-10
-           page-16
-           page-17
-           page-18
-           page-19
-           page-20
-      summary-page
-           page-01
-vin: SALYL2RV8JA741831 expected:                SUV real:                SUV desc: Land Rover, SUV 
-           page-07
-           page-10
-           page-11
-           page-15
       summary-page

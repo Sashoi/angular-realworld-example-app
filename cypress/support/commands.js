@@ -460,6 +460,16 @@ Cypress.Commands.add('commanBeforeEach', () =>{
   cy.intercept('POST', `/member/oauth/token`).as('token')
 })
 
+Cypress.Commands.add('fulfilInputIfEmpty', function ($div, $input, $newValue) {
+  cy.get($div).find($input).then((element)=>{
+    cy.wrap(element).invoke('val').then($val => {
+      if (!$val.length > 0){
+        cy.wrap(element).type($newValue)
+      }
+    })
+  })
+})
+
 
 
 

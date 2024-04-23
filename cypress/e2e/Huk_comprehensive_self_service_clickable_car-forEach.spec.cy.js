@@ -1,11 +1,13 @@
 /// <reference types="cypress" />
 import { getRandomInt } from "../support/utils/common.js";
+import { questionnaire } from "../support/utils/common.js";
+import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 import b2bBody from '../fixtures/templates/b2bBody.json'
 import header from '../fixtures/header.json'
 
-const goingPage = { pageId: '', elements: []}
-const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
+//const goingPage = { pageId: '', elements: []}
+//const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
 const logFilename = 'cypress/fixtures/logs/hukClickableCar.log'
 const pdfPath = 'cypress/fixtures/Pdf/'
 const PathToImages ='cypress/fixtures/images/'
@@ -17,22 +19,21 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   })
 
   beforeEach('Setting up integrations and common variables', () =>{
-
-    console.clear()
+    //console.clear()
     cy.viewport('samsung-note9')
-    cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
-    cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPage')
-    cy.intercept('GET', `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
-    cy.intercept('GET', `/questionnaire/*/picture/clickableCar*`).as('clickableCar')
+    cy.commanBeforeEach()
+    //cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
+    //cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPage')
+    //cy.intercept('GET', `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
+    //cy.intercept('GET', `/questionnaire/*/picture/clickableCar*`).as('clickableCar')
     cy.intercept('GET', `/questionnaire/generic_elements/attachment/*-example*`).as('generic_elements')
-    cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
-      if (req.url.includes('navigateTo')) {
-        req.alias = "nextPage"
-      } else {
-        req.alias = "savePage"
-      }
-    })
-    //cy.intercept('POST', `/member/oauth/token`).as('token')
+    // cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
+    //   if (req.url.includes('navigateTo')) {
+    //     req.alias = "nextPage"
+    //   } else {
+    //     req.alias = "savePage"
+    //   }
+    // })
     cy.wrap(goingPage).its('pageId').as('goingPageId')
     cy.wrap(goingPage).its('elements').as('goingPageElements')
     cy.wrap(questionnaire).its('Id').as('questionnaireId')
@@ -96,11 +97,11 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   }
 
   const file1 = [
-    ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"]
+    ["W1V44760313930767", "Van", "01.01.2017", "Mercedes Vito 09/2021"]
   ]
 
   file1.forEach($car => {
-    it.only(`Huk-comprehensive-self-service-clickable-car vin :  ${$car[0]}`, function () {
+    it(`Huk-comprehensive-self-service-clickable-car vin :  ${$car[0]}`, function () {
 
       const vin = $car[0]
 
@@ -559,7 +560,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
                 if (aliasValue == 'summary-page'){
                   if(executePost){
                     cy.get('button[type="submit"]').contains('Senden').click({ force: true, timeout: 1000 })
-                    cy.wait('@postPage',{requestTimeout : $requestTimeout, responseTimeout: $requestTimeout}).then(xhr => {
+                    cy.wait('@postPost',{requestTimeout : $requestTimeout, responseTimeout: $requestTimeout}).then(xhr => {
                       cy.postPost(xhr,false)
                     })
                     if (generatePdfCondition){
