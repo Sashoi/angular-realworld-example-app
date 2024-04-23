@@ -460,6 +460,29 @@ Cypress.Commands.add('commanBeforeEach', () =>{
   cy.intercept('POST', `/member/oauth/token`).as('token')
 })
 
+Cypress.Commands.add('commanBeforeEach2',(goingPage,questionnaire) =>{
+  console.clear()
+  cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
+  cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
+  cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
+  cy.intercept('GET', `/questionnaire/*/picture/clickableCar*`,{ log: false }).as('clickableCar')
+  cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
+    if (req.url.includes('navigateTo')) {
+      req.alias = "nextPage"
+    } else {
+      req.alias = "savePage"
+    }
+  })
+  cy.intercept('GET', `/questionnaire/*/page/page-*?navigateTo=previous&locale=de`).as('prevPage')
+  cy.intercept('POST', `/member/oauth/token`).as('token')
+  cy.wrap(goingPage).its('pageId').as('goingPageId')
+  cy.wrap(goingPage).its('elements').as('goingPageElements')
+  cy.wrap(questionnaire).its('Id').as('questionnaireId')
+  cy.wrap(questionnaire).its('authorization').as('authorization')
+  cy.wrap(questionnaire).its('bodyType').as('bodyType')
+  cy.wrap(questionnaire).its('notificationId').as('notificationId')
+})
+
 Cypress.Commands.add('fulfilInputIfEmpty', function ($div, $input, $newValue) {
   cy.get($div).find($input).then((element)=>{
     cy.wrap(element).invoke('val').then($val => {

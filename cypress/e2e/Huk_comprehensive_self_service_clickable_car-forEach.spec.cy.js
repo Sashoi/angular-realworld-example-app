@@ -6,8 +6,6 @@ import file from '../fixtures/vinsArray.json'
 import b2bBody from '../fixtures/templates/b2bBody.json'
 import header from '../fixtures/header.json'
 
-//const goingPage = { pageId: '', elements: []}
-//const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
 const logFilename = 'cypress/fixtures/logs/hukClickableCar.log'
 const pdfPath = 'cypress/fixtures/Pdf/'
 const PathToImages ='cypress/fixtures/images/'
@@ -19,27 +17,15 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   })
 
   beforeEach('Setting up integrations and common variables', () =>{
-    //console.clear()
     cy.viewport('samsung-note9')
-    cy.commanBeforeEach()
-    //cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
-    //cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPage')
-    //cy.intercept('GET', `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
-    //cy.intercept('GET', `/questionnaire/*/picture/clickableCar*`).as('clickableCar')
     cy.intercept('GET', `/questionnaire/generic_elements/attachment/*-example*`).as('generic_elements')
-    // cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
-    //   if (req.url.includes('navigateTo')) {
-    //     req.alias = "nextPage"
-    //   } else {
-    //     req.alias = "savePage"
-    //   }
-    // })
-    cy.wrap(goingPage).its('pageId').as('goingPageId')
-    cy.wrap(goingPage).its('elements').as('goingPageElements')
-    cy.wrap(questionnaire).its('Id').as('questionnaireId')
-    cy.wrap(questionnaire).its('authorization').as('authorization')
-    cy.wrap(questionnaire).its('bodyType').as('bodyType')
-    cy.wrap(questionnaire).its('notificationId').as('notificationId')
+    cy.commanBeforeEach2(goingPage,questionnaire)
+    // cy.wrap(goingPage).its('pageId').as('goingPageId')
+    // cy.wrap(goingPage).its('elements').as('goingPageElements')
+    // cy.wrap(questionnaire).its('Id').as('questionnaireId')
+    // cy.wrap(questionnaire).its('authorization').as('authorization')
+    // cy.wrap(questionnaire).its('bodyType').as('bodyType')
+    // cy.wrap(questionnaire).its('notificationId').as('notificationId')
   })
 
   const $dev = Cypress.env("dev");
