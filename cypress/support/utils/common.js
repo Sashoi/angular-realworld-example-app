@@ -17,4 +17,7 @@ export const makeid = (length) => {
   return result;
 }
 
+export const goingPage = { pageId: '', elements: []}
+export const questionnaire = { Id:'', authorization : '', bodyType: ''  }
+
 
