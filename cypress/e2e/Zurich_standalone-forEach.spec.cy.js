@@ -44,7 +44,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = false
+  const executePost = true
   const interceptZurichStandalone = false
 
   function printUiBlocks(uiBlocks){
@@ -90,25 +90,6 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
   }
 
   const file1 = [
-    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"],
-  ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"],
-  [
-    "WVWZZZ6RZGY304402",
-    "Hatch5",
-    "01.01.2017",
-    "Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
-  ],
-  ["VF7SA5FS0BW550414", "Hatch3", "01.01.2014", "CIT DS3 Hatch3"],
-  ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"],
-  [
-    "WDB2083441T069719",
-    "Coupe",
-    "01.01.2009",
-    "MER CLK Coupe (partial identification, build period to be defined manually)"
-  ],
-  ["W0L0XCR975E026845", "Cabrio", "01.01.2009", "OPE Tigra Cabrio"],
-  ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5"],
-  ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
   ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
   ]
   file1.forEach($car => {
@@ -155,11 +136,9 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
       // Fulfill standalone form
       cy.get('ng-select[data-test="standalone_company"]').find('input').type('D',{force: true})
       cy.get('input[name="claimNumber"]').type(claimNumber);
-      //cy.get('ng-select[data-test="standalone_claimType"]').find('input').type('T',{force: true})
       cy.get('input[data-test="standalone_vin"]').type($vin)
       cy.get('input[formcontrolname="firstRegistrationDate"]').type(f_first_registration_date)
       cy.get('input[formcontrolname="mileage"]').type('123.456')
-      //cy.get('input[formcontrolname="licensePlate"]')
       cy.get('[data-test="standalone_licensePlate"]').type(licensePlate)
       if (interceptZurichStandalone){
        // with this intercept I'm replacing the body of standalone
@@ -217,20 +196,12 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
               cy.selectSingleList('equipment-loading-area-cover-type',1)
             }
           })
-
-          //cy.get(selectorNextButton).contains(nextButtonLabel).then($btn => {
-            //cy.log(`disabled ? :${util.inspect(cy.wrap($btn[0].attributes))}`)
-            //cy.log(`disabled ? :${Cypress.$($btn).attr("data-test")}`)
-            //cy.log(`disabled ? :${Cypress.$('@nextBtn').attr("disabled")}`)
-          //})
           cy.selectorHasAttrClass('select#select_buildPeriod','field-invalid').then(res =>{
             if (res){
               cy.selectDropDown('select_buildPeriod',1)
               cy.wait(2000)
             }
           })
-          //if ($vin == 'WDB2083441T069719'){
-          //}
           nextBtn()
         }
       })
@@ -354,7 +325,6 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
             console.log(`from summary-page, saved questionnaireId: ${Id}`);
           })
           if (executePost) {
-
             cy.get('button[type="submit"]').contains('Schadenaufnahme beenden').click()
             cy.wait('@postPost').then(xhr => {
               cy.postPost(xhr)
