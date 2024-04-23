@@ -1,10 +1,10 @@
 /// <reference types="cypress" />
 
 import { getRandomInt } from "../support/utils/common.js";
+import { questionnaire } from "../support/utils/common.js";
+import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 
-const goingPage = { pageId: '', elements: []}
-const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
 const logFilename = 'cypress/fixtures/logs/wuestenrot.log'
 const pdfPath = 'cypress/fixtures/Pdf/'
 
@@ -15,21 +15,8 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
   })
 
   beforeEach('Setting up intercepts and common variables', () => {
-    console.clear()
-    //cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
-    cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
-    cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
-    cy.intercept('GET', `/questionnaire/*/picture/clickableCar*`).as('clickableCar')
+    cy.commanBeforeEach()
     cy.intercept('POST', `/b2b/integration/wuestenrot/wuestenrot-comprehensive-call-center?identifyVehicleAsync=false`).as('postStart')
-    cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
-      if (req.url.includes('navigateTo=next')) {
-        req.alias = "nextPage"
-      } else {
-        req.alias = "savePage"
-      }
-    })
-    cy.intercept('GET', `/questionnaire/*/page/page-*?navigateTo=previous&locale=de`).as('prevPage')
-    cy.intercept('POST', `/member/oauth/token`).as('token')
     cy.wrap(goingPage).its('pageId').as('goingPageId')
     cy.wrap(goingPage).its('elements').as('goingPageElements')
     cy.wrap(questionnaire).its('Id').as('questionnaireId')
@@ -40,7 +27,7 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = false
+  const executePost = true
   const sectionError = true
 
   function _waitFor(waitFor) {
@@ -83,43 +70,16 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
 
   function prevBtn() {
     _waitFor('@prevPage')
-
-    // cy.get('@prevBtn').click({ force: true })
-
-    // cy.wait('@prevPage',{requestTimeout : $requestTimeout}).then(xhr => {
-    //     expect(xhr.response.statusCode).to.equal(200)
-    //     const gPage = xhr.response.body.pageId
-    //     let title = xhr.response.body.pageTitle
-    //     if ((title.length <= 2)){
-    //       title = xhr.response.body.uiBlocks[0].label.content
-    //       if ((title.length <= 2)){
-    //         if (title = xhr.response.body.uiBlocks[0].elements.sections.length > 0){
-    //           title = xhr.response.body.uiBlocks[0].elements.sections[0].label.content
-    //         }
-    //       }
-    //     }
-    //     console.log(`Comming page ${gPage} - ${title}.`)
-    //     cy.then(function () {
-    //       goingPage.elements = []
-    //     })
-    //     //printQuestionnaireIds(xhr.response.body.elements)
-    //     cy.then(function () {
-    //       goingPage.pageId = gPage
-    //     })
-    // })
   }
 
   const file1 = [
     [
-      "WDB2083441T069719",
-      "Coupe",
-      "01.01.2009",
-      "MER CLK Coupe (partial identification, build period to be defined manually)"
+      "VF3VEAHXKLZ080921",
+      "MiniBusMidPanel",
+      "01.01.2017",
+      "Peugeot Expert 09/2020"
     ],
-    ["W0L0XCR975E026845", "Cabrio", "01.01.2009", "OPE Tigra Cabrio"],
-    ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5"],
-    ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
-    ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
+    ["W1V44760313930767", "Van", "01.01.2017", "Mercedes Vito 09/2021"]
   ]
   file1.forEach($car => {
     it(`wuestenrot-comprehensive-call-center for vin: ${$car[0]}`, () => {
@@ -285,6 +245,7 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
             cy.selectSingleList('left-sill-damage-size', 3)
 
             cy.selectSVG('windshield')
+            cy.selectSingleList('windshield-equipment-windshield-electric',0)
             cy.selectMultipleList('windshield-damage-type',1)
             cy.selectMultipleList('windshield-damage-type',2)
             cy.selectSVG('zone-d')

@@ -11,8 +11,7 @@ import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 import b2bBody from '../fixtures/templates/b2bBodyZurich.json'
 
-// const goingPage = { pageId: '', elements: []}
-// const questionnaire = { Id:'', authorization : '', bodyType: ''  }
+
 const logFilename = 'cypress/fixtures/logs/zurichStandalone.log'
 
 describe('Start and complete zurich standalone questionnaire - urichz_call_center', () =>{
@@ -23,20 +22,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
 
   beforeEach('Setting up integrations and common variables', () =>{
     cy.commanBeforeEach()
-    // console.clear()
-    // cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
-    // cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
-    // cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
-    // cy.intercept('GET', `/questionnaire/*/picture/clickableCar*`,{ log: false }).as('clickableCar')
-    // cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
-    //   if (req.url.includes('navigateTo')) {
-    //     req.alias = "nextPage"
-    //   } else {
-    //     req.alias = "savePage"
-    //   }
-    // })
-    // cy.intercept('POST', `/member/oauth/token`).as('token')
-    // cy.intercept('POST', `/b2b/integration/zurich/zurichStandalone`).as('zurichStandalone')
+    cy.intercept('POST', `/b2b/integration/zurich/zurichStandalone`).as('zurichStandalone')
     cy.wrap(goingPage).its('pageId').as('goingPageId')
     cy.wrap(goingPage).its('elements').as('goingPageElements')
     cy.wrap(questionnaire).its('Id').as('questionnaireId')
@@ -95,7 +81,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
   const file1 = [
   ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
   ]
-  file.forEach($car => {
+  file1.forEach($car => {
     it.only(`zurich standalone questionnaire - zurich_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]

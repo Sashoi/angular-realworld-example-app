@@ -456,8 +456,8 @@ Cypress.Commands.add('commanBeforeEach', () =>{
       req.alias = "savePage"
     }
   })
+  cy.intercept('GET', `/questionnaire/*/page/page-*?navigateTo=previous&locale=de`).as('prevPage')
   cy.intercept('POST', `/member/oauth/token`).as('token')
-  cy.intercept('POST', `/b2b/integration/zurich/zurichStandalone`).as('zurichStandalone')
 })
 
 
