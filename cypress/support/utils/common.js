@@ -18,6 +18,6 @@ export const makeid = (length) => {
 }
 
 export const goingPage = { pageId: '', elements: []}
-export const questionnaire = { Id:'', authorization : '', bodyType: ''  }
+export const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
 
 

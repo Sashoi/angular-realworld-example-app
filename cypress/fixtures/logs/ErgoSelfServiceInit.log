@@ -1,144 +1,17 @@
            page-01
-vin: TMBJB7NS4K8027658 expected:                SUV real:                SUV desc: SKODA Kodiaq 1.5 TSI ACT DSG Style 
-           page-07
-           page-08
-           page-09
-           page-13
-           page-23
-      summary-page
-           page-01
-vin: WVWZZZ3CZME020680 expected:            Station real:            Station desc: Passat Variant 1.4 TSI Plug-In-Hybrid DSG GTE 
-           page-07
-           page-08
-           page-09
-           page-13
-           page-23
-      summary-page
-           page-01
-vin: VF3VEAHXKLZ080921 expected:    MiniBusMidPanel real:        VanMidPanel desc: Peugeot Expert 09/2020 
-           page-07
-           page-08
-           page-09
-           page-13
-           page-23
-      summary-page
-           page-01
-vin: W1V44760313930767 expected:                Van real:            MiniBus desc: Mercedes Vito 09/2021 
-           page-07
-           page-08
-           page-09
-           page-13
-           page-23
-      summary-page
-           page-01
-vin: WF03XXTTG3MG53806 expected:            Minibus real:        VanMidPanel desc: Ford Tourneo 08/2021 
-           page-07
-           page-08
-           page-09
-           page-13
-           page-23
-      summary-page
-           page-01
-vin: WF0KXXTTRKMC81361 expected:        VanMidPanel real:        VanMidPanel desc: Ford Transit 06/2021 
-           page-07
-           page-08
-           page-09
-           page-13
-           page-23
-      summary-page
-           page-01
-vin: 6FPPXXMJ2PCD55635 expected: PickUpDoubleCabine real: PickUpDoubleCabine desc: Ford Ranger double cabine, Pick-up 
-           page-07
-           page-08
-           page-09
-           page-13
-           page-23
-      summary-page
-           page-01
-vin: 6FPGXXMJ2GEL59891 expected: PickUpSingleCabine real: PickUpSingleCabine desc: Ford Ranger single cabine, Pick-up 
-           page-07
-           page-08
-           page-09
-           page-13
-           page-23
-      summary-page
-           page-01
-vin: WDB1704351F077666 expected:             Cabrio real:             Cabrio desc: MER SLK Cabrio 
-           page-07
-           page-08
-           page-09
-           page-13
-           page-23
-      summary-page
-           page-01
-vin: WBAUB310X0VN69014 expected:             Hatch3 real:             Hatch3 desc: BMW 1 Series Hatch3 
-           page-07
-           page-08
-           page-09
-           page-13
-           page-23
-      summary-page
-           page-01
-vin: WVWZZZ6RZGY304402 expected:             Hatch5 real:             Hatch5 desc: Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list) 
-           page-07
-           page-08
-           page-09
-           page-13
-           page-23
-      summary-page
-           page-01
-vin: VF7SA5FS0BW550414 expected:             Hatch3 real:             Hatch3 desc: CIT DS3 Hatch3 
-           page-07
-           page-08
-           page-09
-           page-13
-           page-23
-      summary-page
-           page-01
-vin: WAUZZZ4B73N015435 expected:              Sedan real:              Sedan desc: AUD A6/S6/RS6 Sedan 
-           page-07
-           page-08
-           page-09
-           page-13
-           page-23
-      summary-page
-           page-01
-vin: WDB2083441T069719 expected:              Coupe real:              Coupe desc: MER CLK Coupe (partial identification, build period to be defined manually) 
-           page-07
-           page-08
-           page-09
-           page-13
-           page-23
-      summary-page
-           page-01
-vin: W0L0XCR975E026845 expected:             Cabrio real:             Cabrio desc: OPE Tigra Cabrio 
-           page-07
-           page-08
-           page-09
-           page-13
-           page-23
-      summary-page
-           page-01
-vin: WAUZZZ8V3HA101912 expected:             Hatch5 real:             Hatch5 desc: AUD A3/S3/RS3 Hatch5 
-           page-07
-           page-08
-           page-09
-           page-13
-           page-23
-      summary-page
-           page-01
 vin: WVWZZZ7NZDV041367 expected:                MPV real:                MPV desc: VW Sharan MPV 
            page-07
-           page-08
-           page-09
-           page-13
-           page-23
+           page-10
+           page-16
+           page-17
+           page-18
+           page-19
+           page-20
       summary-page
            page-01
 vin: SALYL2RV8JA741831 expected:                SUV real:                SUV desc: Land Rover, SUV 
            page-07
-           page-08
-           page-09
-           page-13
-           page-23
+           page-10
+           page-11
+           page-15
       summary-page

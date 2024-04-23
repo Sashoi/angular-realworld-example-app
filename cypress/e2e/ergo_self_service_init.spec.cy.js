@@ -1,10 +1,9 @@
 import { getRandomInt } from "../support/utils/common.js";
+import { questionnaire } from "../support/utils/common.js";
+import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
-//import b2bBody from '../fixtures/templates/ergoBody.xml'
 import header from '../fixtures/headerXML.json'
 
-const goingPage = { pageId: '', elements: []}
-const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
 const logFilename = 'cypress/fixtures/logs/ErgoSelfServiceInit.log'
 const PathToImages ='cypress/fixtures/images/'
 const b2bBody = 'cypress/fixtures/templates/ergoBody.xml'
@@ -16,21 +15,10 @@ describe('Ergo Self Service init', () =>{
   })
   beforeEach('Setting up integrations and common variables', () =>{
     cy.viewport('samsung-note9')
-    console.clear()
-    cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
+    cy.commanBeforeEach()
     cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPage')
     cy.intercept('POST', `/questionnaire/*/update?locale=de`).as('updatePage')
-    cy.intercept('GET', `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
-    cy.intercept('GET', `/questionnaire/*/picture/clickableCar*`).as('clickableCar')
     cy.intercept('GET', `/questionnaire/generic_elements/attachment/*-example*`).as('generic_elements')
-    cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
-      if (req.url.includes('navigateTo')) {
-        req.alias = "nextPage"
-      } else {
-        req.alias = "savePage"
-      }
-    })
-    cy.intercept('POST', `/member/oauth/token`).as('token')
     cy.wrap(goingPage).its('pageId').as('goingPageId')
     cy.wrap(goingPage).its('elements').as('goingPageElements')
     cy.wrap(questionnaire).its('Id').as('questionnaireId')
@@ -43,15 +31,12 @@ describe('Ergo Self Service init', () =>{
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
   const executePost = true
-  const entire_vehicle_damaged_by_hail = true
+  const entire_vehicle_damaged_by_hail = false
   const glass_parts_damaged_by_hail = true
   const client_email = Cypress.env("client_email")
 
 
   function _waitFor(waitFor) {
-    // if (waitFor == '@nextPage'){
-    //   cy.get('@nextBtn').click({ force: true })
-    // }
     cy.wait(waitFor,{requestTimeout : $requestTimeout}).then(xhr => {
         expect(xhr.response.statusCode).to.equal(200)
         const gPage = xhr.response.body.pageId
@@ -102,10 +87,11 @@ describe('Ergo Self Service init', () =>{
   }
 
   const file1 = [
-    ["WVWZZZ3CZME020680","Station","01.09.2020","Passat Variant 1.4 TSI Plug-In-Hybrid DSG GTE"]
+    ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
+  ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
   ]
 
-  file.forEach($car => {
+  file1.forEach($car => {
     it.only(`Execute /questionnaire/ergo_self_service_init with vin:${$car[0]}`, () =>{
       cy.readFile(b2bBody).then(xml => {
         const xmlDocument = new DOMParser().parseFromString(xml,'text/xml')
