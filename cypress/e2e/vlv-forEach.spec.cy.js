@@ -1,10 +1,10 @@
 /// <reference types="cypress" />
 
 import { getRandomInt } from "../support/utils/common.js";
+import { questionnaire } from "../support/utils/common.js";
+import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 
-const goingPage = { pageId: '', elements: []}
-const questionnaire = { Id:'', authorization : '', bodyType: ''  }
 const logFilename = 'cypress/fixtures/logs/vlvStandalone.log'
 const PathToImages ='cypress/fixtures/images/'
 
@@ -15,22 +15,8 @@ describe('Start and complete vlv standalone questionnaire', () => {
   })
 
   beforeEach('Setting up integrations and common variables', () => {
-
-    console.clear()
+    cy.commanBeforeEach()
     cy.intercept('POST', `/b2b/integration/vlv/vlv-comprehensive-call-center?identifyVehicleAsync=false`).as('postStart')
-    //cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
-    cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
-    cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
-    cy.intercept('GET', `/questionnaire/*/picture/clickableCar*`,{ log : false }).as('clickableCar')
-    cy.intercept('POST', `/member/oauth/token`).as('token')
-    cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
-      if (req.url.includes('navigateTo')) {
-        req.alias = "nextPage"
-      } else {
-        req.alias = "savePage"
-      }
-    })
-
     cy.wrap(goingPage).its('pageId').as('goingPageId')
     cy.wrap(goingPage).its('elements').as('goingPageElements')
     cy.wrap(questionnaire).its('Id').as('questionnaireId')
@@ -80,13 +66,14 @@ describe('Start and complete vlv standalone questionnaire', () => {
   }
 
   const loss_causeArray = ["Unfall", "Vandalismus", "Sturm", "Glasbruch", "Tierschaden"]
-  const loss_causeArray1 = ["Glasbruch", "Tierschaden"]
+  const loss_causeArray1 = ["Unfall"]
 
   const file1 = [
-    ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
+    ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"],
+  ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
   ]
 
-  loss_causeArray.forEach(loss_cause => {
+  loss_causeArray1.forEach(loss_cause => {
     file1.forEach($car => {
       it(`vlv Standalone, vin ${$car[0]}, loss_cause ${loss_cause} `, () => {
 
