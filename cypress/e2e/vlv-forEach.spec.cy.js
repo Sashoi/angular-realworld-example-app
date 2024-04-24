@@ -15,13 +15,8 @@ describe('Start and complete vlv standalone questionnaire', () => {
   })
 
   beforeEach('Setting up integrations and common variables', () => {
-    cy.commanBeforeEach()
     cy.intercept('POST', `/b2b/integration/vlv/vlv-comprehensive-call-center?identifyVehicleAsync=false`).as('postStart')
-    cy.wrap(goingPage).its('pageId').as('goingPageId')
-    cy.wrap(goingPage).its('elements').as('goingPageElements')
-    cy.wrap(questionnaire).its('Id').as('questionnaireId')
-    cy.wrap(questionnaire).its('authorization').as('authorization')
-    cy.wrap(questionnaire).its('bodyType').as('bodyType')
+    cy.commanBeforeEach(goingPage,questionnaire)
   })
 
   const $dev = Cypress.env("dev");
@@ -41,7 +36,7 @@ describe('Start and complete vlv standalone questionnaire', () => {
         if ((title.length <= 2)){
           title = xhr.response.body.uiBlocks[0].label.content
           if ((title.length <= 2)){
-            if (title = xhr.response.body.uiBlocks[0].elements.sections.length > 0){
+            if (xhr.response.body.uiBlocks[0].elements.sections.length > 0){
               title = xhr.response.body.uiBlocks[0].elements.sections[0].label.content
             }
           }

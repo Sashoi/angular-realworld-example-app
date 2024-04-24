@@ -21,14 +21,9 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
   })
 
   beforeEach('Setting up integrations and common variables', () =>{
-    cy.commanBeforeEach()
     cy.intercept('POST', `/b2b/integration/zurich/zurichStandalone`).as('zurichStandalone')
-    cy.wrap(goingPage).its('pageId').as('goingPageId')
-    cy.wrap(goingPage).its('elements').as('goingPageElements')
-    cy.wrap(questionnaire).its('Id').as('questionnaireId')
-    cy.wrap(questionnaire).its('authorization').as('authorization')
-    cy.wrap(questionnaire).its('bodyType').as('bodyType')
-  }) //beforeEach
+    cy.commanBeforeEach(goingPage,questionnaire)
+  })
 
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`

@@ -2,12 +2,12 @@
 /// <reference types="cypress" />
 
 import { getRandomInt } from "../support/utils/common.js";
+import { questionnaire } from "../support/utils/common.js";
+import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 import b2bBody from '../fixtures/templates/b2bBody.json'
 import header from '../fixtures/header.json'
 
-const goingPage = { pageId: '', elements: []}
-const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
 const logFilename = 'cypress/fixtures/logs/hukVehicleZone.log'
 const pdfPath = 'cypress/fixtures/Pdf/'
 const PathToImages ='cypress/fixtures/images/'
@@ -20,27 +20,8 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
 
   beforeEach('Setting up intercepts and common variables', () =>{
     cy.viewport('samsung-note9')
-    console.clear()
-    cy.intercept('GET', `/questionnaire/*/picture/vehicleZones?colour=007d40&areas=&locale=de`).as('vehicleZones')
-    cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
-    //cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
-    cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPage')
-    cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
-    cy.intercept('GET', `/questionnaire/*/picture/clickableCar*`).as('clickableCar')
-    cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
-      if (req.url.includes('navigateTo')) {
-        req.alias = "nextPage"
-      } else {
-        req.alias = "savePage"
-      }
-    })
-    cy.intercept('POST', `/member/oauth/token`).as('token')
-    cy.wrap(goingPage).its('pageId').as('goingPageId')
-    cy.wrap(goingPage).its('elements').as('goingPageElements')
-    cy.wrap(questionnaire).its('Id').as('questionnaireId')
-    cy.wrap(questionnaire).its('authorization').as('authorization')
-    cy.wrap(questionnaire).its('bodyType').as('bodyType')
-    cy.wrap(questionnaire).its('notificationId').as('notificationId')
+    cy.intercept('GET', `/questionnaire/*/picture/vehicleZones*`,{ log: false }).as('vehicleZones')
+    cy.commanBeforeEach(goingPage,questionnaire)
   })
 
   const $dev = Cypress.env("dev");
@@ -353,7 +334,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                     //cy.postQuestionnaire() does not work
                     cy.get('button[type="submit"][data-test="questionnaire-complete-button"]').click({ force: true, timeout: 5000 });
 
-                    cy.wait('@postPage',{requestTimeout : $requestTimeout, responseTimeout: $requestTimeout}).then(xhr => {
+                    cy.wait('@postPost',{requestTimeout : $requestTimeout, responseTimeout: $requestTimeout}).then(xhr => {
                       cy.postPost(xhr,false)
                       console.log(`Cypress.env('notificationId') = ${Cypress.env('notificationId')}`)
                     }) //cy.wait

@@ -2,13 +2,13 @@
 
 import { getRandomInt } from "../support/utils/common.js";
 import { makeid } from "../support/utils/common.js";
+import { questionnaire } from "../support/utils/common.js";
+import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 import b2bBody from '../fixtures/templates/b2bBodyWGV.json'
 import emailBody from '../fixtures/templates/emailBody.json'
 import header from '../fixtures/header.json'
 
-const goingPage = { pageId: '', elements: []}
-const questionnaire = { Id:'', authorization : '', bodyType: ''  }
 const logFilename = 'cypress/fixtures/logs/wgvCallCenter.log'
 
 describe('Execute b2b/integration/wgv/callCenter', () => {
@@ -17,24 +17,7 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
   })
 
   beforeEach('Setting up intercepts and common variables', () =>{
-    console.clear()
-    cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
-    cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
-    cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
-    cy.intercept('GET', `/questionnaire/*/picture/clickableCar*`).as('clickableCar')
-    cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
-      if (req.url.includes('navigateTo')) {
-        req.alias = "nextPage"
-      } else {
-        req.alias = "savePage"
-      }
-    })
-    cy.intercept('POST', `/member/oauth/token`).as('token')
-    cy.wrap(goingPage).its('pageId').as('goingPageId')
-    cy.wrap(goingPage).its('elements').as('goingPageElements')
-    cy.wrap(questionnaire).its('Id').as('questionnaireId')
-    cy.wrap(questionnaire).its('authorization').as('authorization')
-    cy.wrap(questionnaire).its('bodyType').as('bodyType')
+    cy.commanBeforeEach(goingPage,questionnaire)
   })
 
   const $dev = Cypress.env("dev");
@@ -53,7 +36,7 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
         if ((title.length <= 2)){
           title = xhr.response.body.uiBlocks[0].label.content
           if ((title.length <= 2)){
-            if (title = xhr.response.body.uiBlocks[0].elements.sections.length > 0){
+            if (xhr.response.body.uiBlocks[0].elements.sections.length > 0){
               title = xhr.response.body.uiBlocks[0].elements.sections[0].label.content
             }
           }
@@ -90,10 +73,15 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
   }
 
   const file1 = [
-    ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"]
+    [
+      "WDB2083441T069719",
+      "Coupe",
+      "01.01.2009",
+      "MER CLK Coupe (partial identification, build period to be defined manually)"
+    ]
   ]
 
-  file.forEach($car => {
+  file1.forEach($car => {
     it(`Execute b2b/integration/wgv/callCenter Vandalismus with vin:${$car[0]}`, () => {
 
       const vin = $car[0]
@@ -103,8 +91,6 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
       let claim2 = getRandomInt(10000, 99999)
 
       cy.authenticate().then(function (authorization) {
-          //const token = body.accessToken
-          //const authorization = `Bearer ${ token }`;
           cy.then(function () {
             questionnaire.authorization = authorization
           })
@@ -160,7 +146,6 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
                   cy.get('@goingPageId').then(function (aliasValue) {
                     if (aliasValue == 'page-01'){
                       cy.selectSingleList('damage-cause',6)
-                      //cy.get('button[type="submit"]').click()
                       nextBtn()
                     }
                   })
@@ -201,7 +186,12 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
                   cy.selectSingleList('vehicle-customized-interior',0)
                 }
               })
-              //cy.get('button[type="submit"]').contains('Weiter').click()
+              cy.selectorHasAttrClass('select#select_buildPeriod','field-invalid').then(res =>{
+                if (res){
+                  cy.selectDropDown('select_buildPeriod',1)
+                  cy.wait(2000)
+                }
+              })
               nextBtn()
             }
           })
@@ -251,8 +241,6 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
                 cy.selectSingleList('windshield-damage-size-crack-bigger-2cm',0)
 
                 cy.wait(500)
-                //cy.get('button[type="submit"]')
-                //cy.wait(500).contains('Weiter').click({ force: true })
                 nextBtn()
                 cy.wait(500)
               }) //clickableCar

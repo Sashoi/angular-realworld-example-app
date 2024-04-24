@@ -1,10 +1,10 @@
 /// <reference types="cypress" />
 
 import { getRandomInt } from "../support/utils/common.js";
+import { questionnaire } from "../support/utils/common.js";
+import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 
-const goingPage = { pageId: '', elements: []}
-const questionnaire = { Id:'', authorization : '', bodyType: ''  }
 const logFilename = 'cypress/fixtures/logs/hukLiabilityCallCenter.log'
 
 describe('Start and complete huk standalone questionnaire - huk_liability_call_center', () =>{
@@ -14,26 +14,8 @@ describe('Start and complete huk standalone questionnaire - huk_liability_call_c
   })
 
   beforeEach('Setting up integrations and common variables', () =>{
-    console.clear()
-    console.clear()
-    cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
-    cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
-    cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
-    cy.intercept('GET', `/questionnaire/*/picture/clickableCar*`,{ log: false }).as('clickableCar')
-    cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
-      if (req.url.includes('navigateTo')) {
-        req.alias = "nextPage"
-      } else {
-        req.alias = "savePage"
-      }
-    })
-    cy.intercept('POST', `/member/oauth/token`).as('token')
     cy.intercept('POST', `/b2b/integration/huk/huk-liability-call-center?identifyVehicleAsync=false`).as('hukLiabilityCC')
-    cy.wrap(goingPage).its('pageId').as('goingPageId')
-    cy.wrap(goingPage).its('elements').as('goingPageElements')
-    cy.wrap(questionnaire).its('Id').as('questionnaireId')
-    cy.wrap(questionnaire).its('authorization').as('authorization')
-    cy.wrap(questionnaire).its('bodyType').as('bodyType')
+    cy.commanBeforeEach(goingPage,questionnaire)
   })
 
   const $dev = Cypress.env("dev");

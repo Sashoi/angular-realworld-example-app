@@ -2,12 +2,12 @@
 /// <reference types="cypress" />
 
 import { getRandomInt } from "../support/utils/common.js";
+import { questionnaire } from "../support/utils/common.js";
+import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 import b2bBody from '../fixtures/templates/b2bBody.json'
 import header from '../fixtures/header.json'
 
-const goingPage = { pageId: '', elements: []}
-const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
 const logFilename = 'cypress/fixtures/logs/hukVehicleZone-short.log'
 const pdfPath = 'cypress/fixtures/Pdf/'
 const PathToImages ='cypress/fixtures/images/'
@@ -19,28 +19,9 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   })
 
   beforeEach('Login to the app', () =>{
-    console.clear()
     cy.viewport('samsung-note9')
-    cy.intercept('GET', `/questionnaire/*/picture/vehicleZones?colour=007d40&areas=&locale=de`).as('vehicleZones')
-    //cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
-    //cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
-    cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPage')
-    cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
-    cy.intercept('GET', `/questionnaire/*/picture/clickableCar*`).as('clickableCar')
-    cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
-      if (req.url.includes('navigateTo')) {
-        req.alias = "nextPage"
-      } else {
-        req.alias = "savePage"
-      }
-    })
-    cy.intercept('POST', `/member/oauth/token`).as('token')
-    cy.wrap(goingPage).its('pageId').as('goingPageId')
-    cy.wrap(goingPage).its('elements').as('goingPageElements')
-    cy.wrap(questionnaire).its('Id').as('questionnaireId')
-    cy.wrap(questionnaire).its('authorization').as('authorization')
-    cy.wrap(questionnaire).its('bodyType').as('bodyType')
-    cy.wrap(questionnaire).its('notificationId').as('notificationId')
+    cy.intercept('GET', `/questionnaire/*/picture/vehicleZones*`,{ log: false }).as('vehicleZones')
+    cy.commanBeforeEach(goingPage,questionnaire)
   })
 
   const $dev = Cypress.env("dev");
@@ -51,8 +32,8 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
 
 
   function selectCropImage(selectorId,cropSelectorId,fileName){
-    cy.intercept('GET', `/questionnaire/*/attachment/answer/${selectorId}/index-*`).as(`cropOrigin-${selectorId}`)
-    cy.intercept('POST', `/questionnaire/*/attachment/answer/${cropSelectorId}/index-*?locale=de`).as(`attachmentAnswer-${cropSelectorId}`)
+    cy.intercept('GET', `/questionnaire/*/attachment/answer/${selectorId}/index-*`,{ log: false }).as(`cropOrigin-${selectorId}`)
+    cy.intercept('POST', `/questionnaire/*/attachment/answer/${cropSelectorId}/index-*?locale=de`,{ log: false }).as(`attachmentAnswer-${cropSelectorId}`)
     cy.get(`form#${selectorId}`)
     .find('.crop-button-container')
     .find('button').click({ force: true,timeout : $requestTimeout });
@@ -83,9 +64,6 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   function _waitFor(waitFor) {
-    // if (waitFor == '@nextPage'){
-    //   cy.get('@nextBtn').click({ force: true })
-    // }
     cy.wait(waitFor,{timeout : $requestTimeout}).then(xhr => {
         expect(xhr.response.statusCode).to.equal(200)
         const gPage = xhr.response.body.pageId
@@ -368,7 +346,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                     //cy.postQuestionnaire() does not work
                     cy.get('button[type="submit"][data-test="questionnaire-complete-button"]').click({ force: true, timeout: 5000 });
 
-                    cy.wait('@postPage',{timeout : $requestTimeout}).then(xhr => {
+                    cy.wait('@postPost',{timeout : $requestTimeout}).then(xhr => {
                       cy.postPost(xhr,false)
                       console.log(`Cypress.env('notificationId') = ${Cypress.env('notificationId')}`)
                     }) //cy.wait

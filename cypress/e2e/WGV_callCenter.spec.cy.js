@@ -2,14 +2,16 @@
 
 import { getRandomInt } from "../support/utils/common.js";
 import { makeid } from "../support/utils/common.js";
+import { getPageTitle } from "../support/utils/common.js";
+import { questionnaire } from "../support/utils/common.js";
+import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 import b2bBody from '../fixtures/templates/b2bBodyWGV.json'
 import emailBody from '../fixtures/templates/emailBody.json'
 import header from '../fixtures/header.json'
 
-const goingPage = { pageId: '', elements: []}
-const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
 const logFilename = 'cypress/fixtures/logs/wgv.log'
+const PathToImages ='cypress/fixtures/images/'
 
 describe('Execute b2b/integration/wgv/callCenter', () =>{
   before('clear log file', () => {
@@ -17,31 +19,14 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   })
 
   beforeEach('Setting up intercepts and common variables', () => {
-    console.clear()
-    //cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
-    cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
-    cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
-    cy.intercept('GET', `/questionnaire/*/picture/clickableCar*`).as('clickableCar')
-    //cy.intercept('POST', `/b2b/integration/wuestenrot/wuestenrot-comprehensive-call-center?identifyVehicleAsync=false`).as('postStart')
-    cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
-      if (req.url.includes('navigateTo')) {
-        req.alias = "nextPage"
-      } else {
-        req.alias = "savePage"
-      }
-    })
-    //cy.intercept('POST', `/member/oauth/token`).as('token')
-    cy.wrap(goingPage).its('pageId').as('goingPageId')
-    cy.wrap(goingPage).its('elements').as('goingPageElements')
-    cy.wrap(questionnaire).its('Id').as('questionnaireId')
-    cy.wrap(questionnaire).its('authorization').as('authorization')
-    cy.wrap(questionnaire).its('bodyType').as('bodyType')
+    cy.commanBeforeEach(goingPage,questionnaire)
   })
 
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
   const executePost = true
+  const executePost2 = true
   const createNewQuestionnaires = true
   const interceptWGV = false
   const $equipment_2_loading_doors = true
@@ -53,15 +38,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
     cy.wait(waitFor,{requestTimeout : $requestTimeout}).then(xhr => {
         expect(xhr.response.statusCode).to.equal(200)
         const gPage = xhr.response.body.pageId
-        let title = xhr.response.body.pageTitle
-        if ((title.length <= 2)){
-          title = xhr.response.body.uiBlocks[0].label.content
-          if ((title.length <= 2)){
-            if (title = xhr.response.body.uiBlocks[0].elements.sections.length > 0){
-              title = xhr.response.body.uiBlocks[0].elements.sections[0].label.content
-            }
-          }
-        }
+        const  title = getPageTitle(xhr.response.body)
         console.log(`Comming page ${gPage} - ${title}.`)
         cy.then(function () {
           goingPage.elements = []
@@ -70,6 +47,18 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
         cy.then(function () {
           goingPage.pageId = gPage
         })
+        if (waitFor == '@currentPage'){
+          const nextUrl = xhr.response.body.links.next
+          //"https://dev02.spearhead-ag.ch:443/questionnaire/7uRjDM92M9eWEhZVkBrSr/page/page-01?navigateTo=next"
+          const startStr = '/questionnaire/'
+          const endStr = '/page/page'
+          const pos = nextUrl.indexOf(startStr) + startStr.length;
+          const questionnaireId =  nextUrl.substring(pos, nextUrl.indexOf(endStr, pos));
+          cy.then(function () {
+            questionnaire.Id = questionnaireId
+          })
+          console.log(`From @currentPage questionnaireId: ${questionnaireId}`)
+        }
     })
   }
 
@@ -82,9 +71,14 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   }
 
   const file1 = [
-    ["W1V44760313930767", "Van", "01.01.2017", "Mercedes Vito 09/2021"]
+    [
+      "WDB2083441T069719",
+      "Coupe",
+      "01.01.2009",
+      "MER CLK Coupe (partial identification, build period to be defined manually)"
+    ]
   ]
-  file.forEach($car => {
+  file1.forEach($car => {
     it(`wgv callCenter for vin: ${$car[0]}`, () =>{
 
       const $vin = $car[0]
@@ -108,8 +102,8 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
           // see "fixtures/damage_cause_mapping.json"
 
           b2bBody.claimNumber = claimNumber
-          b2bBody.claimType = "03"  //01, 02, 03, 53IV
-          b2bBody.damageCause =  "glass" // see "fixtures/damage_cause_mapping.json"
+          b2bBody.claimType = "01"  //01, 02, 03, 53IV
+          b2bBody.damageCause =  "storm"//"glass" // see "fixtures/damage_cause_mapping.json"
           b2bBody.vin =  $vin
           b2bBody.licensePlate = `EH${claim2}BT` //"EH1234BT"
 
@@ -149,7 +143,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
 
           cy.get('@goingPageId').then(function (aliasValue) {
             if (aliasValue == 'page-01'){
-              cy.selectSingleList('damage-cause',3)
+              cy.selectSingleList('damage-cause',0)
               nextBtn()
             }
           })
@@ -183,6 +177,12 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
                 }
                 if (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine'){
                   cy.selectSingleList('equipment-loading-area-cover-type',1)
+                }
+              })
+              cy.selectorHasAttrClass('select#select_buildPeriod','field-invalid').then(res =>{
+                if (res){
+                  cy.selectDropDown('select_buildPeriod',1)
+                  cy.wait(2000)
                 }
               })
               nextBtn()
@@ -290,12 +290,12 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
                   cy.postPost(xhr).then(function (notificationId) {
                     if (createNewQuestionnaires) {
 
-                      let _headers = {
-                        'Accept': '*/*',
-                        'Accept-Encoding':'gzip, deflate, br',
-                        'Content-Type': 'application/json',
-                        authorization
-                      }
+                      // let _headers = {
+                      //   'Accept': '*/*',
+                      //   'Accept-Encoding':'gzip, deflate, br',
+                      //   'Content-Type': 'application/json',
+                      //   authorization
+                      // }
 
 
                       const options2 = {
@@ -310,6 +310,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
                           // response.body is automatically serialized into JSON
                           expect(response.status).to.eq(200) // true
                           console.log(`wgv_comprehensive_self_service_app:`);
+                          console.log(response.body);
                           //cy.printRequestedInformation(response.body.requestedInformation);
                         })
 
@@ -325,6 +326,10 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
                           // response.body is automatically serialized into JSON
                           expect(response.status).to.eq(200) // true
                           console.log(`wgv_liability_self_service_app:`);
+                          console.log(response.body.requestedInformation[2].requestUrl);
+                          Cypress.env('requestUrl', response.body.requestedInformation[2].requestUrl)
+                          console.log(response.body.requestedInformation[2].templateId);
+                          Cypress.env('templateId', response.body.requestedInformation[2].templateId)
                           //cy.printRequestedInformation(response.body.requestedInformation);
                       })
                     }
@@ -340,5 +345,116 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
       cy.GeneratePDFs(['wgv_default','wgv_pilot','wgv_pilot_2023'])
     }) //it PDF from commands
 
+    it(`Start new questionnaire.`, function () {
+      cy.viewport('samsung-note9')
+      console.log(`Start ${Cypress.env('templateId')} from url: ${Cypress.env('requestUrl')}.`)
+
+      cy.visit(Cypress.env('requestUrl'),{log : false})
+
+      const nextButtonLabel ='Weiter'
+      const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
+      cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
+
+      currentPage()
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-01'){
+          cy.selectMultipleList('terms-of-service-acknowledgement',0)
+          cy.getBodyType2($car,logFilename).then(function (bodyType) {
+            cy.then(function () {
+              questionnaire.bodyType = bodyType
+            })
+          })
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-02'){ // "pageShowCriteria": "getAnswer('damage-cause') == null"
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-03'){
+          nextBtn()
+        }
+      })
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-04'){
+          nextBtn()
+        }
+      })
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-05'){
+          cy.selectSingleList('accident-location',0)
+          cy.get('input#client-zip-code-input').type('10115').blur();
+          cy.get('input[data-test="dropdown-selection-enabled-text-input_client-city"]').should('have.value', 'Berlin')
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-06'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-07'){
+          cy.wait('@clickableCar',{requestTimeout : $requestTimeout}).then(xhr => {
+
+            expect(xhr.response.statusCode).to.equal(200)
+            console.log(`Comming SVG with clickableCar`)
+            cy.selectSVG('hood')
+            nextBtn()
+          })
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-08'){
+          cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,'registration-part-1.jpg')
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-09'){
+          cy.uploadImage('vehicle-left-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
+          cy.uploadImage('vehicle-right-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-10'){
+          cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathToImages,'image dashboard-odometer.jpg')
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-11'){
+          cy.uploadImage('damage-photo-upload-overview-hood',PathToImages,'hood.jpg')
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'summary-page'){
+          if (executePost2) {
+            //pageId: "summary-page"
+            cy.selectMultipleList('summary-confirmation-acknowledgement',0)
+            cy.get('button[type="submit"]').contains('Unterlagen senden').click()
+            cy.wait('@postPost',{ log: false }).then(xhr => {
+              cy.postPost(xhr,false).then(function (notificationId) {
+                console.log(`notificationId: ${notificationId}`);
+              })
+            })
+          }
+        }
+      })
+    }) // it Start new questionnaire
   })  // for Each
 })

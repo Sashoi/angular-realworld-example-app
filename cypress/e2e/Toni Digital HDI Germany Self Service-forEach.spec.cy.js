@@ -4,12 +4,13 @@
 
 import { getRandomInt } from "../support/utils/common.js";
 import { makeid } from "../support/utils/common.js";
+import { questionnaire } from "../support/utils/common.js";
+import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 import b2bBody from '../fixtures/templates/b2bBodyToni_1.json'
 import header from '../fixtures/header.json'
 
-const goingPage = { pageId: '', elements: []}
-const questionnaire = { Id:'', authorization : '', bodyType: ''  }
+
 const logFilename = 'cypress/fixtures/logs/hdiLiabilitySS.log'
 const PathToImages ='cypress/fixtures/images/'
 
@@ -20,25 +21,9 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
   })
 
   beforeEach('Setting up intercepts and common variables', () =>{
-    console.clear()
-    cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
-    cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
-    cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
-    cy.intercept('GET', `/questionnaire/*/picture/clickableCar*`).as('clickableCar')
-    cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
-      if (req.url.includes('navigateTo')) {
-        req.alias = "nextPage"
-      } else {
-        req.alias = "savePage"
-      }
-    })
-    cy.intercept('POST', `/member/oauth/token`).as('token')
-    cy.wrap(goingPage).its('pageId').as('goingPageId')
-    cy.wrap(goingPage).its('elements').as('goingPageElements')
-    cy.wrap(questionnaire).its('Id').as('questionnaireId')
-    cy.wrap(questionnaire).its('authorization').as('authorization')
-    cy.wrap(questionnaire).its('bodyType').as('bodyType')
-  }) //beforeEach
+    cy.viewport('samsung-note9')
+    cy.commanBeforeEach(goingPage,questionnaire)
+  })
 
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
@@ -84,7 +69,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
         if ((title.length <= 2)){
           title = xhr.response.body.uiBlocks[0].label.content
           if ((title.length <= 2)){
-            if (title = xhr.response.body.uiBlocks[0].elements.sections.length > 0){
+            if (xhr.response.body.uiBlocks[0].elements.sections.length > 0){
               title = xhr.response.body.uiBlocks[0].elements.sections[0].label.content
             }
           }
@@ -132,7 +117,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
     ]
   ]
 
-  file.forEach($car => {
+  file1.forEach($car => {
     it(`Execute b2b/integration/toni-digital/hdiLiabilitySelfService for vin: ${$car[0]}`, () =>{
 
       const vin = $car[0]
@@ -162,7 +147,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
           Cypress._.merge(header, {'authorization' : authorization});
           const options = {
             method: 'POST',
-            url: `https://${$dev}.spearhead-ag.ch:443/b2b/integration/toni-digital/hdiLiabilitySelfService`,
+            url: `${baseUrl_lp}b2b/integration/toni-digital/hdiLiabilitySelfService`,
             body: b2bBody,
             headers: header
           };
@@ -383,7 +368,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                   cy.get('input#claimant-email-for-confirmation-link-input').type(eMail)
                   cy.selectMultipleList('summary-confirmation-acknowledgement',0)
                   cy.get('@questionnaireId').then(function (Id) {
-                    console.log(`from summary-page, questionnaireId:${Id}`);
+                    console.log(`from summary-page, questionnaireId: ${Id}`);
                   })
                   if (executePost) {
                     cy.get('button[type="submit"]').contains('Senden').click()
@@ -398,7 +383,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
       })  //cy.authenticate
     }) //it
 
-    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['toni_hdi_tele_check','toni_tele_check','toni_tele_expert'])
     }) //it PDF from commands
   })  //forEach

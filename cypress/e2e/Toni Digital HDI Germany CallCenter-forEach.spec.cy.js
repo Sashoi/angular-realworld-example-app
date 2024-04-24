@@ -2,12 +2,12 @@
 
 import { getRandomInt } from "../support/utils/common.js";
 import { makeid } from "../support/utils/common.js";
+import { questionnaire } from "../support/utils/common.js";
+import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 import b2bBody from '../fixtures/templates/b2bBodyToni_1.json'
 import header from '../fixtures/header.json'
 
-const goingPage = { pageId: '', elements: []}
-const questionnaire = { Id:'', authorization : '', bodyType: ''  }
 const logFilename = 'cypress/fixtures/logs/hdiLiabilityCC.log'
 
 
@@ -18,24 +18,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
   })
 
   beforeEach('Setting up intercepts and common variables', () =>{
-    console.clear()
-    cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
-    cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPost')
-    cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
-    cy.intercept('GET', `/questionnaire/*/picture/clickableCar*`).as('clickableCar')
-    cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
-      if (req.url.includes('navigateTo')) {
-        req.alias = "nextPage"
-      } else {
-        req.alias = "savePage"
-      }
-    })
-    cy.intercept('POST', `/member/oauth/token`).as('token')
-    cy.wrap(goingPage).its('pageId').as('goingPageId')
-    cy.wrap(goingPage).its('elements').as('goingPageElements')
-    cy.wrap(questionnaire).its('Id').as('questionnaireId')
-    cy.wrap(questionnaire).its('authorization').as('authorization')
-    cy.wrap(questionnaire).its('bodyType').as('bodyType')
+    cy.commanBeforeEach(goingPage,questionnaire)
   })
 
   const $dev = Cypress.env("dev");
@@ -55,7 +38,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
         if ((title.length <= 2)){
           title = xhr.response.body.uiBlocks[0].label.content
           if ((title.length <= 2)){
-            if (title = xhr.response.body.uiBlocks[0].elements.sections.length > 0){
+            if (xhr.response.body.uiBlocks[0].elements.sections.length > 0){
               title = xhr.response.body.uiBlocks[0].elements.sections[0].label.content
             }
           }

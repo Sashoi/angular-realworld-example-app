@@ -19,13 +19,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   beforeEach('Setting up integrations and common variables', () =>{
     cy.viewport('samsung-note9')
     cy.intercept('GET', `/questionnaire/generic_elements/attachment/*-example*`).as('generic_elements')
-    cy.commanBeforeEach2(goingPage,questionnaire)
-    // cy.wrap(goingPage).its('pageId').as('goingPageId')
-    // cy.wrap(goingPage).its('elements').as('goingPageElements')
-    // cy.wrap(questionnaire).its('Id').as('questionnaireId')
-    // cy.wrap(questionnaire).its('authorization').as('authorization')
-    // cy.wrap(questionnaire).its('bodyType').as('bodyType')
-    // cy.wrap(questionnaire).its('notificationId').as('notificationId')
+    cy.commanBeforeEach(goingPage,questionnaire)
   })
 
   const $dev = Cypress.env("dev");

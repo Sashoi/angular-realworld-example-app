@@ -15,16 +15,9 @@ describe('Ergo Self Service init', () =>{
   })
   beforeEach('Setting up integrations and common variables', () =>{
     cy.viewport('samsung-note9')
-    cy.commanBeforeEach()
-    cy.intercept('POST', `/questionnaire/*/post?locale=de`).as('postPage')
     cy.intercept('POST', `/questionnaire/*/update?locale=de`).as('updatePage')
     cy.intercept('GET', `/questionnaire/generic_elements/attachment/*-example*`).as('generic_elements')
-    cy.wrap(goingPage).its('pageId').as('goingPageId')
-    cy.wrap(goingPage).its('elements').as('goingPageElements')
-    cy.wrap(questionnaire).its('Id').as('questionnaireId')
-    cy.wrap(questionnaire).its('authorization').as('authorization')
-    cy.wrap(questionnaire).its('bodyType').as('bodyType')
-    cy.wrap(questionnaire).its('notificationId').as('notificationId')
+    cy.commanBeforeEach(goingPage,questionnaire)
   })
 
   const $dev = Cypress.env("dev");
@@ -425,7 +418,7 @@ describe('Ergo Self Service init', () =>{
                     })
                     if (executePost) {
                       cy.get('button[type="submit"]').contains('Senden').click()
-                      cy.wait('@postPage',{timeout : $requestTimeout}).then(xhr => {
+                      cy.wait('@postPost',{timeout : $requestTimeout}).then(xhr => {
                         cy.postPost(xhr,false)
                         console.log(`Cypress.env('notificationId') = ${Cypress.env('notificationId')}`)
                       }) //cy.wait
