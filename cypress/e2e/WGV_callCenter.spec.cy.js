@@ -3,6 +3,7 @@
 import { getRandomInt } from "../support/utils/common.js";
 import { makeid } from "../support/utils/common.js";
 import { getPageTitle } from "../support/utils/common.js";
+import { getQuestionnaireIdFromLinks } from "../support/utils/common.js";
 import { questionnaire } from "../support/utils/common.js";
 import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
@@ -48,16 +49,16 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
           goingPage.pageId = gPage
         })
         if (waitFor == '@currentPage'){
-          const nextUrl = xhr.response.body.links.next
+          //const nextUrl = xhr.response.body.links.next
           //"https://dev02.spearhead-ag.ch:443/questionnaire/7uRjDM92M9eWEhZVkBrSr/page/page-01?navigateTo=next"
-          const startStr = '/questionnaire/'
-          const endStr = '/page/page'
-          const pos = nextUrl.indexOf(startStr) + startStr.length;
-          const questionnaireId =  nextUrl.substring(pos, nextUrl.indexOf(endStr, pos));
+          //const startStr = '/questionnaire/'
+          //const endStr = '/page/page'
+          //const pos = nextUrl.indexOf(startStr) + startStr.length;
+          //const questionnaireId =  nextUrl.substring(pos, nextUrl.indexOf(endStr, pos));
           cy.then(function () {
-            questionnaire.Id = questionnaireId
+            questionnaire.Id = getQuestionnaireIdFromLinks(xhr.response.body.links.next)
           })
-          console.log(`From @currentPage questionnaireId: ${questionnaireId}`)
+          //console.log(`From @currentPage questionnaireId: ${questionnaireId}`)
         }
     })
   }

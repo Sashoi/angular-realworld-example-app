@@ -35,6 +35,19 @@ export const getPageTitle = (body) => {
   return title
 }
 
+export const getQuestionnaireIdFromLinks = (nextUrl) => {
+  //"https://dev02.spearhead-ag.ch:443/questionnaire/7uRjDM92M9eWEhZVkBrSr/page/page-01?navigateTo=next"
+  const startStr = '/questionnaire/'
+  const endStr = '/page/page'
+  const pos = nextUrl.indexOf(startStr) + startStr.length;
+  const questionnaireId =  nextUrl.substring(pos, nextUrl.indexOf(endStr, pos));
+  // cy.then(function () {
+  //   questionnaire.Id = questionnaireId
+  // })
+  console.log(`From @currentPage questionnaireId: ${questionnaireId}`)
+  return questionnaireId
+}
+
 export const goingPage = { pageId: '', elements: []}
 export const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
 
