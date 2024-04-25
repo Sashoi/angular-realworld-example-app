@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 
 import { getRandomInt } from "../support/utils/common.js";
+import { getPageTitle } from "../support/utils/common.js";
 import { questionnaire } from "../support/utils/common.js";
 import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
@@ -35,15 +36,7 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
     cy.wait(waitFor,{requestTimeout : $requestTimeout}).then(xhr => {
         expect(xhr.response.statusCode).to.equal(200)
         const gPage = xhr.response.body.pageId
-        let title = xhr.response.body.pageTitle
-        if ((title.length <= 2)){
-          title = xhr.response.body.uiBlocks[0].label.content
-          if ((title.length <= 2)){
-            if (xhr.response.body.uiBlocks[0].elements.sections.length > 0){
-              title = xhr.response.body.uiBlocks[0].elements.sections[0].label.content
-            }
-          }
-        }
+        const  title = getPageTitle(xhr.response.body)
         console.log(`Comming page ${gPage} - ${title}.`)
         cy.then(function () {
           goingPage.elements = []
