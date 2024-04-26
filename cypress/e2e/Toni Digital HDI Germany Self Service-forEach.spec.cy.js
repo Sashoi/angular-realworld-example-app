@@ -60,30 +60,6 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
     cy.get(`form#${selectorId}`).find(`img[alt="${fileName}"]`).invoke('attr', 'alt').should('eq', fileName)
   }
 
-  // function _waitFor(waitFor) {
-  //   if (waitFor == '@nextPage'){
-  //     cy.get('@nextBtn').click({ force: true })
-  //   }
-  //   cy.wait(waitFor,{requestTimeout : $requestTimeout}).then(xhr => {
-  //       expect(xhr.response.statusCode).to.equal(200)
-  //       const gPage = xhr.response.body.pageId
-  //       const  title = getPageTitle(xhr.response.body)
-  //       console.log(`Comming page ${gPage} - ${title}.`)
-  //       cy.then(function () {
-  //         goingPage.elements = []
-  //       })
-  //       //printQuestionnaireIds(xhr.response.body.elements)
-  //       cy.then(function () {
-  //         goingPage.pageId = gPage
-  //       })
-  //       if (false && waitFor == '@currentPage'){
-  //         cy.then(function () {
-  //           questionnaire.Id = getQuestionnaireIdFromLinks(xhr.response.body.links.next)
-  //         })
-  //       }
-  //   })
-  // }
-
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
     cy.waitFor2('@nextPage',goingPage,questionnaire)

@@ -31,32 +31,6 @@ describe('Ergo Self Service init', () =>{
   const client_email = Cypress.env("client_email")
 
 
-  // function _waitFor(waitFor) {
-  //   cy.wait(waitFor,{requestTimeout : $requestTimeout}).then(xhr => {
-  //       expect(xhr.response.statusCode).to.equal(200)
-  //       const gPage = xhr.response.body.pageId
-  //       const  title = getPageTitle(xhr.response.body)
-  //       console.log(`Comming page ${gPage} - ${title}.`)
-  //       cy.readFile(logFilename).then((text) => {
-  //         const addRow = `${gPage.padStart(18, ' ')}\n`
-  //         text += addRow
-  //         cy.writeFile(logFilename, text)
-  //       })
-  //       cy.then(function () {
-  //         goingPage.elements = []
-  //       })
-  //       //printQuestionnaireIds(xhr.response.body.elements)
-  //       cy.then(function () {
-  //         goingPage.pageId = gPage
-  //       })
-  //       if (false && waitFor == '@currentPage'){
-  //         cy.then(function () {
-  //           questionnaire.Id = getQuestionnaireIdFromLinks(xhr.response.body.links.next)
-  //         })
-  //       }
-  //   })
-  // }
-
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
     cy.waitFor2('@nextPage',goingPage,questionnaire)

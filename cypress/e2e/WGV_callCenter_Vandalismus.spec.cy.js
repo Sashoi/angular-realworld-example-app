@@ -27,36 +27,13 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
   const $requestTimeout = 60000;
   const executePost = true
 
-  function _waitFor(waitFor) {
-    if (waitFor == '@nextPage'){
-      cy.get('@nextBtn').click({ force: true })
-    }
-    cy.wait(waitFor,{requestTimeout : $requestTimeout}).then(xhr => {
-        expect(xhr.response.statusCode).to.equal(200)
-        const gPage = xhr.response.body.pageId
-        const  title = getPageTitle(xhr.response.body)
-        console.log(`Comming page ${gPage} - ${title}.`)
-        cy.then(function () {
-          goingPage.elements = []
-        })
-        //printQuestionnaireIds(xhr.response.body.elements)
-        cy.then(function () {
-          goingPage.pageId = gPage
-        })
-        if (false && waitFor == '@currentPage'){
-          cy.then(function () {
-            questionnaire.Id = getQuestionnaireIdFromLinks(xhr.response.body.links.next)
-          })
-        }
-    })
-  }
-
   function nextBtn() {
-    _waitFor('@nextPage')
+    cy.get('@nextBtn').click({ force: true })
+    cy.waitFor2('@nextPage',goingPage,questionnaire)
   }
 
   function currentPage() {
-    _waitFor('@currentPage')
+    cy.waitFor2('@currentPage',goingPage,questionnaire)
   }
 
   const file1 = [

@@ -31,25 +31,6 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   const executePost = false
   //const generatePdfCondition = true
 
-  // function _waitFor(waitFor) {
-  //   if (waitFor == '@nextPage'){
-  //     cy.get('@nextBtn').click({ force: true })
-  //   }
-  //   cy.wait(waitFor,{requestTimeout : $requestTimeout}).then(xhr => {
-  //       expect(xhr.response.statusCode).to.equal(200)
-  //       const gPage = xhr.response.body.pageId
-  //       const  title = getPageTitle(xhr.response.body)
-  //       console.log(`Comming page ${gPage} - ${title}.`)
-  //       cy.then(function () {
-  //         goingPage.elements = []
-  //       })
-  //       //printQuestionnaireIds(xhr.response.body.elements)
-  //       cy.then(function () {
-  //         goingPage.pageId = gPage
-  //       })
-  //   })
-  // }
-
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
     cy.waitFor2('@nextPage',goingPage,questionnaire)
