@@ -28,41 +28,42 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
   const $requestTimeout = 60000;
-  const executePost = true
+  const executePost = false
   //const generatePdfCondition = true
 
-  function _waitFor(waitFor) {
-    if (waitFor == '@nextPage'){
-      cy.get('@nextBtn').click({ force: true })
-    }
-    cy.wait(waitFor,{requestTimeout : $requestTimeout}).then(xhr => {
-        expect(xhr.response.statusCode).to.equal(200)
-        const gPage = xhr.response.body.pageId
-        const  title = getPageTitle(xhr.response.body)
-        console.log(`Comming page ${gPage} - ${title}.`)
-        cy.then(function () {
-          goingPage.elements = []
-        })
-        //printQuestionnaireIds(xhr.response.body.elements)
-        cy.then(function () {
-          goingPage.pageId = gPage
-        })
-    })
-  }
+  // function _waitFor(waitFor) {
+  //   if (waitFor == '@nextPage'){
+  //     cy.get('@nextBtn').click({ force: true })
+  //   }
+  //   cy.wait(waitFor,{requestTimeout : $requestTimeout}).then(xhr => {
+  //       expect(xhr.response.statusCode).to.equal(200)
+  //       const gPage = xhr.response.body.pageId
+  //       const  title = getPageTitle(xhr.response.body)
+  //       console.log(`Comming page ${gPage} - ${title}.`)
+  //       cy.then(function () {
+  //         goingPage.elements = []
+  //       })
+  //       //printQuestionnaireIds(xhr.response.body.elements)
+  //       cy.then(function () {
+  //         goingPage.pageId = gPage
+  //       })
+  //   })
+  // }
 
   function nextBtn() {
-    _waitFor('@nextPage')
+    cy.get('@nextBtn').click({ force: true })
+    cy.waitFor2('@nextPage',goingPage,questionnaire)
   }
 
   function currentPage() {
-    _waitFor('@currentPage')
+    cy.waitFor2('@currentPage',goingPage,questionnaire)
   }
 
   const file1 = [
     ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"]
   ]
   file1.forEach($car => {
-    it(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
+    it.only(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
 
       const $vin = $car[0]
 

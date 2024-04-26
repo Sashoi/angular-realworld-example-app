@@ -30,7 +30,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = true
+  const executePost = false
 
   const printQuestionnaireIds = (obj) => {
     if(!obj) return;  // Added a null check for  Uncaught TypeError: Cannot convert undefined or null to object
@@ -60,36 +60,37 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
     cy.get(`form#${selectorId}`).find(`img[alt="${fileName}"]`).invoke('attr', 'alt').should('eq', fileName)
   }
 
-  function _waitFor(waitFor) {
-    if (waitFor == '@nextPage'){
-      cy.get('@nextBtn').click({ force: true })
-    }
-    cy.wait(waitFor,{requestTimeout : $requestTimeout}).then(xhr => {
-        expect(xhr.response.statusCode).to.equal(200)
-        const gPage = xhr.response.body.pageId
-        const  title = getPageTitle(xhr.response.body)
-        console.log(`Comming page ${gPage} - ${title}.`)
-        cy.then(function () {
-          goingPage.elements = []
-        })
-        //printQuestionnaireIds(xhr.response.body.elements)
-        cy.then(function () {
-          goingPage.pageId = gPage
-        })
-        if (false && waitFor == '@currentPage'){
-          cy.then(function () {
-            questionnaire.Id = getQuestionnaireIdFromLinks(xhr.response.body.links.next)
-          })
-        }
-    })
-  }
+  // function _waitFor(waitFor) {
+  //   if (waitFor == '@nextPage'){
+  //     cy.get('@nextBtn').click({ force: true })
+  //   }
+  //   cy.wait(waitFor,{requestTimeout : $requestTimeout}).then(xhr => {
+  //       expect(xhr.response.statusCode).to.equal(200)
+  //       const gPage = xhr.response.body.pageId
+  //       const  title = getPageTitle(xhr.response.body)
+  //       console.log(`Comming page ${gPage} - ${title}.`)
+  //       cy.then(function () {
+  //         goingPage.elements = []
+  //       })
+  //       //printQuestionnaireIds(xhr.response.body.elements)
+  //       cy.then(function () {
+  //         goingPage.pageId = gPage
+  //       })
+  //       if (false && waitFor == '@currentPage'){
+  //         cy.then(function () {
+  //           questionnaire.Id = getQuestionnaireIdFromLinks(xhr.response.body.links.next)
+  //         })
+  //       }
+  //   })
+  // }
 
   function nextBtn() {
-    _waitFor('@nextPage')
+    cy.get('@nextBtn').click({ force: true })
+    cy.waitFor2('@nextPage',goingPage,questionnaire)
   }
 
   function currentPage() {
-    _waitFor('@currentPage')
+    cy.waitFor2('@currentPage',goingPage,questionnaire)
   }
 
   const $equipment_2_loading_doors = false
@@ -105,7 +106,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
   ]
 
   file1.forEach($car => {
-    it(`Execute b2b/integration/toni-digital/hdiLiabilitySelfService for vin: ${$car[0]}`, () =>{
+    it.only(`Execute b2b/integration/toni-digital/hdiLiabilitySelfService for vin: ${$car[0]}`, () =>{
 
       const vin = $car[0]
 
@@ -311,7 +312,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
 
                   const file7_1 ="airbag.jpg"
                   cy.elementExists('form#damage-photo-upload-overview-tailgate').then(($element) => {
-                    console.log(`$element: ` + $element)
+                    //console.log(`$element: ${JSON.stringify($element)}`)
                     cy.uploadImage('damage-photo-upload-overview-tailgate',PathToImages,file7_1)
                   })
                   cy.elementExists('form#damage-photo-upload-detail-tailgate').then(($element) => {

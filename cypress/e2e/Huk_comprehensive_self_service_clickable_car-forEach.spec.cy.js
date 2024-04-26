@@ -27,44 +27,50 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
-  const executePost = true
+  const executePost = false
   const generatePdfCondition = true
 
-  function _waitFor(waitFor) {
-    console.log(`waitFor: ${waitFor}`)
-    if (waitFor == '@nextPage'){
-      cy.get('@nextBtn').click({ force: true })
-    }
-    cy.wait(waitFor,{requestTimeout : $requestTimeout}).then(xhr => {
-        expect(xhr.response.statusCode).to.equal(200)
-        const gPage = xhr.response.body.pageId
-        const  title = getPageTitle(xhr.response.body)
-        console.log(`Comming page ${gPage} - ${title}.`)
-        cy.then(function () {
-          goingPage.elements = []
-        })
-        //printQuestionnaireIds(xhr.response.body.elements)
-        cy.then(function () {
-          goingPage.pageId = gPage
-        })
-        if (false && waitFor == '@currentPage'){
-          cy.then(function () {
-            questionnaire.Id = getQuestionnaireIdFromLinks(xhr.response.body.links.next)
-          })
-        }
-    })
-  }
+  // function _waitFor(waitFor) {
+  //   console.log(`waitFor: ${waitFor}`)
+  //   if (waitFor == '@nextPage'){
+  //     cy.get('@nextBtn').click({ force: true })
+  //   }
+  //   cy.wait(waitFor,{requestTimeout : $requestTimeout}).then(xhr => {
+  //       expect(xhr.response.statusCode).to.equal(200)
+  //       const gPage = xhr.response.body.pageId
+  //       const  title = getPageTitle(xhr.response.body)
+  //       console.log(`Comming page ${gPage} - ${title}.`)
+  //       cy.then(function () {
+  //         goingPage.elements = []
+  //       })
+  //       //printQuestionnaireIds(xhr.response.body.elements)
+  //       cy.then(function () {
+  //         goingPage.pageId = gPage
+  //       })
+  //       if (false && waitFor == '@currentPage'){
+  //         cy.then(function () {
+  //           questionnaire.Id = getQuestionnaireIdFromLinks(xhr.response.body.links.next)
+  //         })
+  //       }
+  //   })
+  // }
 
   function nextBtn() {
-    _waitFor('@nextPage')
+    cy.get('@nextBtn').click({ force: true })
+    cy.waitFor2('@nextPage',goingPage,questionnaire)
   }
 
   function currentPage() {
-    _waitFor('@currentPage')
+    cy.waitFor2('@currentPage',goingPage,questionnaire)
   }
 
   const file1 = [
-    ["W1V44760313930767", "Van", "01.01.2017", "Mercedes Vito 09/2021"]
+    [
+      "VF3VEAHXKLZ080921",
+      "MiniBusMidPanel",
+      "01.01.2017",
+      "Peugeot Expert 09/2020"
+    ]
   ]
 
   file1.forEach($car => {
@@ -244,6 +250,16 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
                   //windshield
                   cy.selectSVG('windshield')
 
+                   //load-doors and rear-windows  MiniBusMidPanel VanMidPanel  $equipment_2_loading_doors = true
+                   cy.get('@bodyType').then(function (bodyType) {
+                    if ($equipment_2_loading_doors && (bodyType == 'MiniBusMidPanel' || bodyType == 'VanMidPanel')){
+                      cy.selectSVG('right-load-door')
+                      cy.selectSVG('left-load-door')
+                      cy.selectSVG('left-rear-door-window')
+                      cy.selectSVG('right-rear-door-window')
+                    }
+                  })
+
                   if (selectAllParts) {
 
                     //left-taillight
@@ -383,14 +399,6 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
                       cy.selectSVG('tailgate')
                     }
 
-                    //load-doors and rear-windows
-                    if (vin == "VF3VEAHXKLZ080921" || vin == "WF0KXXTTRKMC81361"){
-                      cy.selectSVG('right-load-door')
-                      cy.selectSVG('left-load-door')
-                      cy.selectSVG('left-rear-door-window')
-                      cy.selectSVG('right-rear-door-window')
-                    }
-
 
                     //rear-bumper
                     cy.selectSVG('rear-bumper')
@@ -469,6 +477,18 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
                   cy.uploadImage('damage-photo-upload-overview-windshield',PathToImages,'broken front window_2.jpg')
                   cy.uploadImage('damage-photo-upload-detail-windshield',PathToImages,'broken front window_1.jpg')
 
+                  cy.get('@bodyType').then(function (bodyType) {
+                    if ($equipment_2_loading_doors && (bodyType == 'MiniBusMidPanel' || bodyType == 'VanMidPanel')){
+                      cy.uploadImage('damage-photo-upload-overview-left-rear-door-window',PathToImages,'airbag.jpg')
+                      cy.uploadImage('damage-photo-upload-detail-left-rear-door-window',PathToImages,'airbag.jpg')
+                      cy.uploadImage('damage-photo-upload-overview-right-rear-door-window',PathToImages,'airbag.jpg')
+                      cy.uploadImage('damage-photo-upload-detail-right-rear-door-window',PathToImages,'airbag.jpg')
+                      cy.uploadImage('damage-photo-upload-overview-left-load-door',PathToImages,'airbag.jpg')
+                      cy.uploadImage('damage-photo-upload-detail-left-load-door',PathToImages,'airbag.jpg')
+                      cy.uploadImage('damage-photo-upload-overview-right-load-door',PathToImages,'airbag.jpg')
+                      cy.uploadImage('damage-photo-upload-detail-right-load-door',PathToImages,'airbag.jpg')
+                    }
+                  })
                   nextBtn()
                 }
               })
@@ -484,8 +504,17 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
                   cy.selectSingleList('windshield-damage-size-scratch-bigger-5cm',0)
                   cy.selectSVG('zone-a')
                   cy.get('@bodyType').then(function (bodyType) {
-                    if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
-                      cy.selectSingleList('loading-floor-area-bend',0)
+                    if (bodyType == 'MiniBusMidPanel' || bodyType == 'VanMidPanel') {
+                      cy.selectSingleList('loading-floor-area-bend', 0)
+                      if ($equipment_2_loading_doors ){
+                        cy.selectMultipleList('left-load-door-damage-type', 0)
+                        cy.selectMultipleList('left-load-door-damage-type', 1)
+                        cy.selectSingleList('left-load-door-damage-size', 2)
+
+                        cy.selectMultipleList('right-load-door-damage-type', 0)
+                        cy.selectMultipleList('right-load-door-damage-type', 1)
+                        cy.selectSingleList('right-load-door-damage-size', 2)
+                      }
                     }
                   })
                   nextBtn()

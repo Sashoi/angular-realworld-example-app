@@ -37,6 +37,8 @@
 // }
 
 import header from '../fixtures/header.json'
+import { getPageTitle } from "../support/utils/common.js";
+import { getQuestionnaireIdFromLinks } from "../support/utils/common.js";
 
 
 const c_requestTimeout = 60000;
@@ -473,6 +475,28 @@ Cypress.Commands.add('fulfilInputIfEmpty', function ($div, $input, $newValue) {
       }
     })
   })
+})
+
+Cypress.Commands.add('waitFor2', function ($waitFor, $goingPage, $questionnaire) {
+  cy.wait($waitFor,{requestTimeout : c_requestTimeout}).then(xhr => {
+    expect(xhr.response.statusCode).to.equal(200)
+    const gPage = xhr.response.body.pageId
+    const  title = getPageTitle(xhr.response.body)
+    console.log(`Comming page ${gPage} - ${title}.`)
+    cy.then(function () {
+      $goingPage.elements = []
+    })
+    //printQuestionnaireIds(xhr.response.body.elements)
+    cy.then(function () {
+      $goingPage.pageId = gPage
+    })
+    if ($waitFor == '@currentPage'){
+      cy.then(function () {
+        $questionnaire.Id = getQuestionnaireIdFromLinks(xhr.response.body.links.next)
+      })
+    }
+})
+
 })
 
 

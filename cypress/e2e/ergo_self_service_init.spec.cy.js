@@ -31,43 +31,47 @@ describe('Ergo Self Service init', () =>{
   const client_email = Cypress.env("client_email")
 
 
-  function _waitFor(waitFor) {
-    cy.wait(waitFor,{requestTimeout : $requestTimeout}).then(xhr => {
-        expect(xhr.response.statusCode).to.equal(200)
-        const gPage = xhr.response.body.pageId
-        const  title = getPageTitle(xhr.response.body)
-        console.log(`Comming page ${gPage} - ${title}.`)
-        cy.readFile(logFilename).then((text) => {
-          const addRow = `${gPage.padStart(18, ' ')}\n`
-          text += addRow
-          cy.writeFile(logFilename, text)
-        })
-        cy.then(function () {
-          goingPage.elements = []
-        })
-        //printQuestionnaireIds(xhr.response.body.elements)
-        cy.then(function () {
-          goingPage.pageId = gPage
-        })
-        if (false && waitFor == '@currentPage'){
-          cy.then(function () {
-            questionnaire.Id = getQuestionnaireIdFromLinks(xhr.response.body.links.next)
-          })
-        }
-    })
-  }
+  // function _waitFor(waitFor) {
+  //   cy.wait(waitFor,{requestTimeout : $requestTimeout}).then(xhr => {
+  //       expect(xhr.response.statusCode).to.equal(200)
+  //       const gPage = xhr.response.body.pageId
+  //       const  title = getPageTitle(xhr.response.body)
+  //       console.log(`Comming page ${gPage} - ${title}.`)
+  //       cy.readFile(logFilename).then((text) => {
+  //         const addRow = `${gPage.padStart(18, ' ')}\n`
+  //         text += addRow
+  //         cy.writeFile(logFilename, text)
+  //       })
+  //       cy.then(function () {
+  //         goingPage.elements = []
+  //       })
+  //       //printQuestionnaireIds(xhr.response.body.elements)
+  //       cy.then(function () {
+  //         goingPage.pageId = gPage
+  //       })
+  //       if (false && waitFor == '@currentPage'){
+  //         cy.then(function () {
+  //           questionnaire.Id = getQuestionnaireIdFromLinks(xhr.response.body.links.next)
+  //         })
+  //       }
+  //   })
+  // }
 
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
-    _waitFor('@nextPage')
+    cy.waitFor2('@nextPage',goingPage,questionnaire)
   }
 
   function currentPage() {
-    _waitFor('@currentPage')
+    cy.waitFor2('@currentPage',goingPage,questionnaire)
   }
 
+  const vehicle_hsn_tsn_1 = '0588'
+  const vehicle_hsn_tsn_2 = 'AUC'
+  const vehicle_identification_by_hsn_tsn = true
+
   const file1 = [
-    ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
+    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"]
   ]
 
   file1.forEach($car => {
@@ -75,13 +79,19 @@ describe('Ergo Self Service init', () =>{
       cy.readFile(b2bBody).then(xml => {
         const xmlDocument = new DOMParser().parseFromString(xml,'text/xml')
         let vin = xmlDocument.querySelector("Fin").textContent
-        console.log(`vin: ${vin}`);
         let claimNumber = xmlDocument.querySelector("SchadenNummer").textContent
-        console.log(`claimNumber: ${claimNumber}`);
         xmlDocument.querySelector("Fin").textContent = $car[0]
         xmlDocument.querySelector("SchadenNummer").textContent = `KS${getRandomInt(10000000,99999999)}-${getRandomInt(1000,9999)}`
         //<Bezeichnung>sivanchevski@soft2run.com</Bezeichnung>
         xmlDocument.querySelector("Bezeichnung").textContent = `sivanchevski1@soft2run.com`
+        //console.log(`vin: ${xmlDocument.querySelector("Fin").textContent}`);
+        //console.log(`claimNumber: ${claimNumber}`);
+        if (vehicle_identification_by_hsn_tsn){
+          xmlDocument.querySelector("Fin").textContent = ''
+          xmlDocument.querySelector("KbaNr2Hersteller").textContent = vehicle_hsn_tsn_1
+          xmlDocument.querySelector("KbaNr3Typ").textContent = vehicle_hsn_tsn_2
+          console.log(`vehicle identification by hsn_tsn: ${xmlDocument.querySelector("KbaNr2Hersteller").textContent}/${xmlDocument.querySelector("KbaNr3Typ").textContent}`);
+        }
         console.log(`vin: ${xmlDocument.querySelector("Fin").textContent}`);
         console.log(`claimNumber: ${xmlDocument.querySelector("SchadenNummer").textContent}`);
         const xmlString = new XMLSerializer().serializeToString(xmlDocument);
@@ -134,7 +144,7 @@ describe('Ergo Self Service init', () =>{
                 const requestedInformation = response3.body.body.requestedInformation
                 if (requestedInformation != undefined && requestedInformation != null && requestedInformation.length > 0)
                 {
-                  console.log(`requestedInformation: ${response3.body.body.requestedInformation}`)
+                  console.log(`requestedInformation: ${JSON.stringify(response3.body.body.requestedInformation)}`)
                   questionnaireUrl = response3.body.body.requestedInformation[0].requestUrl;
                   questionnaireId2 = response3.body.body.requestedInformation[0].questionnaireId;
                   console.log(`Real questionnaireId: ${questionnaireId2}`)

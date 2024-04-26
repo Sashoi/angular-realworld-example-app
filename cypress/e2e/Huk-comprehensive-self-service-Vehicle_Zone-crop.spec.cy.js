@@ -28,9 +28,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
   const $requestTimeout = 60000;
-  const executePost = true
-  //const generatePdfCondition = true
-
+  const executePost = false
 
   function selectCropImage(selectorId,cropSelectorId,fileName){
     cy.intercept('GET', `/questionnaire/*/attachment/answer/${selectorId}/index-*`,{ log: false }).as(`cropOrigin-${selectorId}`)
@@ -64,36 +62,36 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
     })
   }
 
-  function _waitFor(waitFor) {
-    cy.wait(waitFor,{timeout : $requestTimeout}).then(xhr => {
-        expect(xhr.response.statusCode).to.equal(200)
-        const gPage = xhr.response.body.pageId
-        const  title = getPageTitle(xhr.response.body)
-        console.log(`Comming page ${gPage} - ${title}.`)
-        cy.then(function () {
-          goingPage.elements = []
-        })
-        //printQuestionnaireIds(xhr.response.body.elements)
-        cy.then(function () {
-          goingPage.pageId = gPage
-        })
-    })
-  }
+  // function _waitFor(waitFor) {
+  //   cy.wait(waitFor,{timeout : $requestTimeout}).then(xhr => {
+  //       expect(xhr.response.statusCode).to.equal(200)
+  //       const gPage = xhr.response.body.pageId
+  //       const  title = getPageTitle(xhr.response.body)
+  //       console.log(`Comming page ${gPage} - ${title}.`)
+  //       cy.then(function () {
+  //         goingPage.elements = []
+  //       })
+  //       //printQuestionnaireIds(xhr.response.body.elements)
+  //       cy.then(function () {
+  //         goingPage.pageId = gPage
+  //       })
+  //   })
+  // }
 
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
-    _waitFor('@nextPage')
+    cy.waitFor2('@nextPage',goingPage,questionnaire)
   }
 
   function currentPage() {
-    _waitFor('@currentPage')
+    cy.waitFor2('@currentPage',goingPage,questionnaire)
   }
 
   const file1 = [
     ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
   ]
   file1.forEach($car => {
-    it(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
+    it.only(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
 
       const $vin = $car[0]
 
@@ -354,7 +352,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
       })
     }) //it Huk
 
-    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['dekra_schadenbilder','dekra_abschlussbericht'])
     }) //it PDF from commands
   }) //forEach

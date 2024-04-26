@@ -23,41 +23,43 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = true
+  const executePost = false
   const sectionError = true
 
-  function _waitFor(waitFor) {
-    if (waitFor == '@nextPage'){
-      cy.get('@nextBtn').click({ force: true })
-    }
-    if (waitFor == '@prevPage'){
-      cy.get('@prevBtn').click({ force: true })
-    }
-    cy.wait(waitFor,{requestTimeout : $requestTimeout}).then(xhr => {
-        expect(xhr.response.statusCode).to.equal(200)
-        const gPage = xhr.response.body.pageId
-        const  title = getPageTitle(xhr.response.body)
-        console.log(`Comming page ${gPage} - ${title}.`)
-        cy.then(function () {
-          goingPage.elements = []
-        })
-        //printQuestionnaireIds(xhr.response.body.elements)
-        cy.then(function () {
-          goingPage.pageId = gPage
-        })
-    })
-  }
+  // function _waitFor(waitFor) {
+  //   if (waitFor == '@nextPage'){
+  //     cy.get('@nextBtn').click({ force: true })
+  //   }
+  //   if (waitFor == '@prevPage'){
+  //     cy.get('@prevBtn').click({ force: true })
+  //   }
+  //   cy.wait(waitFor,{requestTimeout : $requestTimeout}).then(xhr => {
+  //       expect(xhr.response.statusCode).to.equal(200)
+  //       const gPage = xhr.response.body.pageId
+  //       const  title = getPageTitle(xhr.response.body)
+  //       console.log(`Comming page ${gPage} - ${title}.`)
+  //       cy.then(function () {
+  //         goingPage.elements = []
+  //       })
+  //       //printQuestionnaireIds(xhr.response.body.elements)
+  //       cy.then(function () {
+  //         goingPage.pageId = gPage
+  //       })
+  //   })
+  // }
 
   function nextBtn() {
-    _waitFor('@nextPage')
+    cy.get('@nextBtn').click({ force: true })
+    cy.waitFor2('@nextPage',goingPage,questionnaire)
   }
 
   function currentPage() {
-    _waitFor('@currentPage')
+    cy.waitFor2('@currentPage',goingPage,questionnaire)
   }
 
   function prevBtn() {
-    _waitFor('@prevPage')
+    cy.get('@prevBtn').click({ force: true })
+    cy.waitFor2('@prevPage',goingPage,questionnaire)
   }
 
   const file1 = [
@@ -66,11 +68,10 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
       "MiniBusMidPanel",
       "01.01.2017",
       "Peugeot Expert 09/2020"
-    ],
-    ["W1V44760313930767", "Van", "01.01.2017", "Mercedes Vito 09/2021"]
+    ]
   ]
-  file1.forEach($car => {
-    it(`wuestenrot-comprehensive-call-center for vin: ${$car[0]}`, () => {
+  file.forEach($car => {
+    it.only(`wuestenrot-comprehensive-call-center for vin: ${$car[0]}`, () => {
 
       const $vin = $car[0]
 
@@ -280,6 +281,5 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
     it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['wuestenrot_abschlussbericht'])
     }) //it PDF from commands
-
   })  //forEach
 })

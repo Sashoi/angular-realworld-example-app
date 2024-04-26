@@ -1,4 +1,1 @@
-vin: TMBJB7NS4K8027658 expected:                SUV real:                SUV desc: SKODA Kodiaq 1.5 TSI ACT DSG Style 
-vin: WVWZZZ3CZME020680 expected:            Station real:            Station desc: Passat Variant 1.4 TSI Plug-In-Hybrid DSG GTE 
-vin: VF3VEAHXKLZ080921 expected:    MiniBusMidPanel real:    MiniBusMidPanel desc: Peugeot Expert 09/2020 
-vin: W1V44760313930767 expected:                Van real:            MiniBus desc: Mercedes Vito 09/2021 
+vin: WDB2083441T069719 expected:              Coupe real:              Coupe desc: MER CLK Coupe (partial identification, build period to be defined manually) 

@@ -32,52 +32,42 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   const interceptWGV = false
   const $equipment_2_loading_doors = true
 
-  function _waitFor(waitFor) {
-    if (waitFor == '@nextPage'){
-      cy.get('@nextBtn').click({ force: true })
-    }
-    cy.wait(waitFor,{requestTimeout : $requestTimeout}).then(xhr => {
-        expect(xhr.response.statusCode).to.equal(200)
-        const gPage = xhr.response.body.pageId
-        const  title = getPageTitle(xhr.response.body)
-        console.log(`Comming page ${gPage} - ${title}.`)
-        cy.then(function () {
-          goingPage.elements = []
-        })
-        //printQuestionnaireIds(xhr.response.body.elements)
-        cy.then(function () {
-          goingPage.pageId = gPage
-        })
-        if (waitFor == '@currentPage'){
-          //const nextUrl = xhr.response.body.links.next
-          //"https://dev02.spearhead-ag.ch:443/questionnaire/7uRjDM92M9eWEhZVkBrSr/page/page-01?navigateTo=next"
-          //const startStr = '/questionnaire/'
-          //const endStr = '/page/page'
-          //const pos = nextUrl.indexOf(startStr) + startStr.length;
-          //const questionnaireId =  nextUrl.substring(pos, nextUrl.indexOf(endStr, pos));
-          cy.then(function () {
-            questionnaire.Id = getQuestionnaireIdFromLinks(xhr.response.body.links.next)
-          })
-          //console.log(`From @currentPage questionnaireId: ${questionnaireId}`)
-        }
-    })
-  }
+  // function _waitFor(waitFor) {
+  //   cy.wait(waitFor,{requestTimeout : $requestTimeout}).then(xhr => {
+  //       expect(xhr.response.statusCode).to.equal(200)
+  //       const gPage = xhr.response.body.pageId
+  //       const  title = getPageTitle(xhr.response.body)
+  //       console.log(`Comming page ${gPage} - ${title}.`)
+  //       cy.then(function () {
+  //         goingPage.elements = []
+  //       })
+  //       //printQuestionnaireIds(xhr.response.body.elements)
+  //       cy.then(function () {
+  //         goingPage.pageId = gPage
+  //       })
+  //       if (waitFor == '@currentPage'){
+  //         cy.then(function () {
+  //           questionnaire.Id = getQuestionnaireIdFromLinks(xhr.response.body.links.next)
+  //         })
+  //       }
+  //   })
+  // }
 
   function nextBtn() {
-    _waitFor('@nextPage')
+    cy.get('@nextBtn').click({ force: true })
+    //_waitFor('@nextPage')
+    cy.waitFor2('@nextPage',goingPage,questionnaire)
   }
 
   function currentPage() {
-    _waitFor('@currentPage')
+    //_waitFor('@currentPage')
+    cy.waitFor2('@currentPage',goingPage,questionnaire)
   }
 
   const file1 = [
-    [
-      "WDB2083441T069719",
-      "Coupe",
-      "01.01.2009",
-      "MER CLK Coupe (partial identification, build period to be defined manually)"
-    ]
+    ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
+  ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"],
+  ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
   ]
   file1.forEach($car => {
     it(`wgv callCenter for vin: ${$car[0]}`, () =>{
@@ -383,6 +373,21 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
       })
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-04'){
+          cy.get('@bodyType').then(function (bodyType) {
+            if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
+              cy.wait(2000)
+              cy.selectSingleList('equipment-slide-door',1)
+              cy.selectSingleList('equipment-2-loading-doors',Number($equipment_2_loading_doors))
+
+              cy.selectSingleList('equipment-length',0)
+              cy.selectSingleList('equipment-height',0)
+              cy.selectSingleList('equipment-vehicle-rear-glassed',0)
+              cy.selectSingleList('vehicle-customized-interior',0)
+            }
+            if (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine'){
+              cy.selectSingleList('equipment-loading-area-cover-type',1)
+            }
+          })
           nextBtn()
         }
       })
