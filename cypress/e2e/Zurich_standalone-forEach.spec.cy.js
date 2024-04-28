@@ -50,9 +50,13 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
   }
 
   const file1 = [
-  ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
+    ["W0L0XCR975E026845", "Cabrio", "01.01.2009", "OPE Tigra Cabrio"],
+    ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5"],
+    ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
+    ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"],
+    ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
   ]
-  file.forEach($car => {
+  file1.forEach($car => {
     it.only(`zurich standalone questionnaire - zurich_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
@@ -262,6 +266,18 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
                 cy.selectSVG('left-rear-wheel-tire')
               }
             }
+            cy.selectSVG('windshield')
+            cy.selectMultipleList('windshield-damage-type',0)
+            cy.selectMultipleList('windshield-damage-type',1)
+            cy.selectMultipleList('windshield-damage-type',2)
+            cy.selectSVG('zone-d')
+            cy.selectSVG('zone-a')
+            cy.selectSVG('zone-c')
+            cy.selectSVG('zone-b')
+            cy.selectSingleList('windshield-damage-quantity',3)
+            cy.selectSingleList('windshield-damage-size-scratch-bigger-5cm',0)
+            cy.selectSingleList('windshield-damage-size-stone-chips-bigger-2cm',0)
+            cy.selectSingleList('windshield-damage-size-crack-bigger-2cm',0)
             nextBtn()
           }) //wait('@clickableCar'
         } //'page-02'
