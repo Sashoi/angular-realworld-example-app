@@ -139,7 +139,7 @@
                 </AuftragspositionsPartner>
                 <AuftragspositionsPartner XSIType="Person">
                     <Adresse>
-                        <Ort>Kassel</Ort>
+                        <Ort>Kassel2</Ort>
                         <Land>DE</Land>
                         <Plz>34123</Plz>
                         <Postfach/>
@@ -147,7 +147,7 @@
                         <Telefon1>0561/500455102</Telefon1>
                         <Telefax/>
                         <Email>
-                          <Bezeichnung>sivanchevski1@soft2run.com</Bezeichnung>
+                          <Bezeichnung>sivanchevski2@soft2run.com</Bezeichnung>
                           <DefaultAdresse/>
                           <StandardEmpfaenger/>
                           <SuchFeld/>
