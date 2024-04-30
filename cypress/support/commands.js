@@ -161,42 +161,6 @@ Cypress.Commands.add('getBodyType', ($car,logFilename) =>{
   }) //get('@authorization'
 })
 
-
-Cypress.Commands.add('getBodyType2', ($car,logFilename) =>{
-  const $dev = Cypress.env("dev");
-  const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
-  cy.authenticate(false).then(function (authorization) {
-    cy.get('@questionnaireId').then(function (questionnaireId) {
-      Cypress._.merge(header, {'authorization' : authorization});
-
-      const url = `${baseUrl_lp}questionnaire/${questionnaireId}`
-      console.log(`url: ${url}`)
-      const options = {
-        method: 'GET',
-        url: url,
-        headers:  header,
-        'timeout' : c_requestTimeout
-      };
-      cy.request(options).then(
-        (response) => {
-        expect(response.status).to.eq(200) // true
-        let bodyType = response.body.supportInformation.bodyType
-        console.log(`supportInformation.bodyType: ${bodyType}.`)
-        if (bodyType == undefined || bodyType == null){
-          bodyType = ''
-        }
-        cy.readFile(logFilename).then((text) => {
-          const addRow = `vin: ${$car[0]} expected: ${$car[1].padStart(18, ' ')} real: ${bodyType.padStart(18, ' ')} desc: ${$car[3]} \n`
-          text += addRow
-          cy.writeFile(logFilename, text)
-        })
-        cy.wrap(bodyType).then((bodyType) => {
-          return bodyType
-        })
-      }) //request(options)
-    }) //get('@questionnaireId'
-  }) //get('@authorization'
-})
 Cypress.Commands.add('getQuestionnaireInfo', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`

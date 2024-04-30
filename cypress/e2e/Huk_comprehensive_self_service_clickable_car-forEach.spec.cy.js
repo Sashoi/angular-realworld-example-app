@@ -136,7 +136,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-01'){
                   cy.selectMultipleList('terms-of-service-acknowledgement-huk-coburg',0)
-                  cy.getBodyType2($car,logFilename).then(function (bodyType) {
+                  cy.getBodyType($car,logFilename).then(function (bodyType) {
                     cy.then(function () {
                       questionnaire.bodyType = bodyType
                     })

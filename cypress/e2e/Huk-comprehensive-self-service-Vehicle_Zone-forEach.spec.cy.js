@@ -142,7 +142,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                 }
               })
 
-              cy.getBodyType2($car,logFilename).then(function (bodyType) {
+              cy.getBodyType($car,logFilename).then(function (bodyType) {
                 cy.then(function () {
                   questionnaire.bodyType = bodyType
                 })

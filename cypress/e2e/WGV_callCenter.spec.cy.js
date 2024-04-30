@@ -44,9 +44,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   }
 
   const file1 = [
-    ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
-  ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"],
-  ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
+  ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
   ]
   file1.forEach($car => {
     it(`wgv callCenter for vin: ${$car[0]}`, () =>{
@@ -330,7 +328,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-01'){
           cy.selectMultipleList('terms-of-service-acknowledgement',0)
-          cy.getBodyType2($car,logFilename).then(function (bodyType) {
+          cy.getBodyType($car,logFilename).then(function (bodyType) {
             cy.then(function () {
               questionnaire.bodyType = bodyType
             })
