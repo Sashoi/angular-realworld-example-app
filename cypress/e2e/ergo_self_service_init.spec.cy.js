@@ -47,9 +47,8 @@ describe('Ergo Self Service init', () =>{
   }
 
 
-
   const file1 = [
-    ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
+    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"]
   ]
 
   file1.forEach($car => {
@@ -233,6 +232,7 @@ describe('Ergo Self Service init', () =>{
                   questionnaire.Id = questionnaireId2
                 })
                 console.log(`questionnaireUrl: ${questionnaireUrl}`)
+
                 cy.visit(questionnaireUrl,{log : false})
 
                 const nextButtonLabel ='Speichern und Weiter'
@@ -380,10 +380,16 @@ describe('Ergo Self Service init', () =>{
                     cy.selectMultipleList('windshield-hail-damage-type',0)
                     cy.selectMultipleList('windshield-hail-damage-type',1)
                     //"visibleExpression": "answer('glass-parts-damaged-by-hail') == 'yes' && answer('selected-parts-glass-parts-only')['roof'] == 'yes'",
-
-                      if (!glass_parts_damaged_by_hail){
+                    cy.getQuestionAnswer('selected-parts-glass-parts-only').then(function (answer) {
+                      let roof = answer.map(x => x.roof)
+                      console.log(`roof: ${JSON.stringify(roof)}`);
+                      console.log(`roof bool: ${!roof && roof.length > 0 && roof[0] == 'yes'}`);
+                      if (!glass_parts_damaged_by_hail && (!roof && roof.length > 0 && roof[0] == 'yes')){
                         cy.selectSingleList('roof-equipment-panorama-roof',1)
                       }
+                    })
+
+
 
                     //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
@@ -474,7 +480,7 @@ describe('Ergo Self Service init', () =>{
                     // const nextButtonLabel23 ='Schadenmeldung senden'
                     // cy.get(selectorNextButton).contains(nextButtonLabel23).click()
                     // _waitFor('@nextPage')
-                    cy.getQuestionnaireInfo2($car[0], logFilename)
+                    cy.getQuestionnaireInfo($car[0], logFilename)
                     nextBtn()
                   }
                 })

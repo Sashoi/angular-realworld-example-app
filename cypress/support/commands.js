@@ -493,6 +493,7 @@ Cypress.Commands.add('waitFor2', function ($waitFor, $goingPage, $questionnaire)
     if ($waitFor == '@currentPage'){
       cy.then(function () {
         $questionnaire.Id = getQuestionnaireIdFromLinks(xhr.response.body.links.next)
+        $questionnaire.authorization = xhr.request.headers.authorization
       })
     }
 })
