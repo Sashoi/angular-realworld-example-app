@@ -499,7 +499,37 @@ Cypress.Commands.add('waitFor2', function ($waitFor, $goingPage, $questionnaire)
 
 })
 
+Cypress.Commands.add('getQuestionnaireAnswers', () =>{
+  const $dev = Cypress.env("dev");
+  const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
+  cy.get('@authorization').then(function (authorization) {
+    cy.get('@questionnaireId').then(function (questionnaireId) {
+      Cypress._.merge(header, {'authorization':authorization});
+      Cypress._.merge(header, {'timeout':c_requestTimeout});
+      const options = {
+        method: 'GET',
+        url: `${baseUrl_lp}questionnaire/${questionnaireId}/questionnaireAnswers`,
+        headers: header
+      };
+      cy.request(options).then(
+        (response) => {
+        expect(response.status).to.eq(200) // true
+        cy.wrap(response.body).then((body) => {
+          return body
+        })
+      }) //request(options)
+    }) //get('@questionnaireId'
+  }) //get('@authorization'
+})
 
+Cypress.Commands.add('getQuestionAnswer', function ($questionId) {
+  cy.getQuestionnaireAnswers().then(function (body) {
+    const answer = body.answers.find(x => x.questionId === $questionId).answer
+    cy.wrap(answer).then((answer) => {
+      return answer
+    })
+  })
+})
 
 
 

@@ -6,6 +6,7 @@ import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 import header from '../fixtures/headerXML.json'
 
+
 const logFilename = 'cypress/fixtures/logs/ErgoSelfServiceInit.log'
 const PathToImages ='cypress/fixtures/images/'
 const b2bBody = 'cypress/fixtures/templates/ergoBody.xml'
@@ -25,10 +26,15 @@ describe('Ergo Self Service init', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
-  const executePost = false
-  const entire_vehicle_damaged_by_hail = false
+  const executePost = true
+  const entire_vehicle_damaged_by_hail = true
   const glass_parts_damaged_by_hail = true
   const client_email = Cypress.env("client_email")
+  const vehicle_hsn_tsn_1 = '0588'
+  const vehicle_hsn_tsn_2 = 'AUC'
+  const vehicle_identification_by_hsn_tsn = false
+  const changeRoleType = false
+  const newEmail = `sivanchevski3@soft2run.com`
 
 
   function nextBtn() {
@@ -40,19 +46,17 @@ describe('Ergo Self Service init', () =>{
     cy.waitFor2('@currentPage',goingPage,questionnaire)
   }
 
-  const vehicle_hsn_tsn_1 = '0588'
-  const vehicle_hsn_tsn_2 = 'AUC'
-  const vehicle_identification_by_hsn_tsn = true
+
 
   const file1 = [
-    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"]
+    ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
   ]
 
   file1.forEach($car => {
     it.only(`Execute /questionnaire/ergo_self_service_init with vin:${$car[0]}`, () =>{
       cy.readFile(b2bBody).then(xml => {
         const xmlDocument = new DOMParser().parseFromString(xml,'text/xml')
-        let vin = xmlDocument.querySelector("Fin").textContent
+        /* let vin = xmlDocument.querySelector("Fin").textContent
         let claimNumber = xmlDocument.querySelector("SchadenNummer").textContent
         xmlDocument.querySelector("Fin").textContent = $car[0]
         xmlDocument.querySelector("SchadenNummer").textContent = `KS${getRandomInt(10000000,99999999)}-${getRandomInt(1000,9999)}`
@@ -67,7 +71,98 @@ describe('Ergo Self Service init', () =>{
           console.log(`vehicle identification by hsn_tsn: ${xmlDocument.querySelector("KbaNr2Hersteller").textContent}/${xmlDocument.querySelector("KbaNr3Typ").textContent}`);
         }
         console.log(`vin: ${xmlDocument.querySelector("Fin").textContent}`);
-        console.log(`claimNumber: ${xmlDocument.querySelector("SchadenNummer").textContent}`);
+        console.log(`claimNumber: ${xmlDocument.querySelector("SchadenNummer").textContent}`); */
+
+      expect(xmlDocument.getElementsByTagName("RollenTyp").length).to.gt(0)
+
+      let roleTypeElement;
+
+      //let roleTypeElement = xmlDocument.getElementsByTagName("RollenTyp")[0]
+      Array.from(xmlDocument.getElementsByTagName("RollenTyp")).forEach(element => {
+        console.log(`element: ${element.textContent}`);
+        if (element.textContent == 'ZN'){
+         roleTypeElement = element
+        }
+      })
+
+      if ( !roleTypeElement ) {
+        throw new Error(`test fails, cannot find roleType ZN`)
+      }
+
+      console.log(`roleType: ${roleTypeElement.textContent}`);
+
+      let parentElement = roleTypeElement.parentElement
+      const loop = [1,2,3,4,5,6]
+      loop.forEach((v, index, arr) => {
+        console.log(`parent ${v} of roleType: ${parentElement.nodeName }`);
+        if (parentElement.nodeName == 'body') {
+          arr.length = index + 1; // Behaves like `break`
+        }
+        parentElement = parentElement.parentElement
+      })
+
+      expect(parentElement.getElementsByTagName("Fin").length).to.eq(1)
+      let vinElement = parentElement.getElementsByTagName("Fin")[0]
+      console.log(`vin: ${vinElement.textContent}`);
+
+      expect(parentElement.getElementsByTagName("SchadenNummer").length).to.eq(1)
+      let claimNumberElement = parentElement.getElementsByTagName("SchadenNummer")[0]
+      console.log(`claimNumber: ${claimNumberElement.textContent}`);
+
+      Array.from(parentElement.getElementsByTagName("Bezeichnung")).forEach((element, index) => {
+        console.log(`email ${index}: ${element.childNodes[0].nodeValue}`);
+        element.childNodes[0].nodeValue = newEmail
+      })
+
+      let newDxNumber = `KF3C0910KR${getRandomInt(1000000000000,9999999999999)}+${getRandomInt(100000,999999)}%` //<DxNumber>KF3C0910KR0735504630004+001002%</DxNumber>
+      //newDxNumber = 'KF3C0910KR7990820637743+632584%' //test for preventing duplicate DxNumbers
+      /* If want to check <DxNumber> exists , execute
+      POST {{baseUrl}}/damage/notifications/search-by-extra-information
+      {
+        "dekra_number": "KF3C0910KR7990820637743+642584"
+      }
+      Return Status 200 if exist
+      404 if not exist */
+
+      Array.from(xmlDocument.getElementsByTagName("DxNumber")).forEach((element, index) => {
+        console.log(`DxNumber ${index}: ${element.childNodes[0].nodeValue}`);
+        element.childNodes[0].nodeValue = newDxNumber
+      })
+
+      expect(parentElement.getElementsByTagName("Bezeichnung").length).to.eq(2)
+
+      let vin = $car[0]
+      let claimNumber = `KS${getRandomInt(10000000,99999999)}-${getRandomInt(1000,9999)}`
+
+      vinElement.textContent = vin
+      claimNumberElement.textContent = claimNumber
+
+      if (vehicle_identification_by_hsn_tsn){
+        vinElement.textContent = ''
+        expect(parentElement.getElementsByTagName("KbaNr2Hersteller").length).to.eq(1)
+        parentElement.getElementsByTagName("KbaNr2Hersteller")[0].textContent = vehicle_hsn_tsn_1
+        expect(parentElement.getElementsByTagName("KbaNr3Typ").length).to.eq(1)
+        parentElement.getElementsByTagName("KbaNr3Typ")[0].textContent = vehicle_hsn_tsn_2
+        console.log(`vehicle identification by hsn_tsn: ${parentElement.querySelector("KbaNr2Hersteller").textContent}/${parentElement.querySelector("KbaNr3Typ").textContent}`);
+      }
+
+      console.log(`new vin: ${parentElement.querySelector("Fin").textContent}`);
+      console.log(`new claimNumber: ${parentElement.querySelector("SchadenNummer").textContent}`);
+      Array.from(parentElement.getElementsByTagName("Bezeichnung")).forEach((element, index) => {
+        console.log(`new email ${index}: ${element.childNodes[0].nodeValue}`);
+      })
+      Array.from(xmlDocument.getElementsByTagName("DxNumber")).forEach((element, index) => {
+        console.log(`new DxNumber ${index}: ${element.childNodes[0].nodeValue}`);
+      })
+
+      if (changeRoleType){
+        //expect(parentElement.getElementsByTagName("RollenTyp").length).to.eq(1)
+        roleTypeElement.textContent = 'ZH'
+        //console.log(`new roleType: ${parentElement.querySelector("RollenTyp").textContent}`);
+        Array.from(parentElement.getElementsByTagName("RollenTyp")).forEach((element, index) => {
+          console.log(`new roleType ${index}: ${element.childNodes[0].nodeValue}`);
+        })
+      }
         const xmlString = new XMLSerializer().serializeToString(xmlDocument);
 
 
@@ -82,11 +177,18 @@ describe('Ergo Self Service init', () =>{
             method: 'POST',
             url: `${baseUrl_lp}b2b/integration/dekra/ergo-self-service-init`,
             body: xmlString,
+            failOnStatusCode : false,
             headers: header
           };
           cy.request(options).then(
             (response) => {
             // response.body is automatically serialized into JSON
+            if (response.status != 201){
+              console.log(`status: ${response.status}`);
+              console.log(`internalErrorCode: ${response.body.internalErrorCode}`);
+              console.log(`message: ${response.body.message}`);
+              throw new Error(`test fails : ${response.body.message}`)
+            }
             expect(response.status).to.eq(201) // true
             const questionnaireId = response.body.questionnaireId
             console.log(`self-service-init questionnaireId: ${questionnaireId}`)
@@ -278,9 +380,11 @@ describe('Ergo Self Service init', () =>{
                     cy.selectMultipleList('windshield-hail-damage-type',0)
                     cy.selectMultipleList('windshield-hail-damage-type',1)
                     //"visibleExpression": "answer('glass-parts-damaged-by-hail') == 'yes' && answer('selected-parts-glass-parts-only')['roof'] == 'yes'",
-                    if (!glass_parts_damaged_by_hail){
-                      cy.selectSingleList('roof-equipment-panorama-roof',1)
-                    }
+
+                      if (!glass_parts_damaged_by_hail){
+                        cy.selectSingleList('roof-equipment-panorama-roof',1)
+                      }
+
                     //cy.getQuestionnaireInfo2($car[0], logFilename)
                     nextBtn()
                   }
