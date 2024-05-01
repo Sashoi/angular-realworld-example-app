@@ -39,11 +39,11 @@ describe('Ergo Self Service init', () =>{
 
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
-    cy.waitFor2('@nextPage',goingPage,questionnaire)
+    cy.waitFor('@nextPage',goingPage,questionnaire)
   }
 
   function currentPage() {
-    cy.waitFor2('@currentPage',goingPage,questionnaire)
+    cy.waitFor('@currentPage',goingPage,questionnaire)
   }
 
 
@@ -477,9 +477,6 @@ describe('Ergo Self Service init', () =>{
                 //pageId: "page-23" pageShowCriteria = true
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-23'){
-                    // const nextButtonLabel23 ='Schadenmeldung senden'
-                    // cy.get(selectorNextButton).contains(nextButtonLabel23).click()
-                    // _waitFor('@nextPage')
                     cy.getQuestionnaireInfo($car[0], logFilename)
                     nextBtn()
                   }

@@ -371,7 +371,7 @@ Cypress.Commands.add('fulfilInputIfEmpty', function ($div, $input, $newValue) {
   })
 })
 
-Cypress.Commands.add('waitFor2', function ($waitFor, $goingPage, $questionnaire) {
+Cypress.Commands.add('waitFor', function ($waitFor, $goingPage, $questionnaire) {
   cy.wait($waitFor,{requestTimeout : c_requestTimeout}).then(xhr => {
     expect(xhr.response.statusCode).to.equal(200)
     const gPage = xhr.response.body.pageId

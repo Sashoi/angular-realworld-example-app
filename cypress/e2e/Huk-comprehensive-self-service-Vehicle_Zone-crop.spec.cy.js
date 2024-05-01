@@ -64,11 +64,11 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
 
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
-    cy.waitFor2('@nextPage',goingPage,questionnaire)
+    cy.waitFor('@nextPage',goingPage,questionnaire)
   }
 
   function currentPage() {
-    cy.waitFor2('@currentPage',goingPage,questionnaire)
+    cy.waitFor('@currentPage',goingPage,questionnaire)
   }
 
   const file1 = [

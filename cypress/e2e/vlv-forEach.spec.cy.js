@@ -27,11 +27,11 @@ describe('Start and complete vlv standalone questionnaire', () => {
 
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
-    cy.waitFor2('@nextPage',goingPage,questionnaire)
+    cy.waitFor('@nextPage',goingPage,questionnaire)
   }
 
   function currentPage() {
-    cy.waitFor2('@currentPage',goingPage,questionnaire)
+    cy.waitFor('@currentPage',goingPage,questionnaire)
   }
 
   const loss_causeArray = ["Unfall", "Vandalismus", "Sturm", "Glasbruch", "Tierschaden"]
