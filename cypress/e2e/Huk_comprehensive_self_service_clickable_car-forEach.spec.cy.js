@@ -32,11 +32,11 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
 
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
-    cy.waitFor('@nextPage',goingPage,questionnaire)
+    cy.waitingFor('@nextPage',goingPage,questionnaire)
   }
 
   function currentPage() {
-    cy.waitFor('@currentPage',goingPage,questionnaire)
+    cy.waitingFor('@currentPage',goingPage,questionnaire)
   }
 
   const file1 = [

@@ -42,11 +42,11 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
 
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
-    cy.waitFor('@nextPage',goingPage,questionnaire)
+    cy.waitingFor('@nextPage',goingPage,questionnaire)
   }
 
   function currentPage() {
-    cy.waitFor('@currentPage',goingPage,questionnaire)
+    cy.waitingFor('@currentPage',goingPage,questionnaire)
   }
 
   const file1 = [

@@ -28,16 +28,16 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
 
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
-    cy.waitFor('@nextPage',goingPage,questionnaire)
+    cy.waitingFor('@nextPage',goingPage,questionnaire)
   }
 
   function currentPage() {
-    cy.waitFor('@currentPage',goingPage,questionnaire)
+    cy.waitingFor('@currentPage',goingPage,questionnaire)
   }
 
   function prevBtn() {
     cy.get('@prevBtn').click({ force: true })
-    cy.waitFor('@prevPage',goingPage,questionnaire)
+    cy.waitingFor('@prevPage',goingPage,questionnaire)
   }
 
   const file1 = [
