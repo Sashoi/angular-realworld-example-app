@@ -2957,10 +2957,10 @@ cypress-multi-reporters@^1.6.4:
     debug "^4.3.4"
     lodash "^4.17.21"
 
-cypress@^13.6.6:
-  version "13.6.6"
-  resolved "https://registry.npmjs.org/cypress/-/cypress-13.6.6.tgz"
-  integrity sha512-S+2S9S94611hXimH9a3EAYt81QM913ZVA03pUmGDfLTFa5gyp85NJ8dJGSlEAEmyRsYkioS1TtnWtbv/Fzt11A==
+cypress@^13.9.0:
+  version "13.9.0"
+  resolved "https://registry.npmjs.org/cypress/-/cypress-13.9.0.tgz"
+  integrity sha512-atNjmYfHsvTuCaxTxLZr9xGoHz53LLui3266WWxXJHY7+N6OdwJdg/feEa3T+buez9dmUXHT1izCOklqG82uCQ==
   dependencies:
     "@cypress/request" "^3.0.0"
     "@cypress/xvfb" "^1.2.4"

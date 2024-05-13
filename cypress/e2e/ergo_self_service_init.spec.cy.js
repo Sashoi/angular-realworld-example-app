@@ -10,6 +10,7 @@ import header from '../fixtures/headerXML.json'
 const logFilename = 'cypress/fixtures/logs/ErgoSelfServiceInit.log'
 const PathToImages ='cypress/fixtures/images/'
 const b2bBody = 'cypress/fixtures/templates/ergoBody.xml'
+const b2bBodySave = 'cypress/fixtures/templates/ergoBodySave.xml'
 
 describe('Ergo Self Service init', () =>{
 
@@ -162,12 +163,14 @@ describe('Ergo Self Service init', () =>{
           console.log(`new roleType ${index}: ${element.childNodes[0].nodeValue}`);
         })
       }
+
         const xmlString = new XMLSerializer().serializeToString(xmlDocument);
 
 
         cy.authenticate().then(function (authorization) {
           cy.then(function () {
             questionnaire.authorization = authorization
+            cy.writeFile(b2bBodySave, xmlString)
           })
 
           Cypress._.merge(header, {'authorization' : authorization});

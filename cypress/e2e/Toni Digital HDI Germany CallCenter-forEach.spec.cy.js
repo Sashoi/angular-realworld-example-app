@@ -25,8 +25,8 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
 
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
-  const $requestTimeout = 60000;
-  const executePost = false
+  const $requestTimeout = 60001;
+  const executePost = true
 
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
