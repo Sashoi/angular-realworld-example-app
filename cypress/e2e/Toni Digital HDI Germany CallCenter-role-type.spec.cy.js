@@ -7,12 +7,12 @@ import { getPageTitle } from "../support/utils/common.js";
 import { questionnaire } from "../support/utils/common.js";
 import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
-import b2bBody from '../fixtures/templates/b2bBodyToni_1.json'
+import b2bBody from '../fixtures/templates/b2bBodyToni_2.json'
 
 import header from '../fixtures/header.json'
 
 const logFilename = 'cypress/fixtures/logs/hdiLiabilityCC.log'
-const b2bBodySave = 'cypress/fixtures/templates/b2bBodyToni_1_Save.json'
+const b2bBodySave = 'cypress/fixtures/templates/b2bBodyToni_2_Save.json'
 
 
 describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
@@ -29,6 +29,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60001;
   const executePost = true
+  const role_type = 'client' //or "claimant"
 
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
@@ -60,7 +61,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
       "WDB2083441T069719",
       "Coupe",
       "01.01.2009",
-      "MER CLK Coupe (partial identification, build period to be defined manually) "
+      "MER CLK Coupe (partial identification, build period to be defined manually)"
     ]
   ]
 
@@ -90,6 +91,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
         b2bBody.supportInformation.claimNumber = claimNumber
         b2bBody.supportInformation.vin =  vin
         b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licenseplate
+        b2bBody.qas.find(q => {return q.questionId === "role-type"}).answer = role_type
 
 
         Cypress._.merge(header, {'authorization' : authorization});

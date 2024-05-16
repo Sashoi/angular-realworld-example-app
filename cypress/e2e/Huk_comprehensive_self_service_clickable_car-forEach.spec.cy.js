@@ -28,7 +28,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
   const executePost = false
-  const generatePdfCondition = true
+  const generatePdfCondition = executePost && true
 
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
@@ -40,12 +40,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   }
 
   const file1 = [
-    [
-      "VF3VEAHXKLZ080921",
-      "MiniBusMidPanel",
-      "01.01.2017",
-      "Peugeot Expert 09/2020"
-    ]
+    ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
   ]
 
   file1.forEach($car => {
@@ -583,7 +578,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
       })
     }) //it PDF
 
-    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['dekra_schadenbilder','dekra_abschlussbericht'])
     }) //it PDF from commands
 

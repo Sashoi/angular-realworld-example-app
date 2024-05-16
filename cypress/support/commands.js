@@ -161,6 +161,7 @@ Cypress.Commands.add('getBodyType', ($car,logFilename) =>{
   }) //get('@authorization'
 })
 
+
 Cypress.Commands.add('getQuestionnaireInfo', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
@@ -176,50 +177,47 @@ Cypress.Commands.add('getQuestionnaireInfo', () =>{
       cy.request(options).then(
         (response) => {
         expect(response.status).to.eq(200) // true
-        let spearheadVehicle = ''
-        let iBoxResult = ''
-        let valuationResult = ''
-        let iBoxResultSummary = ''
-        let repairCost = ''
-        if (response.body.internalInformation == undefined || response.body.internalInformation == null){
-          spearheadVehicle = 'no internalInformation'
-        } else {
-          if (response.body.internalInformation.spearheadVehicle == undefined || response.body.internalInformation.spearheadVehicle == null){
-            spearheadVehicle = 'no spearheadVehicle'
-          } else {
-            spearheadVehicle = 'has spearheadVehicle'
-          }
-          if (response.body.internalInformation.iBoxResult == undefined || response.body.internalInformation.iBoxResult == null){
-            iBoxResult = 'no iBoxResult'
-          } else {
-            iBoxResult = 'has iBoxResult'
-            if (response.body.internalInformation.iBoxResult.valuationResult == undefined || response.body.internalInformation.iBoxResult.valuationResult == null){
-              valuationResult = 'no valuationResult'
-            } else {
-              valuationResult = 'has valuationResult'
-              console.log(`retailValue :${response.body.internalInformation.iBoxResult.valuationResult.retailValue}.`)
-            }
-            if (response.body.internalInformation.iBoxResult.iBoxResultSummary == undefined || response.body.internalInformation.iBoxResult.iBoxResultSummary == null){
-              iBoxResultSummary = 'no iBoxResultSummary'
-            } else {
-              iBoxResultSummary = 'has iBoxResultSummary'
-              if (response.body.internalInformation.iBoxResult.iBoxResultSummary.repairCost == undefined || response.body.internalInformation.iBoxResult.iBoxResultSummaryrepairCost == null){
-                repairCost = 'no repairCost'
-              } else {
-                repairCost = 'has repairCost'
-                console.log(`systemValue :${response.body.internalInformation.iBoxResultSummary.repairCost.systemValue}.`)
-              }
-            }
-          }
-        }
+        let spearheadVehicle = response.body.internalInformation
+        let iBoxResult = response.body.internalInformation?.iBoxResult
+        let valuationResult = response.body.internalInformation?.iBoxResult?.valuationResult
+        let iBoxResultSummary = response.body.internalInformation?.iBoxResult?.iBoxResultSummary
+
+        const retailValue = response.body.internalInformation?.iBoxResult?.valuationResult?.retailValue
+        const systemValue = response.body.internalInformation?.iBoxResult?.iBoxResultSummary?.repairCost?.systemValue
+
         console.log(`spearheadVehicle :${spearheadVehicle}.`)
         console.log(`iBoxResult :${iBoxResult}.`)
         console.log(`valuationResult :${valuationResult}.`)
         console.log(`iBoxResultSummary :${iBoxResultSummary}.`)
-        console.log(`repairCost :${repairCost}.`)
+        console.log(`retailValue :${retailValue}.`)
+        console.log(`systemValue :${systemValue}.`)
         // cy.wrap(bodyType).then((bodyType) => {
         //   return bodyType
         // })
+      }) //request(options)
+    }) //get('@questionnaireId'
+  }) //get('@authorization'
+})
+
+
+Cypress.Commands.add('getInternalInformation', () =>{
+  const $dev = Cypress.env("dev");
+  const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
+  cy.get('@authorization').then(function (authorization) {
+    cy.get('@questionnaireId').then(function (questionnaireId) {
+      Cypress._.merge(header, {'authorization':authorization});
+      Cypress._.merge(header, {'timeout':c_requestTimeout});
+      const options = {
+        method: 'GET',
+        url: `${baseUrl_lp}questionnaire/${questionnaireId}`,
+        headers: header
+      };
+      cy.request(options).then(
+        (response) => {
+        expect(response.status).to.eq(200) // true
+        cy.wrap(response.body.internalInformation).then((internalInformation) => {
+           return internalInformation
+        })
       }) //request(options)
     }) //get('@questionnaireId'
   }) //get('@authorization'
@@ -371,18 +369,39 @@ Cypress.Commands.add('fulfilInputIfEmpty', function ($div, $input, $newValue) {
   })
 })
 
+const pushElements = (obj, goingPage) => {
+  if(!obj) return;  // Added a null check for  Uncaught TypeError: Cannot convert undefined or null to object
+  for (const [key, val] of Object.entries(obj)) {
+    if (key == 'id' || key == 'visibleExpression' || key == 'enableExpression'){
+      console.log(`${key}: ${JSON.stringify(val)}`)
+      cy.then(function () {
+        goingPage.elements.push(val)
+      })
+    }
+    if (typeof val === "object") {
+      pushElements(val, goingPage);   // recursively call the function
+    }
+  }
+}
+
 Cypress.Commands.add('waitingFor', function ($waitFor, $goingPage, $questionnaire) {
   cy.wait($waitFor,{requestTimeout : c_requestTimeout}).then(xhr => {
     expect(xhr.response.statusCode).to.equal(200)
-    const gPage = xhr.response.body.pageId
+    const pageId = xhr.response.body.pageId
     const  title = getPageTitle(xhr.response.body)
-    console.log(`Comming page ${gPage} - ${title}.`)
+    console.log(`Comming page ${pageId} - ${title}.`)
     cy.then(function () {
-      $goingPage.elements = []
+      //$goingPage.elements = []
+      if (pageId != 'summary-page' && xhr.response.body?.elements != undefined && xhr.response.body?.elements != null){
+        $goingPage.elements = xhr.response.body.elements
+      } else {
+        $goingPage.elements = []
+      }
     })
+    //pushElements(xhr.response.body.elements, $goingPage)
     //printQuestionnaireIds(xhr.response.body.elements)
     cy.then(function () {
-      $goingPage.pageId = gPage
+      $goingPage.pageId = pageId
     })
     if ($waitFor == '@currentPage'){
       cy.then(function () {

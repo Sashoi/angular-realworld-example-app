@@ -48,7 +48,7 @@ export const getQuestionnaireIdFromLinks = (nextUrl) => {
   return questionnaireId
 }
 
-export const goingPage = { pageId: '', elements: []}
+export const goingPage = { pageId: '', elements: []} 
 export const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
 
 

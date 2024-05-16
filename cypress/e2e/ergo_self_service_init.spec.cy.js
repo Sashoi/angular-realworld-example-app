@@ -27,9 +27,9 @@ describe('Ergo Self Service init', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
-  const executePost = true
-  const entire_vehicle_damaged_by_hail = true
-  const glass_parts_damaged_by_hail = true
+  const executePost = false
+  const entire_vehicle_damaged_by_hail = false
+  const glass_parts_damaged_by_hail = false
   const client_email = Cypress.env("client_email")
   const vehicle_hsn_tsn_1 = '0588'
   const vehicle_hsn_tsn_2 = 'AUC'
@@ -46,6 +46,17 @@ describe('Ergo Self Service init', () =>{
   function currentPage() {
     cy.waitingFor('@currentPage',goingPage,questionnaire)
   }
+
+  function getInternalInformation(massage) {
+    cy.getInternalInformation().then(function (internalInformation) {
+      const retailValue = internalInformation?.iBoxResult?.valuationResult?.retailValue
+      const systemValue = internalInformation?.iBoxResult?.iBoxResultSummary?.repairCost?.systemValue
+      console.log(`${massage}`)
+      console.log(`retailValue :${retailValue}.`)
+      console.log(`systemValue :${systemValue}.`)
+      console.log(`systemValue / retailValue >= 1 :${systemValue / retailValue}.`)
+    })
+ }
 
 
   const file1 = [
@@ -105,6 +116,10 @@ describe('Ergo Self Service init', () =>{
       let vinElement = parentElement.getElementsByTagName("Fin")[0]
       console.log(`vin: ${vinElement.textContent}`);
 
+      expect(parentElement.getElementsByTagName("AmtlichesKennzeichen").length).to.eq(1)
+      let licensePlateElement = parentElement.getElementsByTagName("AmtlichesKennzeichen")[0]
+      console.log(`licensePlate: ${licensePlateElement.textContent}`);
+
       expect(parentElement.getElementsByTagName("SchadenNummer").length).to.eq(1)
       let claimNumberElement = parentElement.getElementsByTagName("SchadenNummer")[0]
       console.log(`claimNumber: ${claimNumberElement.textContent}`);
@@ -132,9 +147,11 @@ describe('Ergo Self Service init', () =>{
       expect(parentElement.getElementsByTagName("Bezeichnung").length).to.eq(2)
 
       let vin = $car[0]
+      let licensePlate = `ER GO${getRandomInt(100,999)}`
       let claimNumber = `KS${getRandomInt(10000000,99999999)}-${getRandomInt(1000,9999)}`
 
       vinElement.textContent = vin
+      licensePlateElement.textContent = licensePlate
       claimNumberElement.textContent = claimNumber
 
       if (vehicle_identification_by_hsn_tsn){
@@ -147,6 +164,7 @@ describe('Ergo Self Service init', () =>{
       }
 
       console.log(`new vin: ${parentElement.querySelector("Fin").textContent}`);
+      console.log(`new licensePlate: ${parentElement.querySelector("AmtlichesKennzeichen").textContent}`);
       console.log(`new claimNumber: ${parentElement.querySelector("SchadenNummer").textContent}`);
       Array.from(parentElement.getElementsByTagName("Bezeichnung")).forEach((element, index) => {
         console.log(`new email ${index}: ${element.childNodes[0].nodeValue}`);
@@ -203,7 +221,7 @@ describe('Ergo Self Service init', () =>{
             cy.request(options2).then(
               (response2) => {
               expect(response2.status).to.eq(200) // true
-              console.log('supportInformation: '+JSON.stringify(response2.body.supportInformation))
+              //console.log('supportInformation: '+JSON.stringify(response2.body.supportInformation))
               const damageNotificationId = response2.body.supportInformation.damageNotificationId
               cy.then(function () {
                 questionnaire.notificationId = damageNotificationId
@@ -222,7 +240,7 @@ describe('Ergo Self Service init', () =>{
                 const requestedInformation = response3.body.body.requestedInformation
                 if (requestedInformation != undefined && requestedInformation != null && requestedInformation.length > 0)
                 {
-                  console.log(`requestedInformation: ${JSON.stringify(response3.body.body.requestedInformation)}`)
+                  //console.log(`requestedInformation: ${JSON.stringify(response3.body.body.requestedInformation)}`)
                   questionnaireUrl = response3.body.body.requestedInformation[0].requestUrl;
                   questionnaireId2 = response3.body.body.requestedInformation[0].questionnaireId;
                   console.log(`Real questionnaireId: ${questionnaireId2}`)
@@ -238,7 +256,7 @@ describe('Ergo Self Service init', () =>{
 
                 cy.visit(questionnaireUrl,{log : false})
 
-                const nextButtonLabel ='Speichern und Weiter'
+                const nextButtonLabel ='Weiter'  //Speichern und Weiter
                 const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
                 cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
 
@@ -380,30 +398,63 @@ describe('Ergo Self Service init', () =>{
                 //pageId: "page-13" pageShowCriteria 'glass-parts-damaged-by-hail' == 'yes') || some glass 'selected-parts' == 'yes'
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-13'){
+                    cy.get('@goingPageElements').then(function (elements) {
+                      elements.forEach(element => {
+                        if (element['id'] == 'roof-equipment-panorama-roof' && eval(element['visibleExpression'])){
+                          console.log(`${element['id']}: ${eval(element['visibleExpression'])}`);
+                          cy.selectSingleList('roof-equipment-panorama-roof',1)
+                        }
+                      })
+                    })
                     cy.selectMultipleList('windshield-hail-damage-type',0)
                     cy.selectMultipleList('windshield-hail-damage-type',1)
                     //"visibleExpression": "answer('glass-parts-damaged-by-hail') == 'yes' && answer('selected-parts-glass-parts-only')['roof'] == 'yes'",
-                    cy.getQuestionAnswer('selected-parts-glass-parts-only').then(function (answer) {
-                      let roof = answer.map(x => x.roof)
-                      console.log(`roof: ${JSON.stringify(roof)}`);
-                      console.log(`roof bool: ${!roof && roof.length > 0 && roof[0] == 'yes'}`);
-                      if (!glass_parts_damaged_by_hail && (!roof && roof.length > 0 && roof[0] == 'yes')){
-                        cy.selectSingleList('roof-equipment-panorama-roof',1)
-                      }
-                    })
-
-
-
+                    // this does not work
+                    // cy.getQuestionAnswer('selected-parts-glass-parts-only').then(function (answer) {
+                    //   let roof = answer.map(x => x.roof)
+                    //   console.log(`roof: ${JSON.stringify(roof)}`);
+                    //   console.log(`roof bool: ${!roof && roof.length > 0 && roof[0] == 'yes'}`);
+                    //   if (!glass_parts_damaged_by_hail && (!roof && roof.length > 0 && roof[0] == 'yes')){
+                    //     cy.selectSingleList('roof-equipment-panorama-roof',1)
+                    //   }
+                    // })
                     //cy.getQuestionnaireInfo()
+                    //getInternalInformation(`On ${aliasValue}:`)
                     nextBtn()
                   }
                 })
 
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-14'){
-                    cy.selectSingleList('unrepaired-pre-damages',0)
-                    cy.selectSingleList('water-entered-vehicle',0)
-                    //cy.getQuestionnaireInfo()
+                    cy.get('@goingPageElements').then(function (elements) {
+                      elements.forEach(element => {
+                        //console.log(`element: ${JSON.stringify(element)}`)
+                        // for (const [key, value] of Object.entries(element)) {
+                        //   if (key == 'visibleExpression'){
+                        //     console.log(`${key} value: ${eval(value)}`);
+                        //   }
+                        //   console.log(`${key}: ${value}`);
+                        // }
+                        if (element['id'] == 'unrepaired-pre-damages' && eval(element['visibleExpression'])){
+                          console.log(`${element['id']}: ${eval(element['visibleExpression'])}`);
+                          cy.selectSingleList('unrepaired-pre-damages',0)
+                        }
+                        if (element['id'] == 'water-entered-vehicle' && eval(element['visibleExpression'])){
+                          console.log(`${element['id']}: ${eval(element['visibleExpression'])}`);
+                          cy.selectSingleList('water-entered-vehicle',0)
+                        }
+                      })
+                    })
+                    //getInternalInformation(`On ${aliasValue}:`)
+                    // This works too
+                    // cy.getInternalInformation().then(function (internalInformation) {
+                    //   const retailValue = internalInformation?.iBoxResult?.valuationResult?.retailValue
+                    //   const systemValue = internalInformation?.iBoxResult?.iBoxResultSummary?.repairCost?.systemValue
+                    //   if (retailValue > 0 && systemValue > 0 && (systemValue / retailValue >= 1)){
+                    //     cy.selectSingleList('unrepaired-pre-damages',0)
+                    //   }
+                    // })
+                    //cy.selectSingleList('water-entered-vehicle',0)
                     nextBtn()
                   }
                 })

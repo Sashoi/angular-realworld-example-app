@@ -77,7 +77,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
       "WDB2083441T069719",
       "Coupe",
       "01.01.2009",
-      "MER CLK Coupe (partial identification, build period to be defined manually)"
+      "MER CLK Coupe (partial identification, build period to be defined manually) "
     ]
   ]
 
