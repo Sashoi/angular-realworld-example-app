@@ -31,6 +31,8 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
   const executePost = false
+  const role_type = 'client' //or claimant or client
+  const selected_parts_count_gte4 = false
 
   const printQuestionnaireIds = (obj) => {
     if(!obj) return;  // Added a null check for  Uncaught TypeError: Cannot convert undefined or null to object
@@ -59,6 +61,29 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
     })
     cy.get(`form#${selectorId}`).find(`img[alt="${fileName}"]`).invoke('attr', 'alt').should('eq', fileName)
   }
+
+  function fulfilCompoundQuestion(question,instance,lastInstance) {
+    cy.get(`div#${question}`).find(`input#${question}-vehicle-license-plate__--__${instance}-input`).type(`SOF 123 ${instance + 1}`)
+    cy.get(`div#${question}`).find(`input#${question}-mobile-number__--__${instance}-input`).type(`+359888123 ${instance + 1}`)
+    cy.get(`div#${question}`).find(`input#${question}-phone-number__--__${instance}-input`).type(`+359021234 ${instance + 1}`)
+	  cy.get(`div#${question}`).find(`input#${question}-email__--__${instance}-input`).type(Cypress.env("client_email"))
+    cy.get(`div#${question}`).find(`input#${question}-first-name__--__${instance}-input`).type(`first-name ${instance + 1}`)
+	  cy.get(`div#${question}`).find(`input#${question}-last-name__--__${instance}-input`).type(`last-name ${instance + 1}`)
+	  cy.get(`div#${question}`).find(`input#${question}-street-name__--__${instance}-input`).type(`street-name ${instance + 1}`)
+	  cy.get(`div#${question}`).find(`input#${question}-street-number__--__${instance}-input`).type(`${instance + 1}`)
+    cy.get(`div#${question}`).find(`input#${question}-zip-code__--__${instance}-input`).type(`1011${instance + 6}`)
+    cy.get(`div#${question}`).find(`input#${question}-street-number__--__${instance}-input`).focus()
+    cy.get(`div#${question}`).find(`input[data-test="dropdown-selection-enabled-text-input_${question}-city__--__${instance}"]`).focus()
+    cy.get(`div#${question}`).find(`input[data-test="dropdown-selection-enabled-text-input_${question}-city__--__${instance}"]`).type(`Sofia ${instance + 1}`)
+	  //country
+	  cy.get(`div#${question}`).find(`input#${question}-vehicle-brand__--__${instance}-input`).type(`vehicle-brand ${instance + 1}`)
+	  cy.get(`div#${question}`).find(`input#${question}-vehicle-description__--__${instance}-input`).type(`vehicle-description ${instance + 1}`)
+	  cy.get(`div#${question}`).find(`input#${question}-vehicle-insurance__--__${instance}-input`).type(`vehicle-insurance ${instance + 1}`)
+    if (!lastInstance) {
+      cy.get(`div#${question}`).find(`input#${question}-email__--__${instance}-input`).focus()
+    cy.get(`div#${question}`).find('button[type="button"]').click({ force: true })
+    }
+}
 
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
@@ -93,12 +118,18 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
   const eMail = Cypress.env("client_email")
 
   const file1 = [
-    [
-      "TMBJB7NS4K8027658",
-      "SUV",
-      "01.09.2018",
-      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
-    ]
+    ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"],
+  [
+    "WDB2083441T069719",
+    "Coupe",
+    "01.01.2009",
+    "MER CLK Coupe (partial identification, build period to be defined manually)"
+  ],
+  ["W0L0XCR975E026845", "Cabrio", "01.01.2009", "OPE Tigra Cabrio"],
+  ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5"],
+  ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
+  ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"],
+  ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
   ]
 
   file1.forEach($car => {
@@ -127,6 +158,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
           b2bBody.qas.find(q => {return q.questionId === "incident-reporter-email"}).answer = eMail
           b2bBody.qas.find(q => {return q.questionId === "number-of-vehicles"}).answer = 'more-than-two'
           b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licensePlate
+          b2bBody.qas.find(q => {return q.questionId === "role-type"}).answer = role_type
 
           Cypress._.merge(header, {'authorization' : authorization});
           const options = {
@@ -159,15 +191,15 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
 
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-01'){
-                  cy.get('@goingPageElements').then(function (elements) {
-                    elements.forEach(element => {
-                      console.log(`id: ${element['id']}`);
-                      if (element['visibleExpression'] != undefined){
-                        console.log(`visibleExpression: ${element['visibleExpression']}`);
-                        console.log(`visibleExpression value: ${eval(element['visibleExpression'])}`);
-                      }
-                    })
-                  })
+                  // cy.get('@goingPageElements').then(function (elements) {
+                  //   elements.forEach(element => {
+                  //     console.log(`id: ${element['id']}`);
+                  //     if (element['visibleExpression'] != undefined){
+                  //       console.log(`visibleExpression: ${element['visibleExpression']}`);
+                  //       console.log(`visibleExpression value: ${eval(element['visibleExpression'])}`);
+                  //     }
+                  //   })
+                  // })
                   cy.getBodyType($car,logFilename).then(function (bodyType) {
                     cy.then(function () {
                       questionnaire.bodyType = bodyType
@@ -175,27 +207,33 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                   })
                   cy.get('@bodyType').then(function (bodyType) {
                     if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
-                      cy.wait(2000)
-                      cy.selectSingleList('equipment-slide-door',1)
-                      cy.selectSingleList('equipment-2-loading-doors',Number($equipment_2_loading_doors))
-                      cy.selectSingleList('equipment-length',0)
-                      cy.selectSingleList('equipment-height',0)
-                      cy.selectSingleList('equipment-vehicle-rear-glassed',0)
-                      cy.selectSingleList('vehicle-customized-interior',0)
+                      if (visible('vehicle-identification')){
+                        cy.wait(2000)
+                        cy.selectSingleList('equipment-slide-door',1)
+                        cy.selectSingleList('equipment-2-loading-doors',Number($equipment_2_loading_doors))
+                        cy.selectSingleList('equipment-length',0)
+                        cy.selectSingleList('equipment-height',0)
+                        cy.selectSingleList('equipment-vehicle-rear-glassed',0)
+                        cy.selectSingleList('vehicle-customized-interior',0)
+                      }
                     }
                     if (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine'){
-                      cy.wait(2000)
-                      cy.selectSingleList('equipment-loading-area-cover-type',1)
+                      if (visible('vehicle-identification')){
+                        cy.wait(2000)
+                        cy.selectSingleList('equipment-loading-area-cover-type',1)
+                      }
                     }
                   })
-                  cy.selectSingleList('collision-type',0)
-                  cy.selectSingleList('loss-circumstances',0)
-                  cy.selectorHasAttrClass('select#select_buildPeriod','field-invalid').then(res =>{
-                    if (res){
-                      cy.selectDropDown('select_buildPeriod',2)
-                      cy.wait(2000)
-                    }
-                  })
+                  //cy.selectSingleList('collision-type',0)
+                  //cy.selectSingleList('loss-circumstances',0)
+                  if (visible('vehicle-identification')){
+                    cy.selectorHasAttrClass('select#select_buildPeriod','field-invalid').then(res =>{
+                      if (res){
+                        cy.selectDropDown('select_buildPeriod',2)
+                        cy.wait(2000)
+                      }
+                    })
+                  }
                   cy.wait(2000)
                   nextBtn()
                 }
@@ -207,19 +245,36 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                   cy.get('input#incident-place-street-name-input').type('Street name')
                   cy.get('input#incident-place-street-number-input').type('123')
                   cy.get('input#incident-place-zip-code-input').type('10115')
-                  cy.get('input#incident-place-city-input').type('Berlin')
-                  cy.selectMultipleList('damaged-objects',3)
-                  //cy.selectSingleList('accident-opponent-damaged-objects-owner-known',0)
-                  //cy.get('div#accident-opponent-damaged-objects-owner').find('button[type="button"]').click({ force: true })
+                  cy.get('input#incident-place-street-number-input').focus()
+                  cy.wait(500)
+                  //cy.get('input#incident-place-city-input').type('Berlin')
+                  cy.get('input[data-test="dropdown-selection-enabled-text-input_incident-place-city"]').should('have.value', 'Berlin')
+                  cy.selectMultipleList('damaged-objects',0)
+                  cy.selectMultipleList('damaged-objects',1)
+                  cy.selectMultipleList('damaged-objects',2)
                   cy.selectSingleList('accident-opponent-damaged-objects-owner-known',1)
+                  //cy.get('div#accident-opponent-damaged-objects-owner').find('button[type="button"]').click({ force: true })
+                  //cy.selectSingleList('accident-opponent-damaged-objects-owner-known',1)
                   cy.get('textarea#accident-opponent-damaged-objects-owner-unknown-description-textarea').type('1 Bitte geben Sie an, was beschädigt wurde{enter}2 Bitte geben Sie an, was beschädigt wurde{enter}')
                   cy.selectSingleList('accident-responsible',0)
-                  cy.selectSingleList('vehicle-driver',0)
+                  if (visible('vehicle-driver')){
+                    cy.selectSingleList('vehicle-driver',0)
+                  }
                   cy.selectSingleList('alcohol-drugs-overfatigue-while-driving',1)
                   cy.selectSingleList('excessive-speed-while-driving',1)
                   cy.selectSingleList('police-informed',0)
                   cy.get('textarea#police-station-name-textarea').type('1. police-station-name-textarea{Enter}2. police-station-name-textarea{Enter}')
                   cy.selectSingleList('accident-protocol',0)
+                  if (visible('accident-opponent-vehicle-owner-known')){
+                    cy.selectSingleList('accident-opponent-vehicle-owner-known',0)
+                    setAnswer('accident-opponent-vehicle-owner-known','yes')
+                  }
+                  cy.selectSingleList('injured-person-known',1)
+                  cy.get('textarea#injured-person-injury-unknown-description-textarea').type('1 injured-person-injury-unknown-description-textarea{enter}2 injured-person-injury-unknown-description-textarea 2{enter}')
+                  if (visible('accident-opponent-vehicle-owner')){
+                    const compoundQuestion = 'accident-opponent-vehicle-owner'
+                    fulfilCompoundQuestion(compoundQuestion,0,true)
+                  }
                   nextBtn()
                 }
               })
@@ -260,6 +315,10 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-04'){
                   cy.selectSingleList('vehicle-damage-repaired',0)
+                  setAnswer('vehicle-damage-repaired','yes')
+                  if (visible('cash-on-hand-settlement-preferred')){
+                    cy.selectSingleList('cash-on-hand-settlement-preferred',0)
+                  }
                   cy.get('input#repair-location-zip-code-input').type('10115')
                   nextBtn()
                 }
@@ -269,7 +328,8 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-05'){
                   const file5_1 ="registration-part-1.jpg"
-                  cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,file5_1)
+                  //cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,file5_1)
+                  cy.uploadImage('accident-locaction-photo-upload',PathToImages,file5_1)
                   nextBtn()
                 }
               })
@@ -278,10 +338,10 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-06'){
                   const file6_1 ="vehicle-right-front-photo.jpg"
-                  cy.uploadImage('vehicle-right-front-photo-upload',PathToImages,file6_1)
+                  cy.uploadImage('damages-on-vehicle-photo-upload',PathToImages,file6_1)
 
-                  const file6_2 ="vehicle-left-rear-photo1.jpg"
-                  cy.uploadImage('vehicle-left-rear-photo-upload',PathToImages,file6_2)
+                  //const file6_2 ="vehicle-left-rear-photo1.jpg"
+                  //cy.uploadImage('vehicle-left-rear-photo-upload',PathToImages,file6_2)
                   nextBtn()
                 }
               })

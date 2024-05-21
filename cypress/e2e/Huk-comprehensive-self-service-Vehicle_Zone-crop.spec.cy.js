@@ -72,7 +72,12 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   const file1 = [
-    ["W1V44760313930767", "Van", "01.01.2017", "Mercedes Vito 09/2021"]
+    [
+      "VF3VEAHXKLZ080921",
+      "MiniBusMidPanel",
+      "01.01.2017",
+      "Peugeot Expert 09/2020"
+    ]
   ]
   file1.forEach($car => {
     it.only(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
@@ -147,7 +152,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //cy.get('.loader').should('not.exist');
               currentPage()
 
-              const nextButtonLabel ='Speichern und Weiter'
+              const nextButtonLabel ='Weiter' //'Speichern und Weiter'
               const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
               cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
 

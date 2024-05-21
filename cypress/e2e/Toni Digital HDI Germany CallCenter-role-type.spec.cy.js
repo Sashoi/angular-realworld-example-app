@@ -19,6 +19,9 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
 
   before('clear log file', () => {
     cy.writeFile(logFilename, '')
+    cy.wrap(Cypress.automation('remote:debugger:protocol', {
+      command: 'Network.clearBrowserCache',
+    }))
   })
 
   beforeEach('Setting up intercepts and common variables', () =>{
@@ -29,7 +32,8 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60001;
   const executePost = true
-  const role_type = 'client' //or "claimant"
+  const role_type = 'client' //or claimant or client
+  const selected_parts_count_gte4 = false
 
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
@@ -56,16 +60,31 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
     }
   }
 
+  const answer = (qId) => {
+    return goingPage.elements.find(x => x.id === qId).answer
+  }
+
+  const arrayIncludes = (qId,value) => {
+    return answer(qId).includes(value)
+  }
+
+  const setAnswer = (qId,answer) => {
+    goingPage.elements.find(x => x.id === qId).answer = answer
+  }
+
+  const visible = (qId) => {
+    return eval(goingPage.elements.find(x => x.id === qId).visibleExpression)
+  }
+
+  const enable = (qId) => {
+    return eval(goingPage.elements.find(x => x.id === qId).enableExpression)
+  }
+
   const file1 = [
-    [
-      "WDB2083441T069719",
-      "Coupe",
-      "01.01.2009",
-      "MER CLK Coupe (partial identification, build period to be defined manually)"
-    ]
+    ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"]
   ]
 
-  file1.forEach($car => {
+  file.forEach($car => {
     it.only(`Execute b2b/integration/toni-digital/hdiLiabilityCallCenter with vin:${$car[0]}`, () =>{
 
       const vin = $car[0]
@@ -129,13 +148,44 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
 
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-01'){
+                  cy.wait(2000)
+                  //console.log(`vehicle-identification answer: ${answer("vehicle-identification")['bodyType']}`);
+                  //console.log(`number-of-vehicles answer: ${answer("number-of-vehicles")}`);
+
+                  cy.get('@goingPageElements').then(function (elements) {
+                    elements.forEach(element => {
+                     //console.log(`id: ${element['id']}`);
+                      if (element['visibleExpression'] != undefined){
+                        //console.log(`visibleExpression: ${element['visibleExpression']}`);
+                        //console.log(`visibleExpression value: ${eval(element['visibleExpression'])}`);
+                        eval(element['visibleExpression'])
+                      }
+                      if (element['answer'] != undefined){
+                        //console.log(`answer: ${element['answer']}`);
+                      }
+                      if (element['readOnly'] != undefined){
+                        //console.log(`readOnly: ${element['readOnly']}`);
+                      }
+                      if (element['optional'] != undefined){
+                        //console.log(`optional: ${element['optional']}`);
+                      }
+                      if(element['id'] == 'vehicle-identification' && eval(element['visibleExpression'])){
+                        cy.selectorHasAttrClass('select#select_buildPeriod','field-invalid').then(res =>{
+                          if (res){
+                            cy.selectDropDown('select_buildPeriod',2)
+                            cy.wait(2000)
+                          }
+                        })
+                      }
+                    })
+                  })
                   cy.getBodyType($car,logFilename).then(function (bodyType) {
                     cy.then(function () {
                       questionnaire.bodyType = bodyType
                     })
                   })
                   cy.get('@bodyType').then(function (bodyType) {
-                    if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
+                    if (visible('vehicle-identification') && (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel')){
                       cy.wait(2000)
                       cy.selectSingleList('equipment-slide-door',1)
                       cy.selectSingleList('equipment-2-loading-doors',Number($equipment_2_loading_doors))
@@ -146,13 +196,10 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
                     }
                     if (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine'){
                       cy.wait(2000)
-                      cy.selectSingleList('equipment-loading-area-cover-type',1)
-                    }
-                  })
-                  cy.selectorHasAttrClass('select#select_buildPeriod','field-invalid').then(res =>{
-                    if (res){
-                      cy.selectDropDown('select_buildPeriod',2)
-                      cy.wait(2000)
+                      if (visible('vehicle-identification') && visible('equipment-loading-area-cover-type')){
+                        cy.selectSingleList('equipment-loading-area-cover-type',1)
+                          setAnswer('equipment-loading-area-cover-type','roll-cover')
+                      }
                     }
                   })
                   cy.wait(1000)
@@ -169,7 +216,9 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
                   cy.get('input#incident-place-city-input').type('Berlin')
 
                   cy.selectSingleList('accident-responsible',0)
-                  cy.selectSingleList('vehicle-driver',0)
+                  if (visible('vehicle-driver')){
+                    cy.selectSingleList('vehicle-driver',0)
+                  }
                   cy.selectSingleList('alcohol-drugs-overfatigue-while-driving',1)
                   cy.selectSingleList('excessive-speed-while-driving',1)
                   cy.selectSingleList('police-informed',1)
@@ -178,9 +227,9 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
                   cy.selectMultipleList('damaged-objects',3)
                   cy.selectSingleList('accident-opponent-damaged-objects-owner-known',0)
                   const compoundQuestion = 'accident-opponent-damaged-objects-owner'
-                  fulfilCompoundQuestion(compoundQuestion,0,false)
-                  fulfilCompoundQuestion(compoundQuestion,1,false)
-                  fulfilCompoundQuestion(compoundQuestion,2,true)
+                  fulfilCompoundQuestion(compoundQuestion,0,true)
+                  //fulfilCompoundQuestion(compoundQuestion,1,false)
+                  //fulfilCompoundQuestion(compoundQuestion,2,true)
                   nextBtn()
                 }
               })
@@ -194,10 +243,9 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
                     console.log(`Comming SVG with clickableCar`)
                     const SVGbody = xhr.response.body;
 
-                    cy.selectSingleList('vehicle-damage-repaired', 0)
                     cy.get('input#repair-location-zip-code-input').type('10115')
 
-                    cy.selectSVG(`exhaust`)
+                    //cy.selectSVG(`exhaust`)
 
                     //towing-hook if check does not calc iBox
                     if (false && SVGbody.search('g id="towing-hook"') > 0 ){
@@ -209,54 +257,38 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
                     //underbody  if check does not calc iBox
                     //cy.selectSVG(`underbody`)
 
-                    cy.selectSVG(`airbag`)
+                    //cy.selectSVG(`airbag`)
 
                     if (SVGbody.search('g id="right-taillight"') > 0 ){
                       cy.selectSVG(`right-taillight`)
-                      cy.selectSingleList('right-taillight-equipment-led-rear-lights', 0)
                     }
 
-                    if (SVGbody.search('g id="left-taillight"') > 0 ){
-                      cy.selectSVG(`left-taillight`)
-                      cy.selectSingleList('left-taillight-equipment-led-rear-lights', 0)
+                    if (selected_parts_count_gte4 && SVGbody.search('g id="left-taillight"') > 0 ){
+                       cy.selectSVG(`left-taillight`)
                     }
 
                     cy.get('@bodyType').then(function (bodyType) {
                       if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
-                        cy.selectSingleList('loading-floor-area-bend', 0)
                         //load-doors and rear-windows
                         if ($equipment_2_loading_doors){
                           if (SVGbody.search('g id="right-load-door"') > 0 ){
                             cy.selectSVG(`right-load-door`)
-                            cy.selectMultipleList('right-load-door-damage-type', 1)
-                            cy.selectSingleList('right-load-door-damage-size', 2)
                             cy.selectSVG(`left-load-door`)
-                            cy.selectMultipleList('left-load-door-damage-type', 1)
-                            cy.selectSingleList('left-load-door-damage-size', 2)
-                            cy.selectSVG(`left-rear-door-window`)
-                            cy.selectSVG(`right-rear-door-window`)
-                          }
-                        }
-                        //load-doors and rear-windows
-                        if (!$equipment_2_loading_doors){
-                          if (SVGbody.search('g id="tailgate"') > 0 ){
-                            cy.selectSVG(`tailgate`)
-                            cy.selectSingleList('tailgate-still-open-close-easily', 1)
-                            cy.selectMultipleList('tailgate-damage-type', 1)
-                            cy.selectSingleList('tailgate-damage-size', 2)
-                            cy.selectSVG(`rear-window`)
+                            if (SVGbody.search('g id="left-rear-door-window"') > 0 ){
+                              cy.selectSVG(`left-rear-door-window`) //right-loading-door-window
+                            }
+                            if (SVGbody.search('g id="right-rear-door-window"') > 0 ){
+                              cy.selectSVG(`right-rear-door-window`) //right-loading-door-window
+                            }
                           }
                         }
                       }
-                      if (bodyType == 'MPV' || bodyType == 'Hatch3' || bodyType == 'Hatch5' || bodyType == 'Sedan' ||
+                      if (bodyType == 'MPV' || bodyType == 'Hatch3' || bodyType == 'Hatch5' || bodyType == 'Sedan' || bodyType == 'Station' ||
                         bodyType == 'Coupe' || bodyType == 'Cabrio' || bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine' ||
                         bodyType == 'SUV'){
                         const regex = /g .*id="tailgate"/;
                         if (SVGbody.search(regex) > 0 ){
                            cy.selectSVG(`tailgate`)
-                           cy.selectMultipleList('tailgate-damage-type', 0)
-                           cy.selectMultipleList('tailgate-damage-type', 1)
-                           cy.selectSingleList('tailgate-damage-size', 2)
                            cy.selectSVG(`rear-window`) // rear-window-damage-type_0 preselected
                         }
                       }
@@ -362,12 +394,6 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
                       cy.selectSVG(`front-bumper`)
                       cy.selectSingleList('front-bumper-equipment-parking-aid-front', 0)
 
-                      cy.get('@bodyType').then(function (bodyType) {
-                        if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
-                          cy.selectSingleList('loading-floor-area-bend', 0)
-                        }
-                      })
-
                       cy.selectSingleList('front-bumper-equipment-fog-lights',0)
                       cy.selectMultipleList('front-bumper-damage-type',2)
                       cy.selectSingleList('front-bumper-damage-size',2)
@@ -445,16 +471,6 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
                       cy.selectMultipleList('right-sill-damage-type', 1)
                       cy.selectSingleList('right-sill-damage-size', 3)
 
-                      //tailgate and rear-window
-                      if (vin == "WVWZZZ6RZGY304402" || vin == "WDB1704351F077666" || vin == "WBAUB310X0VN69014" || vin == "WAUZZZ4B73N015435" || vin == "W0L0XCR975E026845" || vin == "6FPPXXMJ2PCD55635"){
-                        cy.selectSVG(`rear-window`)
-                        cy.selectSVG(`tailgate`)
-                        cy.selectSingleList('tailgate-still-open-close-easily', 1)
-                        cy.selectMultipleList('tailgate-damage-type', 1)
-                        cy.selectSingleList('tailgate-damage-size', 2)
-                      }
-
-
                       //rear-bumper
                       cy.selectSVG(`rear-bumper`)
                       cy.selectSingleList('rear-bumper-equipment-parking-aid-rear', 1)
@@ -493,11 +509,56 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
                 }
               })
 
-              //pageId: "page-04"
+              //pageId: "page-04" pageShowCriteria "answer('role-type') == 'claimant' && answer('selected-parts-count') < 4"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-04'){
-                  cy.get('div#triage-recommendation').find('label[for="triage-recommendation_3"]').should('be.visible');
-                  cy.selectSingleList('triage-recommendation', 3)
+                  //console.log(`visible right-taillight-equipment-led-rear-lights : ${visible('right-taillight-equipment-led-rear-lights')}`)
+                  if (visible('right-taillight-equipment-led-rear-lights')){
+                    cy.selectSingleList('right-taillight-equipment-led-rear-lights', 0)
+                    setAnswer('right-taillight-equipment-led-rear-lights','yes')
+                    cy.wait(2000)
+                    //console.log(`answer right-taillight-equipment-led-rear-lights : ${answer('right-taillight-equipment-led-rear-lights')}`)
+                    //console.log(`visible right-taillight-still-working : ${visible('right-taillight-still-working')}`)
+                    if (visible('right-taillight-still-working')){
+                      cy.selectSingleList('right-taillight-still-working', 1)
+                    }
+                  }
+                  if (visible('left-taillight-equipment-led-rear-lights')){
+                    cy.selectSingleList('left-taillight-equipment-led-rear-lights', 0)
+                    setAnswer('left-taillight-equipment-led-rear-lights','yes')
+                    if (visible('left-taillight-still-working')){
+                      cy.selectSingleList('left-taillight-still-working', 1)
+                    }
+                  }
+                  if (visible('tailgate-still-open-close-easily')){
+                    cy.selectSingleList('tailgate-still-open-close-easily', 1)
+                      setAnswer('left-taillight-equipment-led-rear-lights','no')
+                  }
+                  if (visible('tailgate-damage-type')){
+                    cy.selectMultipleList('tailgate-damage-type', 0)
+                    cy.selectMultipleList('tailgate-damage-type', 1)
+                      setAnswer('tailgate-damage-type',Array.of('scratches','dents-bumps'))
+                  }
+                  //console.log(`tailgate-damage-type answer: ${answer("tailgate-damage-type")}`)
+                  //console.log(`visible 'tailgate-damage-size': ${visible('tailgate-damage-size')} `)
+                  //console.log(`includes in 'tailgate-damage-type': ${answer('tailgate-damage-type').includes('dents-bumps')}`)
+                  if (visible('tailgate-damage-size')){
+                    cy.selectSingleList('tailgate-damage-size', 2)
+                      setAnswer('tailgate-damage-size','big')
+                  }
+                  cy.selectSingleList('vehicle-damage-repaired', 0)
+                  cy.get('@bodyType').then(function (bodyType) {
+                    if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
+                      cy.selectSingleList('loading-floor-area-bend', 0)
+                      //load-doors and rear-windows
+                      if ($equipment_2_loading_doors){
+                          cy.selectMultipleList('right-load-door-damage-type', 1)
+                          cy.selectSingleList('right-load-door-damage-size', 2)
+                          cy.selectMultipleList('left-load-door-damage-type', 1)
+                          cy.selectSingleList('left-load-door-damage-size', 2)
+                      }
+                    }
+                  })
                   nextBtn()
                 }
               })
@@ -505,6 +566,15 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
               //pageId: "page-05"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-05'){
+                  cy.get('div#triage-recommendation').find('label[for="triage-recommendation_3"]').should('be.visible');
+                  cy.selectSingleList('triage-recommendation', 3)
+                  nextBtn()
+                }
+              })
+
+              //pageId: "page-06"
+              cy.get('@goingPageId').then(function (aliasValue) {
+                if (aliasValue == 'page-06'){
                   if (photos_available){
                     cy.selectSingleList('photos-available', 0)
                     cy.selectSingleList('receive-upload-link-by', 0)

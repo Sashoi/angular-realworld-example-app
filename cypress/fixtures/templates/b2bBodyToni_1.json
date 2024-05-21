@@ -1,6 +1,10 @@
 {
   "qas": [
     {
+      "questionId": "role-type",
+      "answer": ["client"]
+    },
+    {
       "questionId": "questionnaire-locale",
       "answer": ["en"]
     },

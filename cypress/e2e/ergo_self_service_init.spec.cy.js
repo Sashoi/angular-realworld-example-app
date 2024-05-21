@@ -58,9 +58,18 @@ describe('Ergo Self Service init', () =>{
     })
  }
 
+ const answer = (qId) => {
+  return goingPage.elements.find(x => x.id === qId).answer
+}
+
 
   const file1 = [
-    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"]
+    [
+      "6FPPXXMJ2PCD55635",
+      "PickUpDoubleCabine",
+      "01.01.2012",
+      "Ford Ranger double cabine, Pick-up"
+    ]
   ]
 
   file1.forEach($car => {

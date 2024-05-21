@@ -86,7 +86,7 @@
     },
     {
       "questionId": "client-vehicle-license-plate",
-      "answer": "HDI 8-236"
+      "answer": "HDI 7-499"
     },
     {
       "questionId": "incident-reporter-first-name",
@@ -122,8 +122,8 @@
     }
   ],
   "supportInformation": {
-    "vin": "WDB2083441T069719",
-    "claimNumber": "5wt7TqX86894",
+    "vin": "ZFA25000002K44267",
+    "claimNumber": "PJks0LB70328",
     "workflowType": "hdiLiabilityCallCenter"
   }
 }
