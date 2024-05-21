@@ -31,8 +31,8 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60001;
-  const executePost = true
-  const role_type = 'client' //or claimant or client
+  const executePost = false
+  const role_type = 'claimant' //or claimant or client
   const selected_parts_count_gte4 = false
 
   function nextBtn() {
@@ -50,7 +50,12 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
     cy.get(`div#${question}`).find(`input#${question}-street-name__--__${instance}-input`).type(`street name ${instance + 1}`)
     cy.get(`div#${question}`).find(`input#${question}-street-number__--__${instance}-input`).type(`${instance + 1}`)
     cy.get(`div#${question}`).find(`input#${question}-zip-code__--__${instance}-input`).type(`1011${instance + 6}`)
-    cy.get(`div#${question}`).find(`input#${question}-city__--__${instance}-input`).type(`Sofia ${instance + 1}`)
+
+    cy.get(`div#${question}`).find(`input#${question}-street-number__--__${instance}-input`).focus()
+    cy.get(`div#${question}`).find(`input[data-test="dropdown-selection-enabled-text-input_${question}-city__--__${instance}"]`).focus()
+    //cy.get(`div#${question}`).find(`input#${question}-city__--__${instance}-input`).type(`Sofia ${instance + 1}`)
+    cy.get(`div#${question}`).find(`input[data-test="dropdown-selection-enabled-text-input_${question}-city__--__${instance}"]`).type(`Sofia ${instance + 1}`)
+
     cy.get(`div#${question}`).find(`input#${question}-phone-number__--__${instance}-input`).type(`08880${instance + 1}`)
     cy.get(`div#${question}`).find(`input#${question}-email__--__${instance}-input`).type(Cypress.env("client_email"))
     cy.get(`div#${question}`).find(`input#${question}-objects-description__--__${instance}-input`).type(`objects-description ${instance + 1}`)
@@ -81,10 +86,21 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
   }
 
   const file1 = [
-    ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"]
+    ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"],
+  [
+    "WDB2083441T069719",
+    "Coupe",
+    "01.01.2009",
+    "MER CLK Coupe (partial identification, build period to be defined manually)"
+  ],
+  ["W0L0XCR975E026845", "Cabrio", "01.01.2009", "OPE Tigra Cabrio"],
+  ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5"],
+  ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
+  ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"],
+  ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
   ]
 
-  file.forEach($car => {
+  file1.forEach($car => {
     it.only(`Execute b2b/integration/toni-digital/hdiLiabilityCallCenter with vin:${$car[0]}`, () =>{
 
       const vin = $car[0]
@@ -213,7 +229,10 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
                   cy.get('input#incident-place-street-name-input').type('Street name')
                   cy.get('input#incident-place-street-number-input').type('123')
                   cy.get('input#incident-place-zip-code-input').type('10115')
-                  cy.get('input#incident-place-city-input').type('Berlin')
+                  cy.get('input#incident-place-street-number-input').focus()
+                  cy.wait(500)
+                  //cy.get('input#incident-place-city-input').type('Berlin')
+                  cy.get('input[data-test="dropdown-selection-enabled-text-input_incident-place-city"]').should('have.value', 'Berlin')
 
                   cy.selectSingleList('accident-responsible',0)
                   if (visible('vehicle-driver')){

@@ -2,7 +2,7 @@
   "qas": [
     {
       "questionId": "role-type",
-      "answer": "client"
+      "answer": "claimant"
     },
     {
       "questionId": "questionnaire-locale",
@@ -86,7 +86,7 @@
     },
     {
       "questionId": "client-vehicle-license-plate",
-      "answer": "HDI 7-499"
+      "answer": "HDI 3-341"
     },
     {
       "questionId": "incident-reporter-first-name",
@@ -123,7 +123,7 @@
   ],
   "supportInformation": {
     "vin": "ZFA25000002K44267",
-    "claimNumber": "PJks0LB70328",
+    "claimNumber": "cz3bh9p20969",
     "workflowType": "hdiLiabilityCallCenter"
   }
 }

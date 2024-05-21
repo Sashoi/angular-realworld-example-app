@@ -2,15 +2,15 @@
 
 //const cypress = require("cypress");
 
-import { getRandomInt } from "../support/utils/common.js";
-import { makeid } from "../support/utils/common.js";
-import { getPageTitle } from "../support/utils/common.js";
-import { getQuestionnaireIdFromLinks } from "../support/utils/common.js";
-import { questionnaire } from "../support/utils/common.js";
-import { goingPage } from "../support/utils/common.js";
-import file from '../fixtures/vinsArray.json'
-import b2bBody from '../fixtures/templates/b2bBodyToni_1.json'
-import header from '../fixtures/header.json'
+import { getRandomInt } from "../../support/utils/common.js";
+import { makeid } from "../../support/utils/common.js";
+import { getPageTitle } from "../../support/utils/common.js";
+import { getQuestionnaireIdFromLinks } from "../../support/utils/common.js";
+import { questionnaire } from "../../support/utils/common.js";
+import { goingPage } from "../../support/utils/common.js";
+import file from '../../fixtures/vinsArray.json'
+import b2bBody from '../../fixtures/templates/b2bBodyToni_1.json'
+import header from '../../fixtures/header.json'
 
 
 const logFilename = 'cypress/fixtures/logs/hdiLiabilitySS.log'
