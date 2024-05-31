@@ -4,25 +4,25 @@ import * as util from 'util' // has no default export
 // or
 //var util = require('util')
 
-const { resolveProjectReferencePath } = require("typescript")
 import { getRandomInt } from "../support/utils/common.js";
 import { getPageTitle } from "../support/utils/common.js";
 import { questionnaire } from "../support/utils/common.js";
 import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
-import b2bBody from '../fixtures/templates/b2bBodyZurich.json'
+//import b2bBody from '../fixtures/templates/dekraIntLiabilityCallCenterBody.json'liability
+//import injectQuestions from '../fixtures/templates/injectQuestions.json'
 
 
-const logFilename = 'cypress/fixtures/logs/zurichStandalone.log'
+const logFilename = 'cypress/fixtures/logs/dekra_int_liability_call_center.log'
 
-describe('Start and complete zurich standalone questionnaire - urichz_call_center', () =>{
+describe('Start and complete dekra_int_liability_call_center standalone questionnaire', () =>{
 
   before('clear log file', () => {
     cy.writeFile(logFilename, '')
   })
 
   beforeEach('Setting up integrations and common variables', () =>{
-    cy.intercept('POST', `/b2b/integration/zurich/zurichStandalone`).as('zurichStandalone')
+    cy.intercept('POST', `/b2b/integration/pnw/dekraLiabilityCallCenter`).as('dekraLiabilityCallCenter')
     cy.commanBeforeEach(goingPage,questionnaire)
   })
 
@@ -30,7 +30,9 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
   const executePost = true
-  const interceptZurichStandalone = false
+  const interceptDekraStandalone = false
+  const vehicle_hsn_tsn = '0588AUC'
+  const vehicle_identification_by_hsn_tsn = true
 
   function printUiBlocks(uiBlocks){
     uiBlocks.forEach((uiBlock, index1) => {
@@ -50,20 +52,14 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
   }
 
   const file1 = [
-
-  [
-    "WDB2083441T069719",
-    "Coupe",
-    "01.01.2009",
-    "MER CLK Coupe (partial identification, build period to be defined manually)"
-  ]
+    ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"]
   ]
   file1.forEach($car => {
-    it.only(`zurich standalone questionnaire - zurich_call_center vin ${$car[0]}`, () => {
+    it.only(`dekra_int_liability_call_center standalone questionnaire, vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
 
-      cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/zurich/#/login?theme=zurich`,{ log : false })
+      cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/dekra/#/standalone/home`,{ log : false })
       // login
       cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
       cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
@@ -85,33 +81,34 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
       const intS3 = getRandomInt(1000,9999).toString()
       const intS4 = getRandomInt(1,9).toString()
       const $equipment_2_loading_doors = true
-      const claimTypeArray = ["VK","TK","KH"]
-      const claimTypeRandom = getRandomInt(0,3)
-      const claimType = claimTypeArray[claimTypeRandom]
 
 
-      const first_registration_date = "2024-02-01";
-      const f_first_registration_date = '01.02.2024';
+      const first_registration_date = $car[2] //"2024-02-01";
+      let f_first_registration_date = $car[2] //'01.02.2024';
       console.log(`vin: ${$vin}, bodyType: ${$car[1]}, description: ${$car[3]}`)
       console.log(`first_registration_date: ${first_registration_date}`)
       const nextButtonLabel ='Weiter'
       const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
-      const claimNumber = `${intS1}-${intS2}-${claimType}${intS4}`
-      const licensePlate = `ZUR ${intS3}`
+      const claimNumber = `DekraIntLCC${intS2}`
+      const licensePlate = `DEK ${intS3} L`
       console.log(`claimNumber: ${claimNumber}`)
 
       // Fulfill standalone form
-      cy.get('ng-select[data-test="standalone_company"]').find('input').type('D',{force: true})
+      cy.get('select[name="processGroup"]').select(1)
       cy.get('input[name="claimNumber"]').type(claimNumber);
-      cy.get('input[data-test="standalone_vin"]').type($vin)
+      if ( !vehicle_identification_by_hsn_tsn ){
+        cy.get('input[data-test="standalone_vin"]').type($vin)
+      } else {
+        cy.get('input[data-test="standalone_countryVehicleIdentification"]').type(vehicle_hsn_tsn)
+        f_first_registration_date = '01.01.2015'
+      }
       cy.get('input[formcontrolname="firstRegistrationDate"]').type(f_first_registration_date)
-      cy.get('input[formcontrolname="mileage"]').type('123.456')
-      cy.get('[data-test="standalone_licensePlate"]').type(licensePlate)
-      if (interceptZurichStandalone){
-       // with this intercept I'm replacing the body of standalone
-       // adding 'roof' as selected SVG
-        cy.intercept('POST', `/b2b/integration/zurich/zurichStandalone`, (req) => {
+      cy.get('input#zipCode[data-test="standalone_zipCode"]').type('22222')
 
+      if (interceptDekraStandalone){
+       // with this intercept I'm replacing the body of standalone
+       // adding 'roof' as selected SVG, to be implement
+        cy.intercept('POST', `/b2b/integration/pnw/dekraLiabilityCallCenter`, (req) => {
           b2bBody.qas.find(q => {return q.questionId === "license-plate"}).answer = licensePlate
           b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licensePlate
           b2bBody.qas.find(q => {return q.questionId === "claimant-vehicle-license-plate"}).answer = licensePlate
@@ -125,7 +122,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
       }
       cy.get('button[data-test="standalone_submit"]').click()
 
-      cy.wait('@zurichStandalone',{requestTimeout : $requestTimeout}).then(xhr => {
+      cy.wait('@dekraLiabilityCallCenter',{requestTimeout : $requestTimeout}).then(xhr => {
         expect(xhr.response.statusCode).to.equal(200)
         const questionnaireId = xhr.response.body.questionnaireId
         console.log(`b2b questionnaireId: ${questionnaireId}`);
@@ -134,7 +131,8 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
         })
         const uiUrl = xhr.response.body.uiUrl
         console.log(`b2b uiUrl: ${uiUrl}`);
-      }) //wait('@zurichStandalone',
+        //cy.intercept('POST', `/questionnaire/${questionnaireId}/page/page-02?navigateTo=next&offset=180&locale=de`).as('injectQuestions')
+      }) //wait('@dekraLiabilityCallCenter',
 
       cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
 
@@ -184,6 +182,11 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
               cy.wait(2000)
             }
           })
+          cy.get('input#accident-date-input').type('01.05.2024')
+          cy.selectSingleList('loss-circumstances', 0)
+          cy.get('input#claimant-vehicle-license-plate-input').type(licensePlate)
+          cy.get('input#vehicle-mileage-input').type('321334')
+          cy.selectSingleList('odometer-reading-source-display', 0)
           nextBtn()
         }
       })
@@ -241,7 +244,6 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
             }
 
             cy.get('#repair-location-zip-code-input').clear().type('22222')
-            cy.selectSingleList('damage-description-completed',1)
             cy.selectMultipleList('hood-damage-type',0)
             cy.selectMultipleList('hood-damage-type',1)
             cy.selectSingleList('hood-damage-size',2)
@@ -285,6 +287,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
               }
             }
             cy.selectSVG('windshield')
+            cy.selectSingleList('windshield-equipment-windshield-electric',0)
             cy.selectMultipleList('windshield-damage-type',0)
             cy.selectMultipleList('windshield-damage-type',1)
             cy.selectMultipleList('windshield-damage-type',2)
@@ -292,22 +295,50 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
             cy.selectSVG('zone-a')
             cy.selectSVG('zone-c')
             cy.selectSVG('zone-b')
-            cy.selectSingleList('windshield-damage-quantity',3)
+            //cy.selectSingleList('windshield-damage-quantity',3)
             cy.selectSingleList('windshield-damage-size-scratch-bigger-5cm',0)
             cy.selectSingleList('windshield-damage-size-stone-chips-bigger-2cm',0)
             cy.selectSingleList('windshield-damage-size-crack-bigger-2cm',0)
-            nextBtn()
+            cy.selectSingleList('vehicle-damage-repaired',0)
           }) //wait('@clickableCar'
+          nextBtn()
+
+          // does not work
+          // cy.wait('@injectQuestions',{requestTimeout : $requestTimeout}).its("response").then(response => {
+          //   expect(response.statusCode).to.equal(200)
+          //   //console.log(`injectQuestions: ${JSON.stringify(xhr.response.body.elements)}`);
+          //   //let newResponse = response
+          //   injectQuestions.forEach((question, index) => {
+          //     //xhr.response.body.elements.insert(0,question)
+          //     response.body.elements.push(question)
+          //     response.body.uiBlocks[2].elements.sections[0].questionIds.push(question.id)
+          //     console.log(`inject question: ${question.id}`);
+          //   })
+          //   response.body.uiBlocks[2].elements.sections[0].label.content = `My label.content`
+          //   return response
+          //   //response.reply(newResponse)
+          // }) //wait('@injectQuestions')
         } //'page-02'
       }) //get('@goingPageId'
+
+
+
 
 
       // Schadenbilder und Dokumente - page-03
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-03'){
-          cy.selectSingleList('send-report-per-email-to-client',1)
-          cy.selectSingleList('send-report-per-email-to-agent',1)
-          cy.selectSingleList('assign-or-archive-claim',1)
+          cy.selectSingleList('photos-available',1)
+          cy.selectSingleList('photos-not-available-because',2)
+          nextBtn()
+        }
+      })
+
+      // Regulierungs- und Handlungsempfehlung
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-04'){
+          cy.selectSingleList('triage-recommendation',0)
+          cy.selectSingleList('reason-for-change-of-system-recommendation',0)
           nextBtn()
         }
       })
@@ -319,7 +350,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
             console.log(`from summary-page, saved questionnaireId: ${Id}`);
           })
           if (executePost) {
-            cy.get('button[type="submit"]').contains('Schadenaufnahme beenden').click()
+            cy.get('button[type="submit"]').contains('Schadenanlage beenden').click()
             cy.wait('@postPost').then(xhr => {
               cy.postPost(xhr)
             })

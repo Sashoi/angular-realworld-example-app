@@ -28,10 +28,10 @@ describe('Ergo Self Service init', () =>{
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
   const executePost = false
-  const entire_vehicle_damaged_by_hail = false
-  const glass_parts_damaged_by_hail = false
+  const entire_vehicle_damaged_by_hail = true
+  const glass_parts_damaged_by_hail = true
   const client_email = Cypress.env("client_email")
-  const vehicle_hsn_tsn_1 = '0588'
+  const vehicle_hsn_tsn_1 = '0588'   //Start with wrong TSN to reach page-04
   const vehicle_hsn_tsn_2 = 'AUC'
   const vehicle_identification_by_hsn_tsn = false
   const changeRoleType = false
@@ -65,10 +65,10 @@ describe('Ergo Self Service init', () =>{
 
   const file1 = [
     [
-      "6FPPXXMJ2PCD55635",
-      "PickUpDoubleCabine",
-      "01.01.2012",
-      "Ford Ranger double cabine, Pick-up"
+      "TMBJB7NS4K8027658",
+      "SUV",
+      "01.09.2018",
+      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
     ]
   ]
 
@@ -305,6 +305,10 @@ describe('Ergo Self Service init', () =>{
                 //pageId: "page-04" pageShowCriteria internalInformation.spearheadVehicle == null
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-04'){
+                    console.log(`vin: ${vin}`);
+                    cy.get('input#vin[data-test="vin-input"]').clear().type(vin,{delay : 200})
+                    cy.get('input#vin[data-test="vin-input"]').clear().type(vin,{delay : 200})
+                    cy.get('button[data-test="identify-button"]').click({ force: true })
                     //cy.getQuestionnaireInfo()
                     nextBtn()
                   }
@@ -520,8 +524,18 @@ describe('Ergo Self Service init', () =>{
 
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-21'){
-                    cy.uploadImage('damage-photo-upload-overview-windshield',PathToImages,'broken front window_2.jpg')
-                    cy.uploadImage('damage-photo-upload-overview-roof',PathToImages,'roof.jpg')
+                    cy.get('@goingPageElements').then(function (elements) {
+                      elements.forEach(element => {
+                        if (element['id'] == 'damage-photo-upload-overview-windshield' && eval(element['visibleExpression'])){
+                          console.log(`${element['id']}: ${eval(element['visibleExpression'])}`);
+                          cy.uploadImage('damage-photo-upload-overview-windshield',PathToImages,'broken front window_2.jpg')
+                        }
+                        if (element['id'] == 'damage-photo-upload-overview-roof' && eval(element['visibleExpression'])){
+                          console.log(`${element['id']}: ${eval(element['visibleExpression'])}`);
+                          cy.uploadImage('damage-photo-upload-overview-roof',PathToImages,'roof.jpg')
+                        }
+                      })
+                    })
                     //cy.getQuestionnaireInfo()
                     nextBtn()
                   }
@@ -558,7 +572,7 @@ describe('Ergo Self Service init', () =>{
                       console.log(`from summary-page, saved questionnaireId: ${Id}`);
                     })
                     if (executePost) {
-                      cy.get('button[type="submit"]').contains('Senden').click()
+                      cy.get('button[type="submit"]').contains('Schadenmeldung senden').click() //Senden
                       cy.wait('@postPost',{timeout : $requestTimeout}).then(xhr => {
                         cy.postPost(xhr,false)
                         console.log(`Cypress.env('notificationId') = ${Cypress.env('notificationId')}`)

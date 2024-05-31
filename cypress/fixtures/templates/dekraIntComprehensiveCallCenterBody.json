@@ -1,0 +1,30 @@
+{
+  "qas": [
+    {
+      "questionId": "odometer-unit",
+      "answer": ["km"]
+    },
+    {
+      "questionId": "standalone",
+      "answer": ["yes"]
+    },
+    {
+      "questionId": "loss-cause",
+      "answer": "other"
+    },
+    {
+      "questionId": "process-type",
+      "answer": "dekraSampleCallCenter"
+    },
+    {
+      "questionId": "claim-number",
+      "answer": "2343452ggsd12"
+    }
+  ],
+  "supportInformation": {
+    "claimNumber": "2343452ggss19",
+    "countryVehicleIdentification": "",
+    "vin1": "WBAUT31020F197739",
+    "vin": "VF3VEAHXKLZ080921"
+  }
+}

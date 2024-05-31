@@ -1,0 +1,28 @@
+[
+  {
+    "id": "incident-place-street-name",
+    "label": {
+      "content": "Strasse",
+      "summary": "Strasse:"
+    },
+    "readOnly": null,
+    "readOnlyCriteria": null,
+    "optional": true,
+    "validation": null,
+    "helpText": "Strasse",
+    "type": "textQuestion"
+  },
+  {
+    "id": "incident-place-street-number",
+    "label": {
+      "content": "Hausnummer",
+      "summary": "Hausnummer:"
+    },
+    "readOnly": null,
+    "readOnlyCriteria": null,
+    "optional": null,
+    "validation": null,
+    "helpText": "Hausnummer",
+    "type": "textQuestion"
+  }
+]

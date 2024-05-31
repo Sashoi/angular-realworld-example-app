@@ -30,8 +30,8 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = false
-  const role_type = 'client' //or claimant or client
+  const executePost = true
+  const role_type = 'claimant' //or claimant or client
   const selected_parts_count_gte4 = false
 
   const printQuestionnaireIds = (obj) => {
@@ -73,6 +73,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
 	  cy.get(`div#${question}`).find(`input#${question}-street-number__--__${instance}-input`).type(`${instance + 1}`)
     cy.get(`div#${question}`).find(`input#${question}-zip-code__--__${instance}-input`).type(`1011${instance + 6}`)
     cy.get(`div#${question}`).find(`input#${question}-street-number__--__${instance}-input`).focus()
+    cy.wait(300)
     cy.get(`div#${question}`).find(`input[data-test="dropdown-selection-enabled-text-input_${question}-city__--__${instance}"]`).focus()
     cy.get(`div#${question}`).find(`input[data-test="dropdown-selection-enabled-text-input_${question}-city__--__${instance}"]`).type(`Sofia ${instance + 1}`)
 	  //country
@@ -118,7 +119,9 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
   const eMail = Cypress.env("client_email")
 
   const file1 = [
-    ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"],
+
+    ["VF7SA5FS0BW550414", "Hatch3", "01.01.2014", "CIT DS3 Hatch3"],
+  ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"],
   [
     "WDB2083441T069719",
     "Coupe",

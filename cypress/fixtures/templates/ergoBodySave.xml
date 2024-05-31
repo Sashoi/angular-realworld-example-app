@@ -57,7 +57,7 @@
         <body>
             <Auftragsposition>
                 <DxID>GDV5472-2</DxID>
-                <DxNumber>KF3C0910KR2665315999463+520752%</DxNumber>
+                <DxNumber>KF3C0910KR5039801795978+339098%</DxNumber>
                 <DxSequence>1</DxSequence>
                 <BemerkungAnnahme2>Es wurde ein unverbindlicher Termin vereinbart am 07.12.2023;  Telefon Privat Besichtigung: 0561/500455102; Telefon Mobil Besichtigung: 0561/500455102;SB-Name: Winter; SB-Vorname: Christin; SB-EMail: christin.winter@ergo.de; SB-Telefon: +49(40)63766083; SB-Fax: +49(40)63766382; Telefon Privat VN: 0561/9706121; Telefon Geschäft VU: +49(211)4770; Telefax Geschäft VU: +49(211)4770;Hagelschaden; Hagelschaden; Sachschaden/ Hagel #Werkstattbindung: unbekannt#; #Vollkasko inkl. Teilkasko##Best##Wertschutz 24 Monate##GAP-Deckung#; Versicherungsbedingungen vom 12.09.2020</BemerkungAnnahme2>
                 <DienstleistungsMenge>1</DienstleistungsMenge>
@@ -89,18 +89,18 @@
                                 <SchadenerweiterungCbxCode>5</SchadenerweiterungCbxCode>
                                 <VertragsGrundlagenCbx>AKB</VertragsGrundlagenCbx>
                                 <VertragsGrundlagenCbxCode>1</VertragsGrundlagenCbxCode>
-                                <SchadenNummer>KS82940405-1279</SchadenNummer>
+                                <SchadenNummer>KS45904455-4868</SchadenNummer>
                                 <VersicherungsNummer>KR073550463.0</VersicherungsNummer>
                             </SchadenArt>
                         </Feststellung>
                         <Fahrzeug XSIType="">
-                            <AmtlichesKennzeichen>ER GO159</AmtlichesKennzeichen>
+                            <AmtlichesKennzeichen>ER GO993</AmtlichesKennzeichen>
                             <Fzgbrief>
                                 <ErstzulassungsDatum>20201112</ErstzulassungsDatum>
                                 <FahrzeugHerstellerText>VOLKSWAGEN-VW</FahrzeugHerstellerText>
                                 <FahrzeugTypText>PASSAT VARIANT 1.4</FahrzeugTypText>
                                 <Farbe/>
-                                <Fin>6FPPXXMJ2PCD55635</Fin>
+                                <Fin>TMBJB7NS4K8027658</Fin>
                                 <Hubraum>0</Hubraum>
                                 <KbaNr1Art/>
                                 <KbaNr2Hersteller>0603</KbaNr2Hersteller>
@@ -226,7 +226,7 @@
         <body>
             <Auftrag>
                 <DxID>GDV5472-2</DxID>
-                <DxNumber>KF3C0910KR2665315999463+520752%</DxNumber>
+                <DxNumber>KF3C0910KR5039801795978+339098%</DxNumber>
                 <DxSequence>1</DxSequence>
                 <Anrede/>
                 <AuftragErteiltDatum>2023-12-05T13:24:58</AuftragErteiltDatum>

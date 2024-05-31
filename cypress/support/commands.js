@@ -144,6 +144,8 @@ Cypress.Commands.add('getBodyType', ($car,logFilename) =>{
         expect(response.status).to.eq(200) // true
         let bodyType = response.body.supportInformation.bodyType
         console.log(`supportInformation.bodyType: ${bodyType}.`)
+        console.log(`templateId: ${response.body.templateId}.`)
+
         if (bodyType == undefined || bodyType == null){
           bodyType = ''
         }

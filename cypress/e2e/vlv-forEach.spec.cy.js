@@ -23,7 +23,7 @@ describe('Start and complete vlv standalone questionnaire', () => {
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = false
+  const executePost = true
 
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
@@ -38,10 +38,16 @@ describe('Start and complete vlv standalone questionnaire', () => {
   const loss_causeArray1 = ["Unfall"]
 
   const file1 = [
-  ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
+    ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"],
+  [
+    "WDB2083441T069719",
+    "Coupe",
+    "01.01.2009",
+    "MER CLK Coupe (partial identification, build period to be defined manually)"
+  ]
   ]
 
-  loss_causeArray1.forEach(loss_cause => {
+  loss_causeArray.forEach(loss_cause => {
     file1.forEach($car => {
       it.only(`vlv Standalone, vin ${$car[0]}, loss_cause ${loss_cause} `, () => {
 
@@ -98,6 +104,7 @@ describe('Start and complete vlv standalone questionnaire', () => {
           })
           console.log(`questionnaireId: ${questionnaireId}`)
           console.log(`uiUrl: ${xhr.response.body.uiUrl}`)
+          //did not solve the problem cy.wait(5000) //Slow calculation of BodyType
         })
         cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
         currentPage()
@@ -106,8 +113,9 @@ describe('Start and complete vlv standalone questionnaire', () => {
         cy.get('@goingPageId').then(function (aliasValue) {
           if (aliasValue == 'page-01'){
             if ( $vin == 'SALYL2RV8JA741831'){
-              cy.wait(5000)
+               cy.wait(5000)
             }
+
             cy.getBodyType($car,logFilename).then(function (bodyType) {
               cy.then(function () {
                 questionnaire.bodyType = bodyType

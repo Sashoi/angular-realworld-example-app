@@ -40,11 +40,17 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   }
 
   const file1 = [
-    ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
+
+    [
+      "VF3VEAHXKLZ080921",
+      "MiniBusMidPanel",
+      "01.01.2017",
+      "Peugeot Expert 09/2020"
+    ]
   ]
 
   file1.forEach($car => {
-    it(`Huk-comprehensive-self-service-clickable-car vin :  ${$car[0]}`, function () {
+    it.only(`Huk-comprehensive-self-service-clickable-car vin :  ${$car[0]}`, function () {
 
       const vin = $car[0]
 
@@ -122,7 +128,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
               console.log(`questionnaireUrl: ${questionnaireUrl}`)
               cy.visit(questionnaireUrl,{log : false})
 
-              const nextButtonLabel ='Speichern und Weiter'
+              const nextButtonLabel ='Weiter' //Speichern und Weiter
               const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
               cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
 

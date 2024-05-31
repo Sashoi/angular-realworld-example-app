@@ -43,12 +43,8 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
   }
 
   const file1 = [
-    [
-      "WDB2083441T069719",
-      "Coupe",
-      "01.01.2009",
-      "MER CLK Coupe (partial identification, build period to be defined manually)"
-    ]
+
+    ["W1V44760313930766", "Van", "01.01.2017", "Mercedes Vito 09/2021"]
 ]
   file1.forEach($car => {
     it(`huk standalone - huk_comprehensive_call_center vin ${$car[0]}`, () => {

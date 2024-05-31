@@ -72,12 +72,10 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   const file1 = [
-    [
-      "VF3VEAHXKLZ080921",
-      "MiniBusMidPanel",
-      "01.01.2017",
-      "Peugeot Expert 09/2020"
-    ]
+    ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5"],
+  ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
+  ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"],
+  ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
   ]
   file1.forEach($car => {
     it.only(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
