@@ -1,1 +1,3 @@
-vin: TMBJB7NS4K8027658 expected:                SUV real:                SUV desc: SKODA Kodiaq 1.5 TSI ACT DSG Style 
+vin: WVWZZZ7NZDV041367 expected:                MPV real:              Sedan desc: VW Sharan MPV 
+vin: SALYL2RV8JA741831 expected:                SUV real:              Sedan desc: Land Rover, SUV 
+vin: ZFA25000002K44267 expected:    MiniBusMidPanel real:              Sedan desc: Fiat Ducato 

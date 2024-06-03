@@ -17,13 +17,16 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
 
   beforeEach('Setting up integrations and common variables', () => {
     cy.intercept('POST', `/b2b/integration/huk/huk-comprehensive-call-center?identifyVehicleAsync=false`).as('hukStandaloneCC')
+    cy.intercept('GET', `/b2b/integration/huk/huk-comprehensive-call-center/*`).as('hukStandaloneCcGET')
+    cy.intercept('GET',  `/questionnaire/*/page/page-*?locale=de`).as('currentPageR')
     cy.commanBeforeEach(goingPage,questionnaire)
   })
 
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = true
+  const executePost = false
+  const executePostR = true
 
   function printUiBlocks(uiBlocks){
     uiBlocks.forEach((uiBlock, index1) => {
@@ -42,16 +45,12 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
     cy.waitingFor('@currentPage',goingPage,questionnaire)
   }
 
-  const file1 = [
+  function currentPageR() {
+    cy.waitingFor('@currentPageR',goingPage,questionnaire)
+  }
 
-    ["W1V44760313930766", "Van", "01.01.2017", "Mercedes Vito 09/2021"]
-]
-  file1.forEach($car => {
-    it(`huk standalone - huk_comprehensive_call_center vin ${$car[0]}`, () => {
-
-      const $vin = $car[0]
-
-      cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/zurich/#/login?theme=huk`,{ log : false })
+  function Login(){
+    cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/zurich/#/login?theme=huk`,{ log : false })
       // login
       cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
       cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
@@ -65,6 +64,23 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
         })
       })
       cy.wait(500)
+  }
+
+  const file1 = [
+    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"],
+  ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"],
+  [
+    "WVWZZZ6RZGY304402",
+    "Hatch5",
+    "01.01.2017",
+    "Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
+  ]
+]
+  file1.forEach($car => {
+    it(`huk standalone - huk_comprehensive_call_center vin ${$car[0]}`, () => {
+
+      const $vin = $car[0]
+      Login()
 
       const intS1 = getRandomInt(10,99).toString()
       const intS2 = getRandomInt(100,999).toString()
@@ -74,18 +90,22 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
       const $claimTypes = ['30','31','32','33','34','35','36','37','38','39'];
       const claimType_random = getRandomInt(0,$claimTypes.length);
       const $claimType = $claimTypes[claimType_random];
-      const claimNumber = `${intS1}-${$claimType}-${intS2}/${intS3}-S`
+      const claimNumber = `${intS1}-${$claimType}-${intS2}/${intS3}-C`
       const first_registration_date = '01.11.2003';
 
+      Cypress.env('claimNumber', claimNumber)
       console.log(`claimNumber: ${claimNumber}`)
       console.log(`vin: ${$vin}`)
       console.log(`first registration date: ${first_registration_date}`)
+      const licensePlate = `HCC ${intS2}`
+      Cypress.env('licensePlate', licensePlate)
+      console.log(`license plate: ${licensePlate}`)
 
 
       // Fulfill standalone form
       cy.get('[name="claimNumber"]').type(claimNumber);
       cy.get('[data-test="standalone_vin"]').type($vin)
-      cy.get('[data-test="standalone_licensePlate"]').type(`HCC ${intS2}`)
+      cy.get('[data-test="standalone_licensePlate"]').type(licensePlate)
       cy.get('[class="btn btn-primary btn-submit"]').click()
 
       cy.wait('@hukStandaloneCC').then(xhr => {
@@ -244,6 +264,86 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
             console.log(`from summary-page, questionnaireId:${Id}`);
           })
           if (executePost) {
+            cy.get('button[type="submit"]').contains('Schadenanlage beenden').click()
+            cy.wait('@postPost').then(xhr => {
+              cy.postPost(xhr)
+            })
+          }
+        }
+      })
+    })
+
+
+    it(`huk standalone - huk_comprehensive_call_center - reoprn vin ${$car[0]}`, () => {
+      const claimNumber  = Cypress.env('claimNumber')
+      const licensePlate = Cypress.env('licensePlate')
+
+      console.log(`claimNumber: ${claimNumber}`)
+      console.log(`licensePlate: ${licensePlate}`)
+
+      Login()
+
+      cy.get('a#OPEN_EXISTING-link').click()
+      cy.get('input[name="claimNumber"]').type(claimNumber)
+      cy.get('input#licensePlate').type(licensePlate)
+      cy.get('button[data-test="standalone_submit"]').click()
+
+      cy.wait('@hukStandaloneCcGET').then(xhr => {
+        expect(xhr.response.statusCode).to.equal(200)
+        console.log(`questionnaireId: ${xhr.response.body.id}`)
+        cy.then(function () {
+          questionnaire.Id = xhr.response.body.id
+        })
+        console.log(`templateId: ${xhr.response.body.templateId}`)
+        console.log(`supportInformation.bodyType: ${xhr.response.body.supportInformation.bodyType}`)
+      })
+      cy.wait(1000)
+
+      currentPageR()
+      const nextButtonLabel ='Weiter'
+      const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
+      cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
+
+      // //Fahrzeugbeschreibung und Schadenhergang - page-01
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-01'){
+          cy.wait(1000)
+          nextBtn()
+        }
+      })
+
+      // Schadenbeschreibung - page-02
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-02'){
+          cy.wait('@clickableCar',{requestTimeout : $requestTimeout}).then(xhr => {
+            expect(xhr.response.statusCode).to.equal(200)
+            console.log(`Comming SVG with clickableCar`)
+            nextBtn()
+          })
+        }
+      })
+
+      // Schadenbilder und Dokumente - page-03
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-03'){
+          nextBtn()
+        }
+      })
+
+      // Regulierungs- und Handlungsempfehlung - page-04
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-04'){
+          nextBtn()
+        }
+      })
+
+      //Zusammenfassung, post questionnaire - summary-page
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'summary-page'){
+          cy.get('@questionnaireId').then(function (Id) {
+            console.log(`from summary-page, questionnaireId:${Id}`);
+          })
+          if (executePostR) {
             cy.get('button[type="submit"]').contains('Schadenanlage beenden').click()
             cy.wait('@postPost').then(xhr => {
               cy.postPost(xhr)

@@ -32,7 +32,7 @@ describe('Start and complete dekra_int_liability_call_center standalone question
   const executePost = true
   const interceptDekraStandalone = false
   const vehicle_hsn_tsn = '0588AUC'
-  const vehicle_identification_by_hsn_tsn = true
+  const vehicle_identification_by_hsn_tsn = false
 
   function printUiBlocks(uiBlocks){
     uiBlocks.forEach((uiBlock, index1) => {
@@ -52,7 +52,9 @@ describe('Start and complete dekra_int_liability_call_center standalone question
   }
 
   const file1 = [
-    ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"]
+
+    ["W1V44760313930767", "Van", "01.01.2017", "Mercedes Vito 09/2021"]
+
   ]
   file1.forEach($car => {
     it.only(`dekra_int_liability_call_center standalone questionnaire, vin ${$car[0]}`, () => {

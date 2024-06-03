@@ -29,8 +29,10 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = true
+  const executePost = false
   const interceptDekraStandalone = false
+  const vehicle_hsn_tsn = '0588AUC'
+  const vehicle_identification_by_hsn_tsn = true
 
   function printUiBlocks(uiBlocks){
     uiBlocks.forEach((uiBlock, index1) => {
@@ -50,12 +52,9 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
   }
 
   const file1 = [
-    [
-      "TMBJB7NS4K8027658",
-      "SUV",
-      "01.09.2018",
-      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
-    ]
+    ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
+  ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"],
+  ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
   ]
   file1.forEach($car => {
     it.only(`dekra_int_comprehensive_call_center standalone questionnaire, vin ${$car[0]}`, () => {
@@ -87,19 +86,25 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
 
 
       const first_registration_date = $car[2] //"2024-02-01";
-      const f_first_registration_date = $car[2] //'01.02.2024';
+      let f_first_registration_date = $car[2] //'01.02.2024';
       console.log(`vin: ${$vin}, bodyType: ${$car[1]}, description: ${$car[3]}`)
       console.log(`first_registration_date: ${first_registration_date}`)
       const nextButtonLabel ='Weiter'
       const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
       const claimNumber = `DekraIntCCC${intS2}`
-      const licensePlate = `DEK ${intS3}`
+      const licensePlate = `DEK ${intS3} C`
       console.log(`claimNumber: ${claimNumber}`)
 
       // Fulfill standalone form
 
       cy.get('input[name="claimNumber"]').type(claimNumber);
-      cy.get('input[data-test="standalone_vin"]').type($vin)
+      if ( !vehicle_identification_by_hsn_tsn ){
+        cy.get('input[data-test="standalone_vin"]').type($vin)
+      } else {
+        cy.get('input[data-test="standalone_countryVehicleIdentification"]').type(vehicle_hsn_tsn)
+        f_first_registration_date = '01.01.2015'
+        cy.get('input[data-test="standalone_vin"]').focus() //this is a bug
+      }
       cy.get('input[formcontrolname="firstRegistrationDate"]').type(f_first_registration_date)
       cy.get('input#zipCode[data-test="standalone_zipCode"]').type('22222')
 
