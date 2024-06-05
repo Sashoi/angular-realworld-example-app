@@ -78,10 +78,8 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
 
       cy.wait(500)
 
-      const intS1 = getRandomInt(10,99).toString()
       const intS2 = getRandomInt(1000000,9999999).toString()
       const intS3 = getRandomInt(1000,9999).toString()
-      const intS4 = getRandomInt(1,9).toString()
       const $equipment_2_loading_doors = true
 
 
