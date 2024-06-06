@@ -9,6 +9,7 @@ import emailBody from '../fixtures/templates/emailBodyA.json'
 import header from '../fixtures/header.json'
 
 const logFilename = 'cypress/fixtures/logs/AllianzComprehensiveCallCenter.log'
+const PathToImages ='cypress/fixtures/images/'
 
 describe('Start and complete Allianz standalone questionnaire - Allianz_comprehensive_call_center', () =>{
 
@@ -17,6 +18,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
   })
 
   beforeEach('Setting up integrations and common variables', () => {
+    cy.viewport('samsung-note9')
     cy.intercept('POST', `/b2b/integration/allianz/allianz-comprehensive-call-center?identifyVehicleAsync=false`).as('allianzStandaloneCC')
     cy.intercept('GET', `/b2b/integration/allianz/allianz-comprehensive-call-center,allianz-liability-call-center/*`).as('allianzStandaloneCcGET')
     cy.intercept('GET',  `/questionnaire/*/page/page-*?locale=de`).as('currentPageR')
@@ -28,6 +30,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
   const $requestTimeout = 60000;
   const executePost = false
   const executePostR = true
+  const executePost2 = false
 
   function printUiBlocks(uiBlocks){
     uiBlocks.forEach((uiBlock, index1) => {
@@ -68,10 +71,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
   }
 
   const file1 = [
-    ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5"],
-  ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
-  ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"],
-  ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
+    ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5"]
 ]
   file1.forEach($car => {
     it(`allianz standalone - allianz_comprehensive_call_center vin ${$car[0]}`, () => {
@@ -357,7 +357,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
       })
     })
 
-    it(`allianz_comprehensive_self_service vin ${$car[0]}`, () => {
+    it(`allianz_comprehensive_self_service create vin ${$car[0]}`, () => {
       const notificationId = Cypress.env('notificationId') //`wlA4icU77W6LjzUFyrGzy`
       cy.authenticate().then(function (authorization) {
         cy.then(function () {
@@ -383,6 +383,110 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
             //cy.printRequestedInformation(response.body.requestedInformation);
         })
       })
+    })
+
+    it(`allianz_comprehensive_self_service execute vin ${$car[0]}`, () => {
+      cy.viewport('samsung-note9')
+      console.log(`Start ${Cypress.env('templateId')} from url: ${Cypress.env('requestUrl')}.`)
+
+      cy.visit(Cypress.env('requestUrl'),{log : false})
+
+      const nextButtonLabel ='Weiter'
+      const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
+      cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
+
+      currentPage()
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-01'){
+          cy.selectMultipleList('terms-of-service-acknowledgement',0)
+          cy.getBodyType($car,logFilename).then(function (bodyType) {
+            cy.then(function () {
+              questionnaire.bodyType = bodyType
+            })
+          })
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-02'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-03'){
+          nextBtn()
+        }
+      })
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-04'){
+          cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,'registration-part-1.jpg')
+          nextBtn()
+        }
+      })
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-05'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-06'){
+          cy.uploadImage('vehicle-right-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
+          cy.uploadImage('vehicle-left-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-07'){
+          cy.uploadImage('vehicle-interior-front-photo-upload',PathToImages,'interior-front.jpg')
+          cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathToImages,'image dashboard-odometer.jpg')
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-08'){
+          cy.uploadImage('damage-photo-upload-overview-hood',PathToImages,'hood.jpg')
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-09'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-10'){
+          cy.get('input#client-bank-name-input').type('FiBank');
+          cy.get('input#client-bank-iban-input').type('IBAN1234');
+          cy.get('input#client-bank-bic-input').type('BIC');
+          cy.get('input#client-bank-account-holder-input').type('Account Holder');
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'summary-page'){
+          cy.get('textarea#summary-message-from-client-textarea').type('Hier können Sie eine persönliche Mitteilung für das Muster Versicherungs AG Schadenteam eintragen.')
+          if (executePost2) {
+            //pageId: "summary-page"
+            cy.selectMultipleList('summary-confirmation-acknowledgement',0)
+            cy.get('button[type="submit"]').contains('Senden').click()
+            cy.wait('@postPost',{ log: false }).then(xhr => {
+              cy.postPost(xhr,false).then(function (notificationId) {
+                console.log(`notificationId: ${notificationId}`);
+              })
+            })
+          }
+        }
+      })
+
     })
   })
 })

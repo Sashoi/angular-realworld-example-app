@@ -17,6 +17,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
   })
 
   beforeEach('Setting up integrations and common variables', () => {
+    cy.viewport('samsung-note9')
     cy.intercept('POST', `/b2b/integration/allianz/allianz-liability-call-center?identifyVehicleAsync=false`).as('allianzStandaloneLC')
     cy.intercept('GET', `/b2b/integration/allianz/allianz-comprehensive-call-center,allianz-liability-call-center/*`).as('allianzStandaloneLcGET')
     cy.intercept('GET',  `/questionnaire/*/page/page-*?locale=de`).as('currentPageR')

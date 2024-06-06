@@ -1,1 +1,5 @@
-vin: TMBJB7NS4K8027658 expected:                SUV real:                SUV desc: SKODA Kodiaq 1.5 TSI ACT DSG Style 
+vin: WDB1704351F077666 expected:             Cabrio real:             Cabrio desc: MER SLK Cabrio 
+vin: WBAUB310X0VN69014 expected:             Hatch3 real:             Hatch3 desc: BMW 1 Series Hatch3 
+vin: WVWZZZ6RZGY304402 expected:             Hatch5 real:             Hatch5 desc: Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list) 
+vin: VF7SA5FS0BW550414 expected:             Hatch3 real:             Hatch3 desc: CIT DS3 Hatch3 
+vin: WAUZZZ4B73N015435 expected:              Sedan real:              Sedan desc: AUD A6/S6/RS6 Sedan 

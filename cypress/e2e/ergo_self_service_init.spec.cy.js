@@ -28,8 +28,8 @@ describe('Ergo Self Service init', () =>{
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
   const executePost = false
-  const entire_vehicle_damaged_by_hail = true
-  const glass_parts_damaged_by_hail = true
+  const entire_vehicle_damaged_by_hail = false
+  const glass_parts_not_damaged_by_hail = false
   const client_email = Cypress.env("client_email")
   const vehicle_hsn_tsn_1 = '0588'   //Start with wrong TSN to reach page-04
   const vehicle_hsn_tsn_2 = 'AUC'
@@ -64,12 +64,16 @@ describe('Ergo Self Service init', () =>{
 
 
   const file1 = [
-    [
-      "TMBJB7NS4K8027658",
-      "SUV",
-      "01.09.2018",
-      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
-    ]
+    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"],
+  ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"],
+  [
+    "WVWZZZ6RZGY304402",
+    "Hatch5",
+    "01.01.2017",
+    "Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
+  ],
+  ["VF7SA5FS0BW550414", "Hatch3", "01.01.2014", "CIT DS3 Hatch3"],
+  ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"]
   ]
 
   file1.forEach($car => {
@@ -393,7 +397,7 @@ describe('Ergo Self Service init', () =>{
 
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-11'){
-                    cy.selectSingleList('glass-parts-damaged-by-hail',Number(glass_parts_damaged_by_hail))
+                    cy.selectSingleList('glass-parts-damaged-by-hail',Number(glass_parts_not_damaged_by_hail))
                     //cy.getQuestionnaireInfo()
                     nextBtn()
                   }
@@ -416,6 +420,11 @@ describe('Ergo Self Service init', () =>{
                         if (element['id'] == 'roof-equipment-panorama-roof' && eval(element['visibleExpression'])){
                           console.log(`${element['id']}: ${eval(element['visibleExpression'])}`);
                           cy.selectSingleList('roof-equipment-panorama-roof',1)
+                        }
+                        if (element['id'] == 'roof-equipment-convertible-roof-material' && eval(element['visibleExpression'])){
+                          //"visibleExpression": "answer('glass-parts-damaged-by-hail') == 'yes' && answer('selected-parts-glass-parts-only')['roof'] == 'yes' && supportInformation('bodyType') == 'Cabrio'",
+                          console.log(`${element['id']}: ${eval(element['visibleExpression'])}`);
+                          cy.selectSingleList('roof-equipment-convertible-roof-material',0)
                         }
                       })
                     })
