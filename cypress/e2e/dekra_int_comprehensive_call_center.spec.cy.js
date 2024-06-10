@@ -11,9 +11,12 @@ import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 //import b2bBody from '../fixtures/templates/dekraIntComprehensiveCallCenterBody.json'
 //import injectQuestions from '../fixtures/templates/injectQuestions.json'
+import emailBody from '../fixtures/templates/emailBodyD.json'
+import header from '../fixtures/header.json'
 
 
 const logFilename = 'cypress/fixtures/logs/dekra_int_comprehensive_call_center.log'
+const PathToImages ='cypress/fixtures/images/'
 
 describe('Start and complete dekra_int_comprehensive_call_center standalone questionnaire', () =>{
 
@@ -29,10 +32,11 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = false
+  const executePost = true
+  const executePost2 = false
   const interceptDekraStandalone = false
   const vehicle_hsn_tsn = '0588AUC'
-  const vehicle_identification_by_hsn_tsn = true
+  const vehicle_identification_by_hsn_tsn = false
 
   function printUiBlocks(uiBlocks){
     uiBlocks.forEach((uiBlock, index1) => {
@@ -52,12 +56,15 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
   }
 
   const file1 = [
-    ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
-  ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"],
-  ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
+    [
+      "WVWZZZ6RZGY304402",
+      "Hatch5",
+      "01.09.2016",
+      "Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
+    ]
   ]
   file1.forEach($car => {
-    it.only(`dekra_int_comprehensive_call_center standalone questionnaire, vin ${$car[0]}`, () => {
+    it(`dekra_int_comprehensive_call_center standalone questionnaire, vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
 
@@ -78,8 +85,9 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
 
       cy.wait(500)
 
-      const intS2 = getRandomInt(1000000,9999999).toString()
-      const intS3 = getRandomInt(1000,9999).toString()
+      //const intS2 = getRandomInt(1000000,9999999).toString()
+      const intS11 = getRandomInt(10000000000,99999999999).toString()
+      const intS4 = getRandomInt(1000,9999).toString()
       const $equipment_2_loading_doors = true
 
 
@@ -89,8 +97,8 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
       console.log(`first_registration_date: ${first_registration_date}`)
       const nextButtonLabel ='Weiter'
       const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
-      const claimNumber = `DekraIntCCC${intS2}`
-      const licensePlate = `DEK ${intS3} C`
+      const claimNumber = `10${intS11}10`  //DekraIntCCC${intS2}`
+      const licensePlate = `DEK ${intS4} C`
       console.log(`claimNumber: ${claimNumber}`)
 
       // Fulfill standalone form
@@ -100,7 +108,7 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
         cy.get('input[data-test="standalone_vin"]').type($vin)
       } else {
         cy.get('input[data-test="standalone_countryVehicleIdentification"]').type(vehicle_hsn_tsn)
-        f_first_registration_date = '01.01.2015'
+        //f_first_registration_date = '01.01.2015'
         cy.get('input[data-test="standalone_vin"]').focus() //this is a bug
       }
       cy.get('input[formcontrolname="firstRegistrationDate"]').type(f_first_registration_date)
@@ -353,7 +361,9 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
             console.log(`from summary-page, saved questionnaireId: ${Id}`);
           })
           if (executePost) {
+            cy.wait(2000)
             cy.get('button[type="submit"]').contains('Schadenanlage beenden').click()
+            cy.wait(2000)
             cy.wait('@postPost').then(xhr => {
               cy.postPost(xhr)
             })
@@ -365,6 +375,255 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
     it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['zurich_default','zurich_pg1_schadenbericht','zurich_pg1_schadenprotokoll'])
     }) //it PDF from commands
+
+    it(`dekra_int_comprehensive_self_service_app create vin ${$car[0]}`, () => {
+      const notificationId = 'kltjnKARCYpXoovcyDPMh'//Cypress.env('notificationId') //`kltjnKARCYpXoovcyDPMh`
+      cy.authenticate().then(function (authorization) {
+        cy.then(function () {
+          questionnaire.authorization = authorization
+        })
+        Cypress._.merge(header, {'authorization':authorization});
+        const options = {
+          method: 'POST',
+          url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/dekra_int_comprehensive_self_service_app?unknownReceiver=true`,
+          body: emailBody,
+          headers: header
+        };
+        cy.request(options).then(
+          (response) => {
+            // response.body is automatically serialized into JSON
+            expect(response.status).to.eq(200) // true
+            console.log(`dekra_int_comprehensive_self_service_app:`);
+            const arrLength = response.body.requestedInformation.length
+            const requestUrl = response.body.requestedInformation[arrLength - 1].requestUrl
+            console.log(requestUrl);
+            Cypress.env('requestUrl', requestUrl)
+            console.log(response.body.requestedInformation[arrLength - 1].templateId);
+            Cypress.env('templateId', response.body.requestedInformation[arrLength - 1].templateId)
+            //cy.printRequestedInformation(response.body.requestedInformation);
+        })
+      })
+    })
+
+    it(`dekra_int_comprehensive_self_service_app execute vin ${$car[0]}`, () => {
+      cy.viewport('samsung-note9')
+      const requestUrl = Cypress.env('requestUrl')
+      console.log(`Start ${Cypress.env('templateId')} from url: ${requestUrl}.`)
+
+      cy.visit(requestUrl,{log : false})
+
+      const nextButtonLabel ='Weiter'
+      const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
+      cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
+
+      currentPage()
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-01'){
+          cy.selectMultipleList('terms-of-service-acknowledgement',0)
+          cy.getBodyType($car,logFilename).then(function (bodyType) {
+            cy.then(function () {
+              questionnaire.bodyType = bodyType
+            })
+          })
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-02'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-03'){
+          nextBtn()
+        }
+      })
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-04'){
+          cy.wait('@clickableCar',{requestTimeout : $requestTimeout, log : false}).then(xhr => {
+            expect(xhr.response.statusCode).to.equal(200)
+            console.log(`Comming SVG with clickableCar`)
+            const SVGbody = xhr.response.body;
+            cy.get('@bodyType').then(function (bodyType) {
+              if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
+                cy.selectSingleList('loading-floor-area-bend', 0)
+                //load-doors and rear-windows
+                if ($equipment_2_loading_doors){
+                  if (SVGbody.search('g id="right-load-door"') > 0 ){
+                    cy.selectSVG(`right-load-door`)
+                    cy.selectSVG(`left-load-door`)
+                  }
+                }
+                //load-doors and rear-windows
+                if (!$equipment_2_loading_doors){
+                  if (SVGbody.search('g id="tailgate"') > 0 ){
+                    cy.selectSVG(`tailgate`)
+                    cy.selectSVG(`rear-window`)
+                  }
+                }
+              }
+              if (bodyType == 'MPV' || bodyType == 'Hatch3' || bodyType == 'Hatch5' || bodyType == 'Sedan' ||
+                  bodyType == 'Coupe' || bodyType == 'Cabrio' || bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine' ||
+                  bodyType == 'SUV'){
+                const regex = /g .*id="tailgate"/;
+                if (SVGbody.search(regex) > 0 ){
+                  cy.selectSVG(`tailgate`)
+                  cy.selectSVG(`rear-window`) // rear-window-damage-type_0 preselected
+                }
+              }
+            }) //get('@bodyType'
+
+            if (xhr.response.body.search('g id="hood"') > 0){
+              cy.selectSVG('hood')
+            }
+
+            if (true){
+              if (xhr.response.body.search('g id="right-front-wheel"') > 0){
+                cy.selectSVG('right-front-wheel')
+                cy.wait(2000)
+              }
+
+              if (xhr.response.body.search('g id="right-rear-wheel"') > 0){
+                cy.selectSVG('right-rear-wheel')
+              }
+              if (xhr.response.body.search('g id="right-front-wheel-tire"') > 0){
+                cy.selectSVG('right-front-wheel-tire')
+              }
+              if (xhr.response.body.search('g id="right-rear-wheel-tire"') > 0){
+                cy.selectSVG('right-rear-wheel-tire')
+              }
+              if (xhr.response.body.search('g id="left-front-wheel"') > 0){
+                cy.selectSVG('left-front-wheel')
+              }
+              if (xhr.response.body.search('g id="left-rear-wheel"') > 0){
+                cy.selectSVG('left-rear-wheel')
+              }
+              if (xhr.response.body.search('g id="left-front-wheel-tire"') > 0){
+                cy.selectSVG('left-front-wheel-tire')
+              }
+              if (xhr.response.body.search('g id="left-rear-wheel-tire"') > 0){
+                cy.selectSVG('left-rear-wheel-tire')
+              }
+            }
+            cy.selectSVG('windshield')
+          }) //wait('@clickableCar'
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-05'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-06'){
+          cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,'registration-part-1.jpg')
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-07'){
+          cy.uploadImage('vehicle-right-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
+          cy.uploadImage('vehicle-left-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
+          cy.uploadImage('vehicle-left-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
+          cy.uploadImage('vehicle-right-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-08'){
+          cy.uploadImage('vehicle-interior-front-photo-upload',PathToImages,'interior-front.jpg')
+          cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathToImages,'image dashboard-odometer.jpg')
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-09'){
+          cy.uploadImage('damage-photo-upload-overview-hood',PathToImages,'airbag.jpg')
+          cy.uploadImage('damage-photo-upload-detail-hood',PathToImages,'airbag.jpg')
+          cy.uploadImage('damage-photo-upload-overview-windshield',PathToImages,'airbag.jpg')
+          cy.uploadImage('damage-photo-upload-detail-windshield',PathToImages,'airbag.jpg')
+
+          cy.uploadImage('damage-photo-upload-overview-leftFrontWheelRim',PathToImages,'airbag.jpg')
+          cy.uploadImage('damage-photo-upload-detail-leftFrontWheelRim',PathToImages,'airbag.jpg')
+          cy.uploadImage('damage-photo-upload-overview-leftFrontTire',PathToImages,'airbag.jpg')
+          cy.uploadImage('damage-photo-upload-detail-leftFrontTire',PathToImages,'airbag.jpg')
+          cy.uploadImage('damage-photo-upload-overview-rightFrontWheelRim',PathToImages,'airbag.jpg')
+          cy.uploadImage('damage-photo-upload-detail-rightFrontWheelRim',PathToImages,'airbag.jpg')
+          cy.uploadImage('damage-photo-upload-overview-rightFrontTire',PathToImages,'airbag.jpg')
+          cy.uploadImage('damage-photo-upload-detail-rightFrontTire',PathToImages,'airbag.jpg')
+
+          cy.uploadImage('damage-photo-upload-overview-leftRearWheelRim',PathToImages,'airbag.jpg')
+          cy.uploadImage('damage-photo-upload-detail-leftRearWheelRim',PathToImages,'airbag.jpg')
+          cy.uploadImage('damage-photo-upload-overview-rightRearWheelRim',PathToImages,'airbag.jpg')
+          cy.uploadImage('damage-photo-upload-detail-rightRearWheelRim',PathToImages,'airbag.jpg')
+          cy.uploadImage('damage-photo-upload-overview-leftRearTire',PathToImages,'airbag.jpg')
+          cy.uploadImage('damage-photo-upload-detail-leftRearTire',PathToImages,'airbag.jpg')
+          cy.uploadImage('damage-photo-upload-overview-rightRearTire',PathToImages,'airbag.jpg')
+          cy.uploadImage('damage-photo-upload-detail-rightRearTire',PathToImages,'airbag.jpg')
+
+          cy.uploadImage('damage-photo-upload-overview-tailGate',PathToImages,'airbag.jpg')
+          cy.uploadImage('damage-photo-upload-detail-tailGate',PathToImages,'airbag.jpg')
+          cy.uploadImage('damage-photo-upload-overview-rearWindow',PathToImages,'airbag.jpg')
+          cy.uploadImage('damage-photo-upload-detail-rearWindow',PathToImages,'airbag.jpg')
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-10'){
+          cy.get('input#client-bank-name-input').type('FiBank');
+          cy.get('input#client-bank-iban-input').type('IBAN1234');
+          cy.get('input#client-bank-bic-input').type('BIC');
+          cy.get('input#client-bank-account-holder-input').type('Account Holder');
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-11'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-12'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-13'){
+          cy.selectSingleList('vehicle-location-equals-home-address', 0)
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'summary-page'){
+          cy.get('textarea#summary-message-from-client-textarea').type('Hier können Sie eine persönliche Mitteilung für das Muster Versicherungs AG Schadenteam eintragen.')
+          if (executePost2) {
+            //pageId: "summary-page"
+            cy.selectMultipleList('summary-confirmation-acknowledgement',0)
+            cy.get('button[type="submit"]').contains('Senden').click()
+            cy.wait('@postPost',{ log: false }).then(xhr => {
+              cy.postPost(xhr,false).then(function (notificationId) {
+                console.log(`notificationId: ${notificationId}`);
+              })
+            })
+          }
+        }
+      })
+
+    })
 
   })  //forEach
 }) //describe

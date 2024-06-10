@@ -28,9 +28,9 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = false
+  const executePost = true
   const executePostR = true
-  const executePost2 = false
+  const executePost2 = true
 
   function printUiBlocks(uiBlocks){
     uiBlocks.forEach((uiBlock, index1) => {

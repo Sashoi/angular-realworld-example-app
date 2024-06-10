@@ -64,16 +64,17 @@ describe('Ergo Self Service init', () =>{
 
 
   const file1 = [
-    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"],
-  ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"],
-  [
-    "WVWZZZ6RZGY304402",
-    "Hatch5",
-    "01.01.2017",
-    "Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
-  ],
-  ["VF7SA5FS0BW550414", "Hatch3", "01.01.2014", "CIT DS3 Hatch3"],
-  ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"]
+    [
+      "WDB2083441T069719",
+      "Coupe",
+      "01.01.2009",
+      "MER CLK Coupe (partial identification, build period to be defined manually)"
+    ],
+    ["W0L0XCR975E026845", "Cabrio", "01.01.2009", "OPE Tigra Cabrio"],
+    ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5"],
+    ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
+    ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"],
+    ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
   ]
 
   file1.forEach($car => {

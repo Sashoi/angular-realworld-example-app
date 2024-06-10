@@ -2826,6 +2826,20 @@ custom-event@~1.0.0:
   resolved "https://registry.npmjs.org/custom-event/-/custom-event-1.0.1.tgz"
   integrity sha512-GAj5FOq0Hd+RsCGVJxZuKaIDXDf3h6GQoNEjFgbLLI/trgtavwUbSnZ5pVfg27DVCaWjIohryS0JFwIJyT2cMg==
 
+cypress-cdp@^1.3.0:
+  version "1.4.34"
+  resolved "https://registry.npmjs.org/cypress-cdp/-/cypress-cdp-1.4.34.tgz"
+  integrity sha512-C+SpT7aC3JzIJITqXPbcNIUSIcN4v8ksvpZPjIrlpkf0iA0PX9qh7xoQDwnB750r0hDyAb4dyb7CSgQj1SUnbQ==
+  dependencies:
+    devtools-protocol "^0.0.1308459"
+
+cypress-clipboard@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.npmjs.org/cypress-clipboard/-/cypress-clipboard-1.0.3.tgz"
+  integrity sha512-y/UGSq1RUMTs/1UJvs60yz1+2pjwTKz66zr3qV5pslg3IDGlANAjKk/uIOlzUquUwKpyb0ICbN18eXYORO9J8Q==
+  dependencies:
+    cypress-cdp "^1.3.0"
+
 cypress-multi-reporters@^1.6.4:
   version "1.6.4"
   resolved "https://registry.npmjs.org/cypress-multi-reporters/-/cypress-multi-reporters-1.6.4.tgz"
@@ -2994,6 +3008,11 @@ detect-node@^2.0.4:
   version "2.1.0"
   resolved "https://registry.npmjs.org/detect-node/-/detect-node-2.1.0.tgz"
   integrity sha512-T0NIuQpnTvFDATNuHN5roPwSBG83rFsuO+MXXH9/3N1eFbn4wcPjttvjMLEPWJ0RGUYgQE7cGgS3tNxbqCGM7g==
+
+devtools-protocol@^0.0.1308459:
+  version "0.0.1308459"
+  resolved "https://registry.npmjs.org/devtools-protocol/-/devtools-protocol-0.0.1308459.tgz"
+  integrity sha512-+Pux6vzaUnioFi9ZygixOoBgltLjzb1/nbAwzecXgv1/FMF2ZdnYgmBIFSm4q4u6ykCdHngojnJN8cji4eGzTA==
 
 di@^0.0.1:
   version "0.0.1"

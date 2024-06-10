@@ -1,0 +1,11 @@
+{
+  "receiver": "",
+  "contact": {
+    "firstName": "Sas",
+    "lastName": "Iva_i",
+    "email": "",
+    "mobileNumber": "",
+    "type": "PERSON"
+  },
+  "emailTemplate": "dekra_int_start_self_service"
+}

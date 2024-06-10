@@ -1,3 +1,2 @@
-vin: WVWZZZ7NZDV041367 expected:                MPV real:              Sedan desc: VW Sharan MPV 
-vin: SALYL2RV8JA741831 expected:                SUV real:              Sedan desc: Land Rover, SUV 
-vin: ZFA25000002K44267 expected:    MiniBusMidPanel real:              Sedan desc: Fiat Ducato 
+vin: WVWZZZ6RZGY304402 expected:             Hatch5 real:             Hatch5 desc: Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list) 
+vin: WVWZZZ6RZGY304402 expected:             Hatch5 real:              Sedan desc: Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list) 
