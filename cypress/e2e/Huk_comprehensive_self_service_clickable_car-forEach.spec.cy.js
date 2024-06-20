@@ -11,6 +11,7 @@ import header from '../fixtures/header.json'
 const logFilename = 'cypress/fixtures/logs/hukClickableCar.log'
 const pdfPath = 'cypress/fixtures/Pdf/'
 const PathToImages ='cypress/fixtures/images/'
+const b2bBodySave = 'cypress/fixtures/templates/b2bBodyHuk_clickable_car_Save.json'
 
 describe('Huk_comprehensive_self_service_clickable_car', () =>{
 
@@ -94,6 +95,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
           expect(response.status).to.eq(200) // true
           const questionnaireId = response.body.questionnaireId;
           console.log(`self-service-init questionnaireId: ${questionnaireId}`)
+          cy.writeFile(b2bBodySave, b2bBody)
 
           const options2 = {
             method: 'GET',

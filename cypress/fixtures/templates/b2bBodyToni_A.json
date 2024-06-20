@@ -1,0 +1,54 @@
+{
+  "qas": [
+    {
+      "answer": ["motorbikeCallCenter"],
+      "questionId": "workflowType"
+    },
+    {
+      "answer": ["casco"],
+      "questionId": "coverage-type"
+    },
+    {
+      "answer": ["22222"],
+      "questionId": "incident-reporter-zip-code"
+    },
+    {
+      "answer": ["22222"],
+      "questionId": "incident-place-zip-code"
+    },
+    {
+      "answer": ["22222"],
+      "questionId": "accident-opponent-vehicle-owner-zip-code"
+    },
+    {
+      "answer": ["22222"],
+      "questionId": "injured-person-zip-code"
+    },
+    {
+      "answer": ["22222"],
+      "questionId": "accident-opponent-damaged-object-owner-zip-code"
+    },
+    {
+      "answer": ["22222"],
+      "questionId": "ranger-info-zip-code"
+    },
+    {
+      "answer": ["22222"],
+      "questionId": "perpetrator-zip-code"
+    },
+    {
+      "answer": ["22222"],
+      "questionId": "accident-opponent-fire-zip-code"
+    },
+    {
+      "answer": ["22222"],
+      "questionId": "repair-shop-zip-code"
+    }
+  ],
+  "readOnlyQuestions": ["string"],
+  "supportInformation": {
+    "vin": "WDB1704351F077666",
+    "additionalProp2": {},
+    "additionalProp3": {}
+  }
+}

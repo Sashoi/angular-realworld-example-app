@@ -86,7 +86,7 @@
     },
     {
       "questionId": "client-vehicle-license-plate",
-      "answer": "HDI 6-968"
+      "answer": "HDI 8-378"
     },
     {
       "questionId": "incident-reporter-first-name",
@@ -123,7 +123,7 @@
   ],
   "supportInformation": {
     "vin": "WAUZZZ4B73N015435",
-    "claimNumber": "ZLUufKn68013",
+    "claimNumber": "qpnXdJQ40451",
     "workflowType": "hdiLiabilityCallCenter"
   }
 }

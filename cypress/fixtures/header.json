@@ -1,5 +1,5 @@
 {
   "Accept": "*/*",
-  "Accept-Encoding": "gzip, deflate, br",
+  "Accept-Encoding": "gzip, deflate, br, zstd",
   "Content-Type": "application/json"
 }

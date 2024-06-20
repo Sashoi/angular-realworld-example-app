@@ -5,21 +5,21 @@ import { getPageTitle } from "../support/utils/common.js";
 import { questionnaire } from "../support/utils/common.js";
 import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
-import emailBody from '../fixtures/templates/emailBodyA.json'
-import b2bBody from '../fixtures/templates/b2bBodySphSales.json'
+//import emailBody from '../fixtures/templates/emailBodyA.json'
+import b2bBody from '../fixtures/templates/b2bBodyToni_A.json'
 import header from '../fixtures/header.json'
 
 const logFilename = 'cypress/fixtures/logs/SphSalesComprehensiveCallCenter.log'
 const PathToImages ='cypress/fixtures/images/'
 
-describe('Start and complete Sph_sales comprehensive call center - sph_sales_comprehensive_call_center', () =>{
+describe('Start and complete Toni automotive call center - toni_automotive_call_center', () =>{
 
   before('clear log file', () => {
     cy.writeFile(logFilename, '')
   })
 
   beforeEach('Setting up integrations and common variables', () => {
-    cy.intercept('POST', `questionnaire/sph_sales_comprehensive_call_center/start`).as('sphSalesCC')
+    cy.intercept('POST', `questionnaire/toni_automotive_call_center/start`).as('toniACC')
     cy.intercept('GET',  `/questionnaire/*/page/page-*?locale=de`).as('currentPageR')
     cy.commanBeforeEach(goingPage,questionnaire)
   })
@@ -27,7 +27,7 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = true
+  const executePost = false
   const executePostR = true
   const executePost2 = true
 
@@ -60,14 +60,14 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
 
   const file1 = [
     [
-      "WVWZZZ6RZGY304402",
-      "Hatch5",
-      "01.06.2015",
-      "Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
+      "VF3VEAHXKLZ080921",
+      "MiniBusMidPanel",
+      "01.01.2017",
+      "Peugeot Expert 09/2020"
     ]
 ]
   file1.forEach($car => {
-    it.only(`Sph sales - sph_sales_comprehensive_call_center vin ${$car[0]}`, () => {
+    it.only(`Toni automotive - toni_automotive_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
 
@@ -90,16 +90,16 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
         cy.then(function () {
           questionnaire.authorization = authorization
         })
-        //b2bBody.supportInformation.vin  = $vin
+        b2bBody.supportInformation.vin  = $vin
         //b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licensePlate
-        b2bBody.qas.find(q => {return q.questionId === "vehicle-first-registration-date"}).answer = first_registration_date
+        //b2bBody.qas.find(q => {return q.questionId === "vehicle-first-registration-date"}).answer = first_registration_date
 
 
         Cypress._.merge(header, {'authorization' : authorization});
 
         const options = {
           method: 'POST',
-          url: `${baseUrl_lp}questionnaire/sph_sales_comprehensive_call_center/start`,
+          url: `${baseUrl_lp}questionnaire/toni_automotive_call_center/start`,
           body: b2bBody,
           headers: header
         };
@@ -112,138 +112,161 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
             questionnaire.Id = questionnaireId
           })
           const uiUrl = response.body.uiUrl;
-          console.log(`sph_sales_comprehensive_call_center questionnaireId: ${questionnaireId}`)
-          console.log(`sph_sales_comprehensive_call_center uiUrl: ${uiUrl}`)
+          console.log(`toni_automotive_call_center questionnaireId: ${questionnaireId}`)
+          console.log(`toni_automotive_call_center uiUrl: ${uiUrl}`)
           cy.visit(uiUrl,{ log : false })
         })
       })
 
+      cy.get('div[class="radio"][title="Kollision"]',{ timeout: 60000 }).should('have.length.greaterThan', 0).and('be.visible')
       const nextButtonLabel ='Weiter'
       const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
       cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
 
       currentPage()
 
+
       cy.wait(1000)
 
-      // Fahrzeugbeschreibung und Schadenhergang - page-01
       cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-01'){
-          cy.get('input#vin').clear().type($vin)
-          cy.get(`button[data-test="identify-button"]`).click()
-          cy.selectorHasAttrClass('select#select_buildPeriod','field-invalid').then(res =>{
-            if (res){
-              cy.selectDropDown('select_buildPeriod',4)
-              cy.wait(2000)
-            }
-          })
-
-          cy.get('input#client-vehicle-license-plate-input').clear().type(licensePlate)
-          cy.selectSingleList('loss-cause',0)
-          cy.selectSingleList('loss-circumstances-details',0)
-
-          //cy.get('textarea#loss-cause-client-remarks-textarea').clear().type('Versicherungsinterne Anmerkung zur Schadenursache und/oder Schadenhergang:')
-          cy.selectSingleList('vehicle-ready-to-drive',1)
-          cy.selectSingleList('vehicle-location',2)
-          //cy.selectSingleList('repair-cost-estimate-available',1)
-          //cy.selectSingleList('cash-on-hand-settlement-preferred',1)
-          //cy.selectSingleList('photo-only-available',1)
-
-
+        if (aliasValue == 'page-02'){
+          cy.selectSingleList('coverage-type-info-client',0)
           cy.getBodyType($car,logFilename).then(function (bodyType) {
             cy.then(function () {
               questionnaire.bodyType = bodyType
             })
           })
+          nextBtn()
+        }
+      })
 
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-03'){
           cy.get('@bodyType').then(function (bodyType) {
-            if (false && (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel')){
-              //cy.selectSingleList('loading-floor-area-bend', 0)
-              cy.wait(2000)
+            if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
               cy.selectSingleList('equipment-slide-door',1)
               cy.selectSingleList('equipment-2-loading-doors',Number($equipment_2_loading_doors))
-
               cy.selectSingleList('equipment-length',0)
               cy.selectSingleList('equipment-height',0)
               cy.selectSingleList('equipment-vehicle-rear-glassed',0)
               cy.selectSingleList('vehicle-customized-interior',0)
             }
-            if (false && (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine')){
+            if (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine'){
               cy.wait(2000)
-              cy.selectSingleList('equipment-loading-area-cover-type',1)
+              cy.selectSingleList('vehicle-loading-area-cover-type',1)
             }
           })
-          cy.wait(4000)
+          cy.wait(2000)
           nextBtn()
         }
       })
 
-      // Schadenbeschreibung - page-02
       cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-02'){
+        if (aliasValue == 'page-05'){
+          cy.get('input#incident-date-time-input').type(`01-06-2024`)
+          cy.get('input[placeholder="HH"]').type(`10`)
+          cy.get('input[placeholder="MM"]').type(`11`)
+          cy.get('input#incident-place-street-name-input').type(`incident place street name`)
+          cy.get('input#incident-place-street-number-input').type(`13 A 1`)
+          cy.get('input#incident-place-zip-code-input').type(`8000`).blur();
+          cy.get('input#incident-place-street-number-input').focus()
+          cy.get('input[data-test="dropdown-selection-enabled-text-input_incident-place-city"]').should('have.value', 'Zürich')
+
+          cy.wait(2000)
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-06'){
+          cy.selectMultipleList('damaged-objects',0)
+          cy.wait(2000)
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-07'){
+          cy.selectSingleList('collision-type',0)
+          cy.get('textarea#collision-type-others-description-textarea').clear().type('Bitte beschreiben Sie in Ihren eigenen Worten was passiert ist:{enter}Bitte beschreiben Sie in Ihren eigenen Worten was passiert ist:{enter}')
+          cy.selectSingleList('loss-circumstances',0)
+
+          cy.wait(2000)
+          nextBtn()
+        }
+      })
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-08'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-09'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-10'){
+          cy.selectSingleList('accident-responsible',0)
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-11'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-12'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-13'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-14'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-15'){
+          cy.selectSingleList('vehicle-driver',0)
+          cy.selectSingleList('alcohol-drugs-overfatigue-while-driving',0)
+          cy.selectSingleList('excessive-speed-while-driving',0)
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-16'){
+          cy.selectSingleList('police-informed',1)
+
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-23'){
           cy.wait('@clickableCar',{requestTimeout : $requestTimeout}).then(xhr => {
             expect(xhr.response.statusCode).to.equal(200)
             console.log(`Comming SVG with clickableCar`)
 
-            if (xhr.response.body.search('g id="right-load-door"') > 0){
-              //cy.selectSVG('right-load-door')
-            }
-            if (xhr.response.body.search('g id="left-load-door"') > 0){
-              //cy.selectSVG('left-load-door')
-            }
-            if (xhr.response.body.search('g id="tailgate"') > 0){
-              //cy.selectSVG('tailgate')
-            }
             if (xhr.response.body.search('g id="hood"') > 0){
               cy.selectSVG('hood')
-              //cy.selectMultipleList('hood-DT2',0)
-              cy.selectSingleList('hood-still-open-close-easily',1)
-              cy.selectMultipleList('hood-damage-type',1)
-              cy.selectSingleList('hood-damage-size',2)
-            }
+              cy.get('input#vehicle-mileage-input').clear().type('123654')
 
-            //cy.selectSingleList('vehicle-safe-to-drive',0)
-            //cy.selectSingleList('vehicle-ready-to-drive',0)
-            //cy.selectSingleList('unrepaired-pre-damages',1)
-            //cy.selectSingleList('vehicle-damage-repaired',0)
-            //cy.get('textarea#unrepaired-pre-damages-description-textarea').clear().type('Bitte beschreiben Sie die unreparierten Vorschäden')
-            //cy.get('#repair-location-zip-code-input').clear().type('22222')
-
-            if (xhr.response.body.search('g id="rightFrontWheelRim"') > 0){
-              cy.selectSVG('rightFrontWheelRim')
               cy.wait(2000)
-              cy.selectSingleList('rightFrontWheelRim-FRW2\\.1',0)
-              cy.selectMultipleList('rightFrontWheelRim-DT2',1)
-            }
-
-            if (xhr.response.body.search('g id="rightRearWheelRim"') > 0){
-              cy.selectSVG('rightRearWheelRim')
-              cy.selectSingleList('rightRearWheelRim-FRW2\\.1',0)
-              cy.selectMultipleList('rightRearWheelRim-DT2',0)
-              cy.selectMultipleList('rightRearWheelRim-DT2',1)
-            }
-            if (xhr.response.body.search('g id="rightFrontTire"') > 0){
-              cy.selectSVG('rightFrontTire')
-            }
-            if (xhr.response.body.search('g id="rightRearTire"') > 0){
-              cy.selectSVG('rightRearTire')
-            }
-            if (xhr.response.body.search('g id="leftFrontWheelRim"') > 0){
-              cy.selectSVG('leftFrontWheelRim')
-              cy.selectSingleList('leftFrontWheelRim-FRW2\\.1',0)
-              cy.selectMultipleList('leftFrontWheelRim-DT2',1)
-            }
-            if (xhr.response.body.search('g id="leftRearWheelRim"') > 0){
-              cy.selectSVG('leftRearWheelRim')
-              cy.selectSingleList('leftRearWheelRim-FRW2\\.1',0)
-              cy.selectMultipleList('leftRearWheelRim-DT2',0)
-              cy.selectMultipleList('leftRearWheelRim-DT2',1)
-            }
-            if (xhr.response.body.search('g id="leftFrontTire"') > 0){
-              cy.selectSVG('leftFrontTire')
-            }
-            if (xhr.response.body.search('g id="leftRearTire"') > 0){
-              cy.selectSVG('leftRearTire')
+              cy.selectMultipleList('hood-damage-type',0)
             }
 
             cy.get('@bodyType').then(function (bodyType) {
@@ -260,22 +283,29 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
         }
       })
 
-      // Regulierungsempfehlung - page-03
       cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-03'){
-          cy.selectSingleList('triage-recommendation',0)
+        if (aliasValue == 'page-24'){
+          cy.selectSingleList('repair-cost-estimate-available',1)
           nextBtn()
         }
       })
 
-      // Schadenbilder und Dokumente - page-04
       cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-04'){
-          cy.selectSingleList('photos-available',1)
-          cy.selectSingleList('photos-not-available-because',2)
+        if (aliasValue == 'page-25'){
+          cy.uploadImage('vehicle-right-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
+          cy.uploadImage('vehicle-left-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
+          cy.uploadImage('photo-upload-incident-place',PathToImages,'vehicle-left-rear-photo1.jpg')
+          cy.uploadImage('photo-upload-sketch-accident-situation',PathToImages,'vehicle-left-rear-photo1.jpg')
+          cy.uploadImage('photo-upload-accident-report',PathToImages,'vehicle-left-rear-photo1.jpg')
+
+          cy.uploadImage('damage-photo-upload-overview-hood',PathToImages,'hood.jpg')
+          cy.uploadImage('damage-photo-upload-detail-hood',PathToImages,'hood-d.jpg')
+
+          cy.get('input#send-email-for-upload-photos-input').clear().type('sivanchevski@soft2run.com')
           nextBtn()
         }
       })
+
       //cy.then(() => this.skip())    // stop here
 
 
@@ -286,16 +316,16 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
             console.log(`from summary-page, questionnaireId:${Id}`);
           })
           if (executePost) {
-            cy.get('button[type="submit"]').contains('Schadenanlage beenden').click()
-            cy.wait('@postPost').then(xhr => {
-              cy.postPost(xhr)
+            cy.get('button[type="submit"]').contains('Senden').click()
+            cy.wait('@postPost',{ timeout: 600000 }).then(xhr => {
+              cy.postPost(xhr, false)
             })
           }
         }
       })
     })
 
-    it.skip(`sph_sales_comprehensive_self_service_app create vin ${$car[0]}`, () => {
+    it.skip(`toni_automotive_self_service create vin ${$car[0]}`, () => {
       const notificationId = Cypress.env('notificationId') //`wlA4icU77W6LjzUFyrGzy`
       cy.authenticate().then(function (authorization) {
         cy.then(function () {
@@ -304,7 +334,7 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
         Cypress._.merge(header, {'authorization':authorization});
         const options = {
           method: 'POST',
-          url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/allianz_comprehensive_self_service`,
+          url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/toni_automotive_self_service`,
           body: emailBody,
           headers: header
         };
@@ -312,7 +342,7 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
           (response) => {
             // response.body is automatically serialized into JSON
             expect(response.status).to.eq(200) // true
-            console.log(`allianz_comprehensive_self_service:`);
+            console.log(`toni_automotive_self_service:`);
             const arrLength = response.body.requestedInformation.length
             console.log(response.body.requestedInformation[arrLength - 1].requestUrl);
             Cypress.env('requestUrl', response.body.requestedInformation[arrLength - 1].requestUrl)
@@ -323,7 +353,7 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
       })
     })
 
-    it.skip(`sph_sales_comprehensive_self_service_app.json execute vin ${$car[0]}`, () => {
+    it.skip(`toni_automotive_self_service execute vin ${$car[0]}`, () => {
       cy.viewport('samsung-note9')
       console.log(`Start ${Cypress.env('templateId')} from url: ${Cypress.env('requestUrl')}.`)
 

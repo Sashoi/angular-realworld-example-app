@@ -1,0 +1,86 @@
+{
+  "qas": [
+    {
+      "questionId": "role-type",
+      "answer": ["client"]
+    },
+    {
+      "questionId": "accident-date",
+      "answer": ["2020-01-01"]
+    },
+    {
+      "questionId": "loss-cause",
+      "answer": ["animal"]
+    },
+    {
+      "questionId": "loss-circumstances",
+      "answer": ["rear-end-collision"]
+    },
+    {
+      "questionId": "client-insurance-claim-number",
+      "answer": "78-33-998/560424-S"
+    },
+    {
+      "questionId": "animal-species",
+      "answer": ["fox"]
+    },
+    {
+      "questionId": "insurance-name",
+      "answer": ["huk-coburg"]
+    },
+    {
+      "questionId": "huk-coburg-triage-category",
+      "answer": ["total-loss"]
+    },
+    {
+      "questionId": "client-insurance-policy-number",
+      "answer": ["123456789X"]
+    },
+    {
+      "questionId": "insurance-policy-type",
+      "answer": [""]
+    },
+    {
+      "questionId": "client-zip-code",
+      "answer": ["96450"]
+    },
+    {
+      "questionId": "client-country",
+      "answer": ["DE"]
+    },
+    {
+      "questionId": "vehicle-vin",
+      "answer": "VF3VEAHXKLZ080921"
+    },
+    {
+      "questionId": "vehicle-first-registration-date",
+      "answer": ["2019-10-01"]
+    },
+    {
+      "questionId": "client-vehicle-license-plate",
+      "answer": "HSS 3-351"
+    },
+    {
+      "questionId": "client-email",
+      "answer": ["sivanchevski1@soft2run.com"]
+    },
+    {
+      "questionId": "client-mobile-phone-number",
+      "answer": ["123654789"]
+    },
+    {
+      "questionId": "vehicle-mileage",
+      "answer": {
+        "unit": "km",
+        "value": 300123,
+        "fileUploaded": "false"
+      }
+    },
+    {
+      "questionId": "part-selection-type",
+      "answer": "clickable-car"
+    }
+  ],
+  "supportInformation": null,
+  "readOnlyQuestions": null
+}

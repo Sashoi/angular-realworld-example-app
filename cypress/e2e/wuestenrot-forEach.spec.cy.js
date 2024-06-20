@@ -48,7 +48,7 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
       "Peugeot Expert 09/2020"
     ]
   ]
-  file.forEach($car => {
+  file1.forEach($car => {
     it.only(`wuestenrot-comprehensive-call-center for vin: ${$car[0]}`, () => {
 
       const $vin = $car[0]
