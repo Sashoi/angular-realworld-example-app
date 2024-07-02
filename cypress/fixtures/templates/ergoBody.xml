@@ -120,8 +120,8 @@
                         <PLZ>34117</PLZ>
                         <Postfach/>
                         <StrasseUndHausNr>Kölnische Str. 81</StrasseUndHausNr>
-                        <Telefon1>0561/9706121</Telefon1>
-                        <Telefon2>0561/9706122</Telefon2>
+                        <Telefon1>+359/888795023</Telefon1>
+                        <Telefon2>0359/88879502</Telefon2>
                         <Telefax/>
                         <Email>
                           <Bezeichnung>sivanchevski1@soft2run.com</Bezeichnung>
@@ -134,7 +134,7 @@
                     <Name>Miroslav</Name>
                     <RollenTyp>ZN</RollenTyp>
                     <Titel1/>
-                    <Name2>Ilyovski</Name2>
+                    <Name2></Name2>
                     <Name3>Test-Name3</Name3>
                     <Name4>Test-Name4</Name4>
                 </AuftragspositionsPartner>
@@ -145,7 +145,7 @@
                         <Plz>34123</Plz>
                         <Postfach/>
                         <StrasseUndHausNr>Ochshäuser Straße 37 - 39</StrasseUndHausNr>
-                        <Telefon1>0561/500455102</Telefon1>
+                        <Telefon1>0359/888795023</Telefon1>
                         <Telefax/>
                         <Email>
                           <Bezeichnung>sivanchevski2@soft2run.com</Bezeichnung>

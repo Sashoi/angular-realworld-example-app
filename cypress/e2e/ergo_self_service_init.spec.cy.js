@@ -28,14 +28,18 @@ describe('Ergo Self Service init', () =>{
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
   const executePost = false
-  const entire_vehicle_damaged_by_hail = false
+  const noLicensePlate = false
+  const entire_vehicle_damaged_by_hail = true
   const glass_parts_not_damaged_by_hail = false
   const client_email = Cypress.env("client_email")
-  const vehicle_hsn_tsn_1 = '0588'   //Start with wrong TSN to reach page-04
+  const vehicle_hsn_tsn_1 = '05881'   //Start with wrong TSN to reach page-04
   const vehicle_hsn_tsn_2 = 'AUC'
   const vehicle_identification_by_hsn_tsn = false
   const changeRoleType = false
-  const newEmail = `sivanchevski3@soft2run.com`
+  const newEmail = `sivanchevski@soft2run.com`
+  const newPhoneNumber = `359888795023`
+  const $equipment_2_loading_doors = true
+  //<Name2>Ilyovski</Name2>
 
 
   function nextBtn() {
@@ -64,12 +68,12 @@ describe('Ergo Self Service init', () =>{
 
 
   const file1 = [
-    [
-      "VF3VEAHXKLZ080921",
-      "MiniBusMidPanel",
-      "01.01.2017",
-      "Peugeot Expert 09/2020 "
-    ]
+  [
+    "6FPGXXMJ2GEL59891",
+    "PickUpSingleCabine",
+    "01.01.2012",
+    "Ford Ranger single cabine, Pick-up"
+  ]
   ]
 
   file1.forEach($car => {
@@ -157,6 +161,9 @@ describe('Ergo Self Service init', () =>{
 
       let vin = $car[0]
       let licensePlate = `ER GO${getRandomInt(100,999)}`
+      if (noLicensePlate){
+        licensePlate = ``;
+      }
       let claimNumber = `KS${getRandomInt(10000000,99999999)}-${getRandomInt(1000,9999)}`
 
       vinElement.textContent = vin
@@ -366,6 +373,7 @@ describe('Ergo Self Service init', () =>{
                     cy.selectSVG('hood')
                     cy.selectSVG('roof')
                     cy.selectSVG('windshield')
+                    cy.selectSVG('left-headlight')
                     //cy.getQuestionnaireInfo()
                     nextBtn()
                   }
@@ -380,9 +388,33 @@ describe('Ergo Self Service init', () =>{
                   }
                 })
 
-                //pageId: "page-10" pageShowCriteria 'entire-vehicle-damaged-by-hail' = 0
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-10'){
+                    cy.getBodyType($car,logFilename).then(function (bodyType) {
+                      cy.then(function () {
+                        questionnaire.bodyType = bodyType
+                      })
+                    })
+                    cy.get('@bodyType').then(function (bodyType) {
+                      if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
+                        cy.wait(2000)
+                        cy.selectSingleList('equipment-slide-door',1)
+                        cy.selectSingleList('equipment-2-loading-doors',Number($equipment_2_loading_doors))
+
+                        cy.selectSingleList('equipment-length',0)
+                        cy.selectSingleList('equipment-height',0)
+                        cy.selectSingleList('equipment-vehicle-rear-glassed',0)
+                        cy.selectSingleList('vehicle-customized-interior',0)
+                        cy.selectSingleList('loading-floor-area-bend', 0)
+                      }
+                    })
+                    nextBtn()
+                  }
+                })
+
+                //pageId: "page-11" pageShowCriteria 'entire-vehicle-damaged-by-hail' = 0
+                cy.get('@goingPageId').then(function (aliasValue) {
+                  if (aliasValue == 'page-11'){
                     cy.selectSingleList('damaged-vehicle-area-left-hail-damage-intensity',2)
                     cy.selectSingleList('damaged-vehicle-area-top-hail-damage-intensity',2)
                     cy.selectSingleList('damaged-vehicle-area-right-hail-damage-intensity',2)
@@ -392,7 +424,7 @@ describe('Ergo Self Service init', () =>{
                 })
 
                 cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-11'){
+                  if (aliasValue == 'page-12'){
                     cy.selectSingleList('glass-parts-damaged-by-hail',Number(glass_parts_not_damaged_by_hail))
                     //cy.getQuestionnaireInfo()
                     nextBtn()
@@ -400,7 +432,7 @@ describe('Ergo Self Service init', () =>{
                 })
 
                 cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-12'){
+                  if (aliasValue == 'page-13'){
                     cy.selectSVG('roof')
                     cy.selectSVG('windshield')
                     //cy.getQuestionnaireInfo()
@@ -408,9 +440,9 @@ describe('Ergo Self Service init', () =>{
                   }
                 })
 
-                //pageId: "page-13" pageShowCriteria 'glass-parts-damaged-by-hail' == 'yes') || some glass 'selected-parts' == 'yes'
+                //pageId: "page-14" pageShowCriteria 'glass-parts-damaged-by-hail' == 'yes') || some glass 'selected-parts' == 'yes'
                 cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-13'){
+                  if (aliasValue == 'page-14'){
                     cy.get('@goingPageElements').then(function (elements) {
                       elements.forEach(element => {
                         if (element['id'] == 'roof-equipment-panorama-roof' && eval(element['visibleExpression'])){
@@ -422,7 +454,15 @@ describe('Ergo Self Service init', () =>{
                           console.log(`${element['id']}: ${eval(element['visibleExpression'])}`);
                           cy.selectSingleList('roof-equipment-convertible-roof-material',0)
                         }
+                        if (element['id'] == 'left-headlight-damage-type' && eval(element['visibleExpression'])){
+                          cy.selectMultipleList('left-headlight-damage-type',0)
+                        }
+                        if (element['id'] == 'left-headlight-still-working' && eval(element['visibleExpression'])){
+                          //console.log(`${element['id']}: ${eval(element['visibleExpression'])}`);
+                          cy.selectSingleList('left-headlight-still-working',0)
+                        }
                       })
+
                     })
                     cy.selectMultipleList('windshield-hail-damage-type',0)
                     cy.selectMultipleList('windshield-hail-damage-type',1)
@@ -443,7 +483,7 @@ describe('Ergo Self Service init', () =>{
                 })
 
                 cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-14'){
+                  if (aliasValue == 'page-15'){
                     cy.get('@goingPageElements').then(function (elements) {
                       elements.forEach(element => {
                         //console.log(`element: ${JSON.stringify(element)}`)
@@ -478,7 +518,7 @@ describe('Ergo Self Service init', () =>{
                 })
 
                 cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-15'){
+                  if (aliasValue == 'page-16'){
                     cy.selectSingleList('cash-on-hand-preferred',0)
                     //cy.getQuestionnaireInfo()
                     nextBtn()
@@ -486,15 +526,7 @@ describe('Ergo Self Service init', () =>{
                 })
 
                 cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-16'){
-                    //cy.getQuestionnaireInfo()
-                    nextBtn()
-                  }
-                })
-
-                cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-17'){
-                    cy.uploadImage('vehicle-registration-part-1-photo-upload-2',PathToImages,'registration-part-1.jpg')
                     //cy.getQuestionnaireInfo()
                     nextBtn()
                   }
@@ -502,7 +534,7 @@ describe('Ergo Self Service init', () =>{
 
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-18'){
-                    cy.uploadImage('vehicle-interior-front-photo-upload',PathToImages,'interior-front.jpg')
+                    cy.uploadImage('vehicle-registration-part-1-photo-upload-2',PathToImages,'registration-part-1.jpg')
                     //cy.getQuestionnaireInfo()
                     nextBtn()
                   }
@@ -510,7 +542,7 @@ describe('Ergo Self Service init', () =>{
 
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-19'){
-                    cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathToImages,'image dashboard-odometer.jpg')
+                    cy.uploadImage('vehicle-interior-front-photo-upload',PathToImages,'interior-front.jpg')
                     //cy.getQuestionnaireInfo()
                     nextBtn()
                   }
@@ -518,6 +550,14 @@ describe('Ergo Self Service init', () =>{
 
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-20'){
+                    cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathToImages,'image dashboard-odometer.jpg')
+                    //cy.getQuestionnaireInfo()
+                    nextBtn()
+                  }
+                })
+
+                cy.get('@goingPageId').then(function (aliasValue) {
+                  if (aliasValue == 'page-21'){
                     cy.uploadImage('vehicle-right-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
                     cy.uploadImage('vehicle-left-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
                     cy.uploadImage('vehicle-left-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
@@ -528,16 +568,20 @@ describe('Ergo Self Service init', () =>{
                 })
 
                 cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-21'){
+                  if (aliasValue == 'page-22'){
                     cy.get('@goingPageElements').then(function (elements) {
                       elements.forEach(element => {
                         if (element['id'] == 'damage-photo-upload-overview-windshield' && eval(element['visibleExpression'])){
-                          console.log(`${element['id']}: ${eval(element['visibleExpression'])}`);
+                          //console.log(`${element['id']}: ${eval(element['visibleExpression'])}`);
                           cy.uploadImage('damage-photo-upload-overview-windshield',PathToImages,'broken front window_2.jpg')
                         }
                         if (element['id'] == 'damage-photo-upload-overview-roof' && eval(element['visibleExpression'])){
-                          console.log(`${element['id']}: ${eval(element['visibleExpression'])}`);
+                          //console.log(`${element['id']}: ${eval(element['visibleExpression'])}`);
                           cy.uploadImage('damage-photo-upload-overview-roof',PathToImages,'roof.jpg')
+                        }
+                        if (element['id'] == 'damage-photo-upload-overview-left-headlight' && eval(element['visibleExpression'])){
+                          //console.log(`${element['id']}: ${eval(element['visibleExpression'])}`);
+                          cy.uploadImage('damage-photo-upload-overview-left-headlight',PathToImages,'roof.jpg')
                         }
                       })
                     })
@@ -547,7 +591,7 @@ describe('Ergo Self Service init', () =>{
                 })
 
                 cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-22'){
+                  if (aliasValue == 'page-23'){
                     cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu1.jpg')
                     cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu2.jpg')
                     cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu3.jpg')
@@ -556,9 +600,9 @@ describe('Ergo Self Service init', () =>{
                   }
                 })
 
-                //pageId: "page-23" pageShowCriteria = true
+                //pageId: "page-24" pageShowCriteria = true
                 cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-23'){
+                  if (aliasValue == 'page-24'){
                     cy.getQuestionnaireInfo($car[0], logFilename)
                     nextBtn()
                   }
@@ -568,8 +612,8 @@ describe('Ergo Self Service init', () =>{
                   if (aliasValue == 'summary-page'){
                     //cy.getQuestionnaireInfo()
                     cy.selectSingleList('client-salutation',1)
-                    cy.fulfilInputIfEmpty('div#client-first-name','input#client-first-name-input','firstName')
-                    cy.fulfilInputIfEmpty('div#client-last-name','input#client-last-name-input','lastName')
+                    //cy.fulfilInputIfEmpty('div#client-first-name','input#client-first-name-input','firstName')
+                    //cy.fulfilInputIfEmpty('div#client-last-name','input#client-last-name-input','lastName')
                     cy.fulfilInputIfEmpty('div#client-phone-number','input#client-phone-number-input','1234567890')
                     cy.fulfilInputIfEmpty('div#client-email','input#client-email-input',client_email)
                     //cy.get('div#client-email').find('input#client-email-input').blur()

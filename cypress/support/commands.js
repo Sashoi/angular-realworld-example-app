@@ -125,6 +125,7 @@ Cypress.Commands.add('uploadImage', (selectorId,toPath,fileName) =>{
 })
 
 Cypress.Commands.add('getBodyType', ($car,logFilename) =>{
+  const showDetailLog = false
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   cy.get('@authorization').then(function (authorization) {
@@ -145,6 +146,28 @@ Cypress.Commands.add('getBodyType', ($car,logFilename) =>{
         let bodyType = response.body.supportInformation.bodyType
         console.log(`supportInformation.bodyType: ${bodyType}.`)
         console.log(`templateId: ${response.body.templateId}.`)
+        console.log(`pages total count: ${response.body.pages.length}.`)
+        console.log(`pages question count: ${response.body.pages.filter((x) => x.pageType == "question").length}.`)
+        console.log(`pages null count: ${response.body.pages.filter((x) => x.pageType == null).length}.`)
+        console.log(`pages summary count: ${response.body.pages.filter((x) => x.pageType == "summary").length}.`)
+        console.log(`pages summary-page-questions count: ${response.body.pages.filter((x) => x.id == "summary-page-questions").length}.`)
+        console.log(`pages finalPage count: ${response.body.pages.filter((x) => x.pageType == "finalPage").length}.`)
+        let questionsAll = 0
+        response.body.pages.forEach((page, index) => {
+            if (showDetailLog) {
+              console.log(`page id : ${page.id} pageType : ${page.pageType} index :  ${index}.`)
+            }
+            const questions = page.elements.length
+            if (page.pageType == "summary"){
+              console.log(`summaryElements : ${questions}.`)
+            } else {
+              if (showDetailLog) {
+                console.log(`questions : ${questions}.`)
+              }
+              questionsAll += questions
+            }
+        })
+        console.log(`All questions count : ${questionsAll}.`)
 
         if (bodyType == undefined || bodyType == null){
           bodyType = ''
@@ -440,7 +463,7 @@ Cypress.Commands.add('getQuestionnaireAnswers', () =>{
 
 Cypress.Commands.add('getQuestionAnswer', function ($questionId) {
   cy.getQuestionnaireAnswers().then(function (body) {
-    const answer = body.answers.find(x => x.questionId === $questionId).answer
+    const answer = body.answers.find(x => x.questionId === $questionId)?.answer
     cy.wrap(answer).then((answer) => {
       return answer
     })

@@ -60,10 +60,10 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
 
   const file1 = [
     [
-      "WVWZZZ6RZGY304402",
-      "Hatch5",
-      "01.06.2015",
-      "Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
+      "VF3VEAHXKLZ080921",
+      "MiniBusMidPanel",
+      "01.01.2017",
+      "Peugeot Expert 09/2020"
     ]
 ]
   file1.forEach($car => {
@@ -133,7 +133,7 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
           cy.get(`button[data-test="identify-button"]`).click()
           cy.selectorHasAttrClass('select#select_buildPeriod','field-invalid').then(res =>{
             if (res){
-              cy.selectDropDown('select_buildPeriod',4)
+              cy.selectDropDown('select_buildPeriod',1)
               cy.wait(2000)
             }
           })
@@ -264,6 +264,8 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-03'){
           cy.selectSingleList('triage-recommendation',0)
+          cy.selectSingleList('recommended-action',0)
+          cy.selectSingleList('photos-available',1)
           nextBtn()
         }
       })
@@ -271,8 +273,7 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
       // Schadenbilder und Dokumente - page-04
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-04'){
-          cy.selectSingleList('photos-available',1)
-          cy.selectSingleList('photos-not-available-because',2)
+          //cy.selectSingleList('photos-not-available-because',2)
           nextBtn()
         }
       })

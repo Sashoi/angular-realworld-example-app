@@ -37,11 +37,7 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
   }
 
   const file1 = [
-    ["W0L0XCR975E026845", "Cabrio", "01.01.2009", "OPE Tigra Cabrio"],
-  ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5"],
-  ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
-  ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"],
-  ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
+    ["W1V44760313930767", "Van", "01.01.2017", "Mercedes Vito 09/2021"]
   ]
 
   file1.forEach($car => {
