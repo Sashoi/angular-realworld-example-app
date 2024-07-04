@@ -45,7 +45,7 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
       "VF3VEAHXKLZ080921",
       "MiniBusMidPanel",
       "01.01.2017",
-      "Peugeot Expert 09/2020"
+      "Peugeot Expert 09/2020 "
     ]
   ]
   file1.forEach($car => {

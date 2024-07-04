@@ -88,7 +88,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
   }
 
   const file1 = [
-    ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan "]
+    ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"]
   ]
 
   file1.forEach($car => {

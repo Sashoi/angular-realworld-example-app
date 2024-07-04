@@ -84,17 +84,17 @@ const coverage_type_info_clientArr =
  "PartiallyComprehensiveVandalism 8","VehicleLiabilityNotCustomer 9","OptionalAssistance 10","OptionalLegalAssistance 11",
 ]
 
-const coverage_type_info_clien = 11  // ok all 12
+const coverage_type_info_clien = 0  // ok all 12
 
 const vehicle_body_type_array = [
   "Hatch3", "Station", "Coupe", "Sedan", "Van", "MiniBus", "PickUpSingleCabine", "Cabrio", "Other"
 ]
 
-const vehicle_body_type_value = 8;
+const vehicle_body_type_value = 0;
 
 
   const file1 = [
-    ["WDB", "Cabrio", "01.01.2004", "MER SLK Cabrio"]
+    ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"]
 ]
   file1.forEach($car => {
     it.only(`Toni automotive - toni_automotive_call_center vin ${$car[0]}`, () => {

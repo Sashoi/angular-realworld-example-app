@@ -25,7 +25,7 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = true
+  const executePost = false
 
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })

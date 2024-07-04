@@ -1,2 +1,2 @@
-vin: WVWZZZ6RZGY304402 expected:             Hatch5 real:             Hatch5 desc: Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list) 
-vin: WVWZZZ6RZGY304402 expected:             Hatch5 real:              Sedan desc: Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list) 
+vin: VF3VEAHXKLZ080921 expected:    MiniBusMidPanel real:    MiniBusMidPanel desc: Peugeot Expert 09/2020 
+vin: VF3VEAHXKLZ080921 expected:    MiniBusMidPanel real:              Sedan desc: Peugeot Expert 09/2020 

@@ -27,7 +27,7 @@ describe('Ergo Self Service init', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
-  const executePost = false
+  const executePost = true
   const noLicensePlate = false
   const entire_vehicle_damaged_by_hail = true
   const glass_parts_not_damaged_by_hail = false
@@ -37,7 +37,7 @@ describe('Ergo Self Service init', () =>{
   const vehicle_identification_by_hsn_tsn = false
   const changeRoleType = false
   const newEmail = `sivanchevski@soft2run.com`
-  const newPhoneNumber = `359888795023`
+  const newPhoneNumber = `3598887950-00`
   const $equipment_2_loading_doors = true
   //<Name2>Ilyovski</Name2>
 
@@ -72,12 +72,12 @@ describe('Ergo Self Service init', () =>{
     "6FPGXXMJ2GEL59891",
     "PickUpSingleCabine",
     "01.01.2012",
-    "Ford Ranger single cabine, Pick-up"
+    "Ford Ranger single cabine, Pick-up "
   ]
   ]
 
   file1.forEach($car => {
-    it.only(`Execute /questionnaire/ergo_self_service_init with vin:${$car[0]}`, () =>{
+    it(`Execute /questionnaire/ergo_self_service_init with vin:${$car[0]}`, () =>{
       cy.readFile(b2bBody).then(xml => {
         const xmlDocument = new DOMParser().parseFromString(xml,'text/xml')
         /* let vin = xmlDocument.querySelector("Fin").textContent
@@ -142,6 +142,15 @@ describe('Ergo Self Service init', () =>{
         element.childNodes[0].nodeValue = newEmail
       })
 
+      Array.from(parentElement.getElementsByTagName("Telefon1")).forEach((element, index) => {
+        console.log(`Telefon1 ${index}: ${element.childNodes[0].nodeValue}`);
+        element.childNodes[0].nodeValue = newPhoneNumber
+      })
+      Array.from(parentElement.getElementsByTagName("Telefon2")).forEach((element, index) => {
+        console.log(`Telefon2 ${index}: ${element.childNodes[0].nodeValue}`);
+        element.childNodes[0].nodeValue = newPhoneNumber
+      })
+
       let newDxNumber = `KF3C0910KR${getRandomInt(1000000000000,9999999999999)}+${getRandomInt(100000,999999)}%` //<DxNumber>KF3C0910KR0735504630004+001002%</DxNumber>
       //newDxNumber = 'KF3C0910KR7990820637743+632584%' //test for preventing duplicate DxNumbers
       /* If want to check <DxNumber> exists , execute
@@ -184,6 +193,12 @@ describe('Ergo Self Service init', () =>{
       console.log(`new claimNumber: ${parentElement.querySelector("SchadenNummer").textContent}`);
       Array.from(parentElement.getElementsByTagName("Bezeichnung")).forEach((element, index) => {
         console.log(`new email ${index}: ${element.childNodes[0].nodeValue}`);
+      })
+      Array.from(parentElement.getElementsByTagName("Telefon1")).forEach((element, index) => {
+        console.log(`new Telefon1 ${index}: ${element.childNodes[0].nodeValue}`);
+      })
+      Array.from(parentElement.getElementsByTagName("Telefon2")).forEach((element, index) => {
+        console.log(`new Telefon2 ${index}: ${element.childNodes[0].nodeValue}`);
       })
       Array.from(xmlDocument.getElementsByTagName("DxNumber")).forEach((element, index) => {
         console.log(`new DxNumber ${index}: ${element.childNodes[0].nodeValue}`);
@@ -367,29 +382,8 @@ describe('Ergo Self Service init', () =>{
                   }
                 })
 
-                //pageId: "page-08" SVG pageShowCriteria 'entire-vehicle-damaged-by-hail' = 1
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-08'){
-                    cy.selectSVG('hood')
-                    cy.selectSVG('roof')
-                    cy.selectSVG('windshield')
-                    cy.selectSVG('left-headlight')
-                    //cy.getQuestionnaireInfo()
-                    nextBtn()
-                  }
-                })
-
-                //pageId: "page-09" pageShowCriteria 'entire-vehicle-damaged-by-hail' = 1
-                cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-09'){
-                    cy.selectSingleList('hail-damage-intensity',2)
-                    //cy.getQuestionnaireInfo()
-                    nextBtn()
-                  }
-                })
-
-                cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-10'){
                     cy.getBodyType($car,logFilename).then(function (bodyType) {
                       cy.then(function () {
                         questionnaire.bodyType = bodyType
@@ -411,6 +405,29 @@ describe('Ergo Self Service init', () =>{
                     nextBtn()
                   }
                 })
+
+                //pageId: "page-09" SVG pageShowCriteria 'entire-vehicle-damaged-by-hail' = 1
+                cy.get('@goingPageId').then(function (aliasValue) {
+                  if (aliasValue == 'page-09'){
+                    cy.selectSVG('hood')
+                    cy.selectSVG('roof')
+                    cy.selectSVG('windshield')
+                    cy.selectSVG('left-headlight')
+                    //cy.getQuestionnaireInfo()
+                    nextBtn()
+                  }
+                })
+
+                //pageId: "page-10" pageShowCriteria 'entire-vehicle-damaged-by-hail' = 1
+                cy.get('@goingPageId').then(function (aliasValue) {
+                  if (aliasValue == 'page-10'){
+                    cy.selectSingleList('hail-damage-intensity',2)
+                    //cy.getQuestionnaireInfo()
+                    nextBtn()
+                  }
+                })
+
+
 
                 //pageId: "page-11" pageShowCriteria 'entire-vehicle-damaged-by-hail' = 0
                 cy.get('@goingPageId').then(function (aliasValue) {
@@ -643,5 +660,8 @@ describe('Ergo Self Service init', () =>{
         }) //authorization
       })//readFile xml
     }) //it
+    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+      cy.GeneratePDFs(['ergo_abschlussbericht','ergo_hagelbericht'])
+    }) //it PDF from commands
   }) //forEach
 })

@@ -18,7 +18,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
   })
 
   beforeEach('Setting up integrations and common variables', () => {
-    cy.viewport('samsung-note9')
+    //cy.viewport('samsung-note9')
     cy.intercept('POST', `/b2b/integration/allianz/allianz-comprehensive-call-center?identifyVehicleAsync=false`).as('allianzStandaloneCC')
     cy.intercept('GET', `/b2b/integration/allianz/allianz-comprehensive-call-center,allianz-liability-call-center/*`).as('allianzStandaloneCcGET')
     cy.intercept('GET',  `/questionnaire/*/page/page-*?locale=de`).as('currentPageR')
@@ -30,7 +30,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
   const $requestTimeout = 60000;
   const executePost = true
   const executePostR = true
-  const executePost2 = true
+  const executePost2 = false
 
   function printUiBlocks(uiBlocks){
     uiBlocks.forEach((uiBlock, index1) => {
@@ -53,22 +53,22 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
     cy.waitingFor('@currentPageR',goingPage,questionnaire)
   }
 
-  function Login(){
-    cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/zurich/#/login?theme=allianz`,{ log : false })
-      // login
-      cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
-      cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
-      cy.get('form').submit()
+  // function Login(){
+  //   cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/zurich/#/login?theme=allianz`,{ log : false })
+  //     // login
+  //     cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
+  //     cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
+  //     cy.get('form').submit()
 
-      cy.wait('@token',{requestTimeout : $requestTimeout}).then(xhr => {
-        expect(xhr.response.statusCode).to.equal(200)
-        const access_token = xhr.response.body.access_token
-        cy.then(function () {
-          questionnaire.authorization = `Bearer ${access_token}`
-        })
-      })
-      cy.wait(500)
-  }
+  //     cy.wait('@token',{requestTimeout : $requestTimeout}).then(xhr => {
+  //       expect(xhr.response.statusCode).to.equal(200)
+  //       const access_token = xhr.response.body.access_token
+  //       cy.then(function () {
+  //         questionnaire.authorization = `Bearer ${access_token}`
+  //       })
+  //     })
+  //     cy.wait(500)
+  // }
 
   const file1 = [
     ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5"]
@@ -77,7 +77,12 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
     it(`allianz standalone - allianz_comprehensive_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
-      Login()
+      //Login()
+      cy.standaloneLogin('allianz').then(function (authorization) {
+        cy.then(function () {
+          questionnaire.authorization = authorization
+        })
+      })
 
       const intS3 = getRandomInt(100,999).toString()
       const intS4 = getRandomInt(1000,9999).toString()
@@ -185,11 +190,11 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
               cy.selectSingleList('hood-damage-size',2)
             }
 
-            cy.selectSingleList('vehicle-safe-to-drive',0)
-            cy.selectSingleList('vehicle-ready-to-drive',0)
-            cy.selectSingleList('unrepaired-pre-damages',1)
+            //cy.selectSingleList('vehicle-safe-to-drive',0)
+            //cy.selectSingleList('vehicle-ready-to-drive',0)
+            //cy.selectSingleList('unrepaired-pre-damages',1)
             cy.selectSingleList('vehicle-damage-repaired',0)
-            cy.get('textarea#unrepaired-pre-damages-description-textarea').clear().type('Bitte beschreiben Sie die unreparierten Vorschäden')
+            //cy.get('textarea#unrepaired-pre-damages-description-textarea').clear().type('Bitte beschreiben Sie die unreparierten Vorschäden')
             //cy.get('#repair-location-zip-code-input').clear().type('22222')
 
             if (xhr.response.body.search('g id="rightFrontWheelRim"') > 0){
@@ -278,7 +283,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
       })
     })
 
-    it(`allianz standalone - allianz_comprehensive_call_center - reoprn vin ${$car[0]}`, () => {
+    it.skip(`allianz standalone - allianz_comprehensive_call_center - reoprn vin ${$car[0]}`, () => {
       const claimNumber  = Cypress.env('claimNumber')
       //const licensePlate = Cypress.env('licensePlate')
 
@@ -420,12 +425,14 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
           nextBtn()
         }
       })
+
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-04'){
           cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,'registration-part-1.jpg')
           nextBtn()
         }
       })
+
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-05'){
           nextBtn()
@@ -488,5 +495,8 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
       })
 
     })
-  })
+    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+      cy.GeneratePDFs(['allianz_abschlussbericht'])
+    }) //it PDF from commands
+  }) // forEach
 })

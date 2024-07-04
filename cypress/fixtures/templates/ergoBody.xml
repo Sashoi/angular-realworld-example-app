@@ -118,9 +118,9 @@
                         <Ort>Kassel</Ort>
                         <Land>DE</Land>
                         <PLZ>34117</PLZ>
-                        <Postfach/>
+                        <Postfach>Postfach</Postfach>
                         <StrasseUndHausNr>Kölnische Str. 81</StrasseUndHausNr>
-                        <Telefon1>+359/888795023</Telefon1>
+                        <Telefon1>+359/88879502</Telefon1>
                         <Telefon2>0359/88879502</Telefon2>
                         <Telefax/>
                         <Email>
@@ -131,10 +131,10 @@
                         </Email>
                     </Adresse>
                     <Anrede/>
-                    <Name>Miroslav</Name>
+                    <Name>Test-Name</Name>
                     <RollenTyp>ZN</RollenTyp>
                     <Titel1/>
-                    <Name2></Name2>
+                    <Name2>Test-Name2</Name2>
                     <Name3>Test-Name3</Name3>
                     <Name4>Test-Name4</Name4>
                 </AuftragspositionsPartner>
@@ -143,9 +143,9 @@
                         <Ort>Kassel2</Ort>
                         <Land>DE</Land>
                         <Plz>34123</Plz>
-                        <Postfach/>
+                        <Postfach>Postfach</Postfach>
                         <StrasseUndHausNr>Ochshäuser Straße 37 - 39</StrasseUndHausNr>
-                        <Telefon1>0359/888795023</Telefon1>
+                        <Telefon1>0359/88879502</Telefon1>
                         <Telefax/>
                         <Email>
                           <Bezeichnung>sivanchevski2@soft2run.com</Bezeichnung>

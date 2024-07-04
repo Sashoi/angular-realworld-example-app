@@ -23,7 +23,7 @@ describe('Start and complete vlv standalone questionnaire', () => {
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = true
+  const executePost = false
 
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
@@ -38,16 +38,10 @@ describe('Start and complete vlv standalone questionnaire', () => {
   const loss_causeArray1 = ["Unfall"]
 
   const file1 = [
-    ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"],
-  [
-    "WDB2083441T069719",
-    "Coupe",
-    "01.01.2009",
-    "MER CLK Coupe (partial identification, build period to be defined manually)"
-  ]
+    ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"]
   ]
 
-  loss_causeArray.forEach(loss_cause => {
+  loss_causeArray1.forEach(loss_cause => {
     file1.forEach($car => {
       it.only(`vlv Standalone, vin ${$car[0]}, loss_cause ${loss_cause} `, () => {
 

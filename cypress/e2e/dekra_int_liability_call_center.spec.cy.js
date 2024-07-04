@@ -32,11 +32,12 @@ describe('Start and complete dekra_int_liability_call_center standalone question
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = true
+  const executePost = false
   const executePost2 = false
   const interceptDekraStandalone = false
   const vehicle_hsn_tsn = '0588AUC'
   const vehicle_identification_by_hsn_tsn = false
+  const $equipment_2_loading_doors = true
 
   function printUiBlocks(uiBlocks){
     uiBlocks.forEach((uiBlock, index1) => {
@@ -86,7 +87,7 @@ describe('Start and complete dekra_int_liability_call_center standalone question
       const intS2 = getRandomInt(1000000,9999999).toString()
       const intS3 = getRandomInt(1000,9999).toString()
       const intS4 = getRandomInt(1,9).toString()
-      const $equipment_2_loading_doors = true
+
 
 
       const first_registration_date = $car[2] //"2024-02-01";
@@ -370,7 +371,7 @@ describe('Start and complete dekra_int_liability_call_center standalone question
     }) //it PDF from commands
 
     it(`dekra_int_liability_self_service_app create vin ${$car[0]}`, () => {
-      const notificationId = 'kltjnKARCYpXoovcyDPMh'//Cypress.env('notificationId') //`kltjnKARCYpXoovcyDPMh`
+      const notificationId = 'XO6TmDF2ZSFTMEdGEATDq'//Cypress.env('notificationId') //`kltjnKARCYpXoovcyDPMh`
       cy.authenticate().then(function (authorization) {
         cy.then(function () {
           questionnaire.authorization = authorization
@@ -389,10 +390,11 @@ describe('Start and complete dekra_int_liability_call_center standalone question
             console.log(`dekra_int_liability_self_service_app:`);
             const arrLength = response.body.requestedInformation.length
             const requestUrl = response.body.requestedInformation[arrLength - 1].requestUrl
-            console.log(requestUrl);
+            console.log(`requestUrl : ${requestUrl}`);
             Cypress.env('requestUrl', requestUrl)
-            console.log(response.body.requestedInformation[arrLength - 1].templateId);
-            Cypress.env('templateId', response.body.requestedInformation[arrLength - 1].templateId)
+            const templateId = response.body.requestedInformation[arrLength - 1].templateId
+            console.log(`templateId : ${templateId}`);
+            Cypress.env('templateId', templateId)
             //cy.printRequestedInformation(response.body.requestedInformation);
         })
       })
@@ -475,6 +477,18 @@ describe('Start and complete dekra_int_liability_call_center standalone question
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-08'){
+          cy.get('@bodyType').then(function (bodyType) {
+            if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
+              cy.wait(2000)
+              cy.selectSingleList('equipment-slide-door',1)
+              cy.selectSingleList('equipment-2-loading-doors',Number($equipment_2_loading_doors))
+
+              cy.selectSingleList('equipment-length',0)
+              cy.selectSingleList('equipment-height',0)
+              cy.selectSingleList('equipment-vehicle-rear-glassed',0)
+              cy.selectSingleList('vehicle-customized-interior',0)
+            }
+          })
           cy.selectSingleList('vehicle-safe-to-drive',1)
           cy.selectSingleList('vehicle-ready-to-drive',1)
           cy.selectSingleList('unrepaired-pre-damages',0)

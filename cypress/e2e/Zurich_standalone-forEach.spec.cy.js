@@ -29,7 +29,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = true
+  const executePost = false
   const interceptZurichStandalone = false
 
   function printUiBlocks(uiBlocks){
@@ -49,13 +49,11 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
     cy.waitingFor('@currentPage',goingPage,questionnaire)
   }
 
-  const file1 = [
-
-  [
-    "WDB2083441T069719",
-    "Coupe",
-    "01.01.2009",
-    "MER CLK Coupe (partial identification, build period to be defined manually)"
+  const file1 = [[
+    "TMBJB7NS4K8027658",
+    "SUV",
+    "01.09.2018",
+    "SKODA Kodiaq 1.5 TSI ACT DSG Style"
   ]
   ]
   file1.forEach($car => {

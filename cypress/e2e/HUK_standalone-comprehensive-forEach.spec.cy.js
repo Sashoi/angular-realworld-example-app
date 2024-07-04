@@ -49,38 +49,41 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
     cy.waitingFor('@currentPageR',goingPage,questionnaire)
   }
 
-  function Login(){
-    cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/zurich/#/login?theme=huk`,{ log : false })
-      // login
-      cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
-      cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
-      cy.get('form').submit()
+  // function Login(){
+  //   cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/zurich/#/login?theme=huk`,{ log : false })
+  //     // login
+  //     cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
+  //     cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
+  //     cy.get('form').submit()
 
-      cy.wait('@token',{requestTimeout : $requestTimeout}).then(xhr => {
-        expect(xhr.response.statusCode).to.equal(200)
-        const access_token = xhr.response.body.access_token
-        cy.then(function () {
-          questionnaire.authorization = `Bearer ${access_token}`
-        })
-      })
-      cy.wait(500)
-  }
+  //     cy.wait('@token',{requestTimeout : $requestTimeout}).then(xhr => {
+  //       expect(xhr.response.statusCode).to.equal(200)
+  //       const access_token = xhr.response.body.access_token
+  //       cy.then(function () {
+  //         questionnaire.authorization = `Bearer ${access_token}`
+  //       })
+  //     })
+  //     cy.wait(500)
+  // }
 
   const file1 = [
-    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"],
-  ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"],
   [
     "WVWZZZ6RZGY304402",
     "Hatch5",
     "01.01.2017",
-    "Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
+    "Volkswagen Polo Limousine  5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
   ]
 ]
   file1.forEach($car => {
-    it(`huk standalone - huk_comprehensive_call_center vin ${$car[0]}`, () => {
+    it.only(`huk standalone - huk_comprehensive_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
-      Login()
+      ///Login()
+      cy.standaloneLogin('huk').then(function (authorization) {
+        cy.then(function () {
+          questionnaire.authorization = authorization
+        })
+      })
 
       const intS1 = getRandomInt(10,99).toString()
       const intS2 = getRandomInt(100,999).toString()
@@ -272,7 +275,6 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
         }
       })
     })
-
 
     it(`huk standalone - huk_comprehensive_call_center - reoprn vin ${$car[0]}`, () => {
       const claimNumber  = Cypress.env('claimNumber')

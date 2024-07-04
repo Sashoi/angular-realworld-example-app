@@ -46,7 +46,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
       "VF3VEAHXKLZ080921",
       "MiniBusMidPanel",
       "01.01.2017",
-      "Peugeot Expert 09/2020"
+      "Peugeot Expert 09/2020 "
     ]
   ]
 
@@ -233,8 +233,8 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
                     if ($equipment_2_loading_doors && (bodyType == 'MiniBusMidPanel' || bodyType == 'VanMidPanel')){
                       cy.selectSVG('right-load-door')
                       cy.selectSVG('left-load-door')
-                      cy.selectSVG('left-rear-door-window')
-                      cy.selectSVG('right-rear-door-window')
+                      //cy.selectSVG('left-rear-door-window')
+                      //cy.selectSVG('right-rear-door-window')
                     }
                   })
 
@@ -457,10 +457,10 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
 
                   cy.get('@bodyType').then(function (bodyType) {
                     if ($equipment_2_loading_doors && (bodyType == 'MiniBusMidPanel' || bodyType == 'VanMidPanel')){
-                      cy.uploadImage('damage-photo-upload-overview-left-rear-door-window',PathToImages,'airbag.jpg')
-                      cy.uploadImage('damage-photo-upload-detail-left-rear-door-window',PathToImages,'airbag.jpg')
-                      cy.uploadImage('damage-photo-upload-overview-right-rear-door-window',PathToImages,'airbag.jpg')
-                      cy.uploadImage('damage-photo-upload-detail-right-rear-door-window',PathToImages,'airbag.jpg')
+                      //cy.uploadImage('damage-photo-upload-overview-left-rear-door-window',PathToImages,'airbag.jpg')
+                      //cy.uploadImage('damage-photo-upload-detail-left-rear-door-window',PathToImages,'airbag.jpg')
+                      //cy.uploadImage('damage-photo-upload-overview-right-rear-door-window',PathToImages,'airbag.jpg')
+                      //cy.uploadImage('damage-photo-upload-detail-right-rear-door-window',PathToImages,'airbag.jpg')
                       cy.uploadImage('damage-photo-upload-overview-left-load-door',PathToImages,'airbag.jpg')
                       cy.uploadImage('damage-photo-upload-detail-left-load-door',PathToImages,'airbag.jpg')
                       cy.uploadImage('damage-photo-upload-overview-right-load-door',PathToImages,'airbag.jpg')

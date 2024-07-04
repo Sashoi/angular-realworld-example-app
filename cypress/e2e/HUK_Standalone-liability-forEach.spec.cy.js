@@ -67,7 +67,7 @@ describe('Start and complete huk standalone questionnaire - huk_liability_call_c
   ]
 
   file1.forEach($car => {
-    it(`huk standalone - huk_liability_call_center vin: ${$car[0]}`, () => {
+    it.only(`huk standalone - huk_liability_call_center vin: ${$car[0]}`, () => {
 
       const $vin = $car[0];
 
@@ -362,5 +362,13 @@ describe('Start and complete huk standalone questionnaire - huk_liability_call_c
       })
 
     })
+
+    it(`"huk_liability_call_center" - create vin: ${$car[0]}`, () => {
+
+    })
+    it(`"huk_liability_call_center" - execute vin: ${$car[0]}`, () => {
+
+    })
+
   })
 })

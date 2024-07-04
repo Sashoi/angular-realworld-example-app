@@ -53,6 +53,7 @@ Cypress.Commands.add('elementExists', (selector) =>{
     }
   })
 })
+
 Cypress.Commands.add('selectSVG', (selectorId) =>{
   cy.get('svg',{ log : false }).find(`g#${selectorId}`,{ log : false }).invoke('attr', 'data-selection-state').then(($state) => {
     if ($state == undefined || $state == "no"){
@@ -467,6 +468,28 @@ Cypress.Commands.add('getQuestionAnswer', function ($questionId) {
     cy.wrap(answer).then((answer) => {
       return answer
     })
+  })
+})
+
+Cypress.Commands.add('standaloneLogin', function (theme, bearer = true) {
+  const $dev = Cypress.env("dev");
+  //const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
+  cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/zurich/#/login?theme=${theme}`,{ log : false })
+  cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
+  cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
+  cy.get('form').submit()
+  cy.wait(500)
+
+  cy.wait('@token',{requestTimeout : c_requestTimeout}).then(xhr => {
+    expect(xhr.response.statusCode).to.equal(200)
+    const access_token = xhr.response.body.access_token
+    // cy.then(function () {
+    //   questionnaire.authorization = `Bearer ${access_token}`
+    // })
+    const authorization = bearer ? `Bearer ${ access_token }` : `${ access_token }`;
+      cy.wrap(authorization,{ log : false}).then((authorization) => {
+        return authorization
+      })
   })
 })
 

@@ -57,10 +57,10 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
 
   const file1 = [
     [
-      "WVWZZZ6RZGY304402",
-      "Hatch5",
-      "01.09.2016",
-      "Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
+      "VF3VEAHXKLZ080921",
+      "MiniBusMidPanel",
+      "01.01.2017",
+      "Peugeot Expert 09/2020"
     ]
   ]
   file1.forEach($car => {
