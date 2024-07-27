@@ -1,0 +1,26 @@
+{
+  "qas": [
+    {
+      "questionId": "vehicle-first-registration-date",
+      "answer": "2017-01-01"
+    },
+    {
+      "questionId": "accident-date",
+      "answer": ["2024-06-01"]
+    },
+    {
+      "questionId": "client-vehicle-license-plate",
+      "answer": ""
+    },
+    {
+      "questionId": "vehicle-mileage",
+      "answer": "123456"
+    }
+  ],
+  "supportInformation": {
+    "vin2": "",
+    "additionalProp2": {},
+    "additionalProp3": {}
+  },
+  "readOnlyQuestions": null
+}

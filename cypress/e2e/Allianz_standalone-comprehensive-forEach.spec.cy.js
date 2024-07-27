@@ -71,10 +71,23 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
   // }
 
   const file1 = [
-    ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5"]
+    [
+      "6FPPXXMJ2PCD55635",
+      "PickUpDoubleCabine",
+      "01.01.2012",
+      "Ford Ranger double cabine, Pick-up"
+    ],
+    [
+      "6FPGXXMJ2GEL59891",
+      "PickUpSingleCabine",
+      "01.01.2012",
+      "Ford Ranger single cabine, Pick-up"
+    ],
+    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"],
+    ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"]
 ]
   file1.forEach($car => {
-    it(`allianz standalone - allianz_comprehensive_call_center vin ${$car[0]}`, () => {
+    it.only(`allianz standalone - allianz_comprehensive_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
       //Login()
@@ -190,6 +203,16 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
               cy.selectSingleList('hood-damage-size',2)
             }
 
+            if (xhr.response.body.search('g id="right-headlight"') > 0){
+              cy.selectSVG('right-headlight')
+              cy.selectSingleList('right-headlight-loose-shifted-by-hand',0)
+            }
+
+            if (xhr.response.body.search('g id="left-headlight"') > 0){
+              cy.selectSVG('left-headlight')
+              cy.selectSingleList('left-headlight-loose-shifted-by-hand',0)
+            }
+
             //cy.selectSingleList('vehicle-safe-to-drive',0)
             //cy.selectSingleList('vehicle-ready-to-drive',0)
             //cy.selectSingleList('unrepaired-pre-damages',1)
@@ -227,11 +250,16 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
               cy.selectMultipleList('leftRearWheelRim-DT2',0)
               cy.selectMultipleList('leftRearWheelRim-DT2',1)
             }
-            if (xhr.response.body.search('g id="leftFrontTire"') > 0){
-              cy.selectSVG('leftFrontTire')
+            if (xhr.response.body.search('g id="right-front-wheel"') > 0){
+              cy.selectSVG('right-front-wheel')
+              cy.selectSingleList('right-front-wheel-equipment-rims-type',0)
+              cy.selectMultipleList('right-front-wheel-damage-type',0)
             }
-            if (xhr.response.body.search('g id="leftRearTire"') > 0){
-              cy.selectSVG('leftRearTire')
+
+            if (xhr.response.body.search('g id="left-front-wheel"') > 0){
+              cy.selectSVG('left-front-wheel')
+              cy.selectSingleList('left-front-wheel-equipment-rims-type',0)
+              cy.selectMultipleList('left-front-wheel-damage-type',0)
             }
 
             cy.get('@bodyType').then(function (bodyType) {
@@ -243,6 +271,9 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
                 cy.wait(1000)
               }
             })
+
+            cy.get('textarea#vehicle-damage-internal-note-textarea').type('Hinweis:Dieses Freitext-Eingabefeld ist für Muster Versicherungs AG interne Anmerkungen vorgesehen.')
+
             nextBtn()
           })
         }
@@ -290,7 +321,12 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
       console.log(`claimNumber: ${claimNumber}`)
       //console.log(`licensePlate: ${licensePlate}`)
 
-      Login()
+      //Login()
+      cy.standaloneLogin('allianz').then(function (authorization) {
+        cy.then(function () {
+          questionnaire.authorization = authorization
+        })
+      })
 
       cy.get('a#OPEN_EXISTING-link').click()
       cy.get('input[name="claimNumber"]').type(claimNumber)
@@ -362,7 +398,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
       })
     })
 
-    it(`allianz_comprehensive_self_service create vin ${$car[0]}`, () => {
+    it.skip(`allianz_comprehensive_self_service create vin ${$car[0]}`, () => {
       const notificationId = Cypress.env('notificationId') //`wlA4icU77W6LjzUFyrGzy`
       cy.authenticate().then(function (authorization) {
         cy.then(function () {
@@ -390,7 +426,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
       })
     })
 
-    it(`allianz_comprehensive_self_service execute vin ${$car[0]}`, () => {
+    it.skip(`allianz_comprehensive_self_service execute vin ${$car[0]}`, () => {
       cy.viewport('samsung-note9')
       console.log(`Start ${Cypress.env('templateId')} from url: ${Cypress.env('requestUrl')}.`)
 
@@ -495,7 +531,8 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
       })
 
     })
-    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['allianz_abschlussbericht'])
     }) //it PDF from commands
   }) // forEach

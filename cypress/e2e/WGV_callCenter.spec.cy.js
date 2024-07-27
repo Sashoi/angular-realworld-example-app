@@ -8,6 +8,7 @@ import { questionnaire } from "../support/utils/common.js";
 import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 import b2bBody from '../fixtures/templates/b2bBodyWGV.json'
+const b2bBodySave = 'cypress/fixtures/templates/wgvBodySave.json'
 import emailBody from '../fixtures/templates/emailBody.json'
 import header from '../fixtures/header.json'
 
@@ -26,9 +27,10 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = false
-  const executePost2 = false
-  const createNewQuestionnaires = executePost && false
+  const executePost = true
+  const executePost2 = true
+  const createNewQuestionnaires = executePost && true
+  const newQuestionnaire = 2 //1 - wgv_comprehensive_self_service_app, 2 - wgv_liability_self_service_app
   const interceptWGV = false
   const $equipment_2_loading_doors = true
 
@@ -49,18 +51,29 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   ]
 
   const damageCauseArr1 =[
-    [ 1, "collisionmultiple", "Kollision mit mehreren Fahrzeugen"]
+    [0, "collisionsingle"]
   ]
 
   const file1 = [
-    ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
-  ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"],
-  ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
+    [
+      "6FPPXXMJ2PCD55635",
+      "PickUpDoubleCabine",
+      "01.01.2012",
+      "Ford Ranger double cabine, Pick-up"
+    ],
+    [
+      "6FPGXXMJ2GEL59891",
+      "PickUpSingleCabine",
+      "01.01.2012",
+      "Ford Ranger single cabine, Pick-up"
+    ],
+    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"],
+    ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"]
   ]
 
-  damageCauseArr.forEach($damageCause => {
+  damageCauseArr1.forEach($damageCause => {
     file1.forEach($car => {
-      it.only(`wgv callCenter for vin: ${$car[0]} damage-cause: ${$damageCause[1]}`, () =>{
+      it(`wgv callCenter for vin: ${$car[0]} damage-cause: ${$damageCause[1]}`, () =>{
 
         const $vin = $car[0]
         console.log(`vin :${$vin}`)
@@ -86,7 +99,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
             b2bBody.claimType = "01"  //01, 02, 03, 53IV
             b2bBody.damageCause =  "storm"//"glass" // see "fixtures/damage_cause_mapping.json"
             b2bBody.vin =  $vin
-            b2bBody.licensePlate = `EH${claim2}BT` //"EH1234BT"
+            b2bBody.licensePlate = `WGV${claim2}BT` //"EH1234BT"
 
             Cypress._.merge(header, {'authorization':authorization});
             const options = {
@@ -102,6 +115,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
               (response) => {
                 // response.body is automatically serialized into JSON
                 expect(response.status).to.eq(200) // true
+                cy.writeFile(b2bBodySave, b2bBody)
 
                 const callCenterQuestionnaireId = response.body.callCenterQuestionnaireId
                 const callCenterQuestionnaireUrl = response.body.callCenterQuestionnaireUrl
@@ -306,11 +320,12 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
                           (response) => {
                             // response.body is automatically serialized into JSON
                             expect(response.status).to.eq(200) // true
-                            console.log(`wgv_liability_self_service_app:`);
-                            console.log(response.body.requestedInformation[2].requestUrl);
-                            Cypress.env('requestUrl', response.body.requestedInformation[2].requestUrl)
-                            console.log(response.body.requestedInformation[2].templateId);
-                            Cypress.env('templateId', response.body.requestedInformation[2].templateId)
+                            const requestUrl = response.body.requestedInformation[newQuestionnaire].requestUrl
+                            const templateId = response.body.requestedInformation[newQuestionnaire].templateId
+                            Cypress.env('requestUrl', requestUrl)
+                            Cypress.env('templateId', templateId)
+                            console.log(`requestUrl : ${requestUrl}`);
+                            console.log(`templateId : ${templateId}`);
                             //cy.printRequestedInformation(response.body.requestedInformation);
                         })
                       }
@@ -326,9 +341,11 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
         cy.GeneratePDFs(['wgv_default','wgv_pilot','wgv_pilot_2023'])
       }) //it PDF from commands
 
-      it.skip(`Start new questionnaire.`, function () {
+      it(`Start new questionnaire.`, function () {
         cy.viewport('samsung-note9')
         console.log(`Start ${Cypress.env('templateId')} from url: ${Cypress.env('requestUrl')}.`)
+
+        cy.wait(4000)
 
         cy.visit(Cypress.env('requestUrl'),{log : false})
 

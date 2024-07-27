@@ -23,7 +23,7 @@ describe('Start and complete vlv standalone questionnaire', () => {
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = false
+  const executePost = true
 
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
@@ -47,19 +47,26 @@ describe('Start and complete vlv standalone questionnaire', () => {
 
         const $vin = $car[0]
 
-        cy.visit(`${baseUrl_lp}ui/questionnaire/zurich/#/login?theme=vlv`,{ log : false })
-        // login
-        cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
-        cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
-        cy.get('form').submit()
-        cy.wait(500)
-        cy.wait('@token',{requestTimeout : $requestTimeout, log : false}).then(xhr => {
-          expect(xhr.response.statusCode).to.equal(200)
-          const access_token = xhr.response.body.access_token
+        // cy.visit(`${baseUrl_lp}ui/questionnaire/zurich/#/login?theme=vlv`,{ log : false })
+        // // login
+        // cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
+        // cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
+        // cy.get('form').submit()
+        // cy.wait(500)
+        // cy.wait('@token',{requestTimeout : $requestTimeout, log : false}).then(xhr => {
+        //   expect(xhr.response.statusCode).to.equal(200)
+        //   const access_token = xhr.response.body.access_token
+        //   cy.then(function () {
+        //     questionnaire.authorization = `Bearer ${access_token}`
+        //   })
+        // })  //wait @token
+
+        //Login()
+        cy.standaloneLogin('vlv').then(function (authorization) {
           cy.then(function () {
-            questionnaire.authorization = `Bearer ${access_token}`
+            questionnaire.authorization = authorization
           })
-        })  //wait @token
+        })
 
 
         const intS1 = getRandomInt(1000, 9999).toString()
@@ -250,7 +257,7 @@ describe('Start and complete vlv standalone questionnaire', () => {
         })
       })  //it vlv
 
-      it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+      it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
         cy.GeneratePDFs(['vlv_abschlussbericht'])
       }) //it PDF from commands
     }) //forEach

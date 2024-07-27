@@ -95,7 +95,7 @@ Cypress.Commands.add('selectSingleList', (selectorId, option) =>{
 Cypress.Commands.add('selectDropDown', (selectorId, option) =>{
   cy.get(`select#${selectorId}`).invoke('attr', 'class').then($classNames => {
     console.log(`class Names :  ${$classNames}.`)
-    if ($classNames.includes('field-invalid')) {
+    if ($classNames.includes('field-invalid') || $classNames.includes('ng-invalid')) {
       cy.get(`select#${selectorId}`).select(option)//.should('have.value', '200501')
       cy.get(`select#${selectorId}`).invoke('val').then($val => {
         console.log(`selected for ${selectorId} :  ${$val}.`)
@@ -316,6 +316,7 @@ Cypress.Commands.add(`GeneratePDFs`, function (pdf_templates) {
         console.log(`GeneratePDFs for vin: ${vin}`)
         pdf_templates.forEach(pdf_template => {
           cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
+          console.log(`pdf template : ${pdf_template}`)
         })
       })
     } else {
@@ -332,6 +333,7 @@ Cypress.Commands.add('printRequestedInformation', function (requestedInformation
       console.log(`workflowType:${element.workflowType}`);
       console.log(`templateId:${element.templateId}`);
       console.log(`requestUrl:${element.requestUrl}`);
+      Cypress.env('requestUrl', element.requestUrl)
     });
   }
 
@@ -483,9 +485,6 @@ Cypress.Commands.add('standaloneLogin', function (theme, bearer = true) {
   cy.wait('@token',{requestTimeout : c_requestTimeout}).then(xhr => {
     expect(xhr.response.statusCode).to.equal(200)
     const access_token = xhr.response.body.access_token
-    // cy.then(function () {
-    //   questionnaire.authorization = `Bearer ${access_token}`
-    // })
     const authorization = bearer ? `Bearer ${ access_token }` : `${ access_token }`;
       cy.wrap(authorization,{ log : false}).then((authorization) => {
         return authorization

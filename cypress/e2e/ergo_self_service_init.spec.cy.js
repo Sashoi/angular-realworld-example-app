@@ -27,17 +27,17 @@ describe('Ergo Self Service init', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
-  const executePost = true
+  const executePost = false
   const noLicensePlate = false
   const entire_vehicle_damaged_by_hail = true
-  const glass_parts_not_damaged_by_hail = false
+  const glass_parts_not_damaged_by_hail = true
   const client_email = Cypress.env("client_email")
   const vehicle_hsn_tsn_1 = '05881'   //Start with wrong TSN to reach page-04
   const vehicle_hsn_tsn_2 = 'AUC'
   const vehicle_identification_by_hsn_tsn = false
   const changeRoleType = false
   const newEmail = `sivanchevski@soft2run.com`
-  const newPhoneNumber = `3598887950-00`
+  const newPhoneNumber = `359888795023`
   const $equipment_2_loading_doors = true
   //<Name2>Ilyovski</Name2>
 
@@ -68,16 +68,11 @@ describe('Ergo Self Service init', () =>{
 
 
   const file1 = [
-  [
-    "6FPGXXMJ2GEL59891",
-    "PickUpSingleCabine",
-    "01.01.2012",
-    "Ford Ranger single cabine, Pick-up "
-  ]
+    "WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"
   ]
 
   file1.forEach($car => {
-    it(`Execute /questionnaire/ergo_self_service_init with vin:${$car[0]}`, () =>{
+    it.only(`Execute /questionnaire/ergo_self_service_init with vin:${$car[0]}`, () =>{
       cy.readFile(b2bBody).then(xml => {
         const xmlDocument = new DOMParser().parseFromString(xml,'text/xml')
         /* let vin = xmlDocument.querySelector("Fin").textContent
@@ -660,7 +655,7 @@ describe('Ergo Self Service init', () =>{
         }) //authorization
       })//readFile xml
     }) //it
-    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['ergo_abschlussbericht','ergo_hagelbericht'])
     }) //it PDF from commands
   }) //forEach

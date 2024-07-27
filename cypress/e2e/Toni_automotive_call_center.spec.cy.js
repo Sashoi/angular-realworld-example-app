@@ -28,7 +28,7 @@ describe('Start and complete Toni automotive call center - toni_automotive_call_
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60001;
-  const executePost = false
+  const executePost = true
   const executePost2 = true
 
   function printUiBlocks(uiBlocks){
@@ -84,7 +84,7 @@ const coverage_type_info_clientArr =
  "PartiallyComprehensiveVandalism 8","VehicleLiabilityNotCustomer 9","OptionalAssistance 10","OptionalLegalAssistance 11",
 ]
 
-const coverage_type_info_clien = 0  // ok all 12
+const coverage_type_info_clien = 2  // ok all 12
 
 const vehicle_body_type_array = [
   "Hatch3", "Station", "Coupe", "Sedan", "Van", "MiniBus", "PickUpSingleCabine", "Cabrio", "Other"
@@ -94,10 +94,10 @@ const vehicle_body_type_value = 0;
 
 
   const file1 = [
-    ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"]
+      ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"]
 ]
   file1.forEach($car => {
-    it.only(`Toni automotive - toni_automotive_call_center vin ${$car[0]}`, () => {
+    it(`Toni automotive - toni_automotive_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
 
@@ -570,10 +570,10 @@ const vehicle_body_type_value = 0;
             const arrLength = response.body.body.requestedInformation.length
             const requestedInformation = response.body.body.requestedInformation[arrLength - 1]
             const requestUrl = requestedInformation.requestUrl
-            console.log(requestUrl);
+            console.log(`requestUrl : ${requestUrl}`);
             Cypress.env('requestUrl', requestUrl)
             const templateId = requestedInformation.templateId
-            console.log(templateId);
+            console.log(`templateId : ${templateId}`);
             Cypress.env('templateId', templateId)
             //cy.printRequestedInformation(response.body.requestedInformation);
         })
@@ -582,10 +582,12 @@ const vehicle_body_type_value = 0;
 
 
     it(`toni_automotive_claim_handler execute vin ${$car[0]}`, () => {
-      cy.wait(6000)
+      cy.wait(2000)
       let requestUrl = Cypress.env('requestUrl')
       //requestUrl = 'https://dev02.spearhead-ag.ch:443/p/r/T9AxhE834hVZc2fVzB3aY'
       console.log(`Start ${Cypress.env('templateId')} from url: ${requestUrl}.`)
+
+      cy.wait(4000)
 
       cy.visit(requestUrl,{log : false})
 
@@ -638,7 +640,7 @@ const vehicle_body_type_value = 0;
         if (aliasValue == 'summary-page'){
           if (executePost2) {
             //pageId: "summary-page"
-            cy.selectMultipleList('summary-confirmation-acknowledgement',0)
+            //cy.selectMultipleList('summary-confirmation-acknowledgement',0)
             cy.get('button[type="submit"]').contains('Senden').click()
             cy.wait('@postPost',{ log: false }).then(xhr => {
               cy.postPost(xhr,false).then(function (notificationId) {
@@ -650,5 +652,10 @@ const vehicle_body_type_value = 0;
       })
 
     })
+
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+      cy.GeneratePDFs(['toni_default', 'toni_tele_check', 'toni_tele_expert']) // 'toni_hdi_tele_check',
+    }) //it PDF from commands
+
   })
 })

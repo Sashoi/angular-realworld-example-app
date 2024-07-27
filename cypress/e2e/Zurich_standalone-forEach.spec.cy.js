@@ -61,20 +61,27 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
 
       const $vin = $car[0]
 
-      cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/zurich/#/login?theme=zurich`,{ log : false })
-      // login
-      cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
-      cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
-      cy.get('form').submit()
+      // cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/zurich/#/login?theme=zurich`,{ log : false })
+      // // login
+      // cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
+      // cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
+      // cy.get('form').submit()
 
 
-      cy.wait('@token',{requestTimeout : $requestTimeout}).then(xhr => {
-        expect(xhr.response.statusCode).to.equal(200)
-        const access_token = xhr.response.body.access_token
+      // cy.wait('@token',{requestTimeout : $requestTimeout}).then(xhr => {
+      //   expect(xhr.response.statusCode).to.equal(200)
+      //   const access_token = xhr.response.body.access_token
+      //   cy.then(function () {
+      //     questionnaire.authorization = `Bearer ${access_token}`
+      //   })
+      // })  //wait @token
+
+      //Login()
+      cy.standaloneLogin('zurich').then(function (authorization) {
         cy.then(function () {
-          questionnaire.authorization = `Bearer ${access_token}`
+          questionnaire.authorization = authorization
         })
-      })  //wait @token
+      })
 
       cy.wait(500)
 

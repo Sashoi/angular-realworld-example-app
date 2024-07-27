@@ -24,7 +24,7 @@ describe('Start and complete huk standalone questionnaire - huk_liability_call_c
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = false
+  const executePost = true
   const executePostR = true
 
   function nextBtn() {
@@ -40,22 +40,22 @@ describe('Start and complete huk standalone questionnaire - huk_liability_call_c
     cy.waitingFor('@currentPageR',goingPage,questionnaire)
   }
 
-  function Login(){
-    cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/zurich/#/login?theme=huk`,{ log : false })
-      // login
-      cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
-      cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
-      cy.get('form').submit()
+  // function Login(){
+  //   cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/zurich/#/login?theme=huk`,{ log : false })
+  //     // login
+  //     cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
+  //     cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
+  //     cy.get('form').submit()
 
-      cy.wait('@token',{requestTimeout : $requestTimeout}).then(xhr => {
-        expect(xhr.response.statusCode).to.equal(200)
-        const access_token = xhr.response.body.access_token
-        cy.then(function () {
-          questionnaire.authorization = `Bearer ${access_token}`
-        })
-      })
-      cy.wait(500)
-  }
+  //     cy.wait('@token',{requestTimeout : $requestTimeout}).then(xhr => {
+  //       expect(xhr.response.statusCode).to.equal(200)
+  //       const access_token = xhr.response.body.access_token
+  //       cy.then(function () {
+  //         questionnaire.authorization = `Bearer ${access_token}`
+  //       })
+  //     })
+  //     cy.wait(500)
+  // }
 
   const file1 = [
     [
@@ -71,7 +71,12 @@ describe('Start and complete huk standalone questionnaire - huk_liability_call_c
 
       const $vin = $car[0];
 
-      Login()
+      //Login()
+      cy.standaloneLogin('huk').then(function (authorization) {
+        cy.then(function () {
+          questionnaire.authorization = authorization
+        })
+      })
 
       const intS1 = getRandomInt(10,99).toString()
       const intS2 = getRandomInt(100,999).toString()
@@ -281,7 +286,7 @@ describe('Start and complete huk standalone questionnaire - huk_liability_call_c
       })
     })
 
-    it(`huk standalone - huk_liability_call_center reopen vin: ${$car[0]}`, () => {
+    it.skip(`huk standalone - huk_liability_call_center reopen vin: ${$car[0]}`, () => {
 
       const claimNumber  = Cypress.env('claimNumber')
       const licensePlate = Cypress.env('licensePlate')
@@ -289,7 +294,12 @@ describe('Start and complete huk standalone questionnaire - huk_liability_call_c
       console.log(`claimNumber: ${claimNumber}`)
       console.log(`licensePlate: ${licensePlate}`)
 
-      Login()
+      //Login()
+      cy.standaloneLogin('huk').then(function (authorization) {
+        cy.then(function () {
+          questionnaire.authorization = authorization
+        })
+      })
 
       cy.get('a#OPEN_EXISTING-link').click()
       cy.get('input[name="claimNumber"]').type(claimNumber)
@@ -363,12 +373,18 @@ describe('Start and complete huk standalone questionnaire - huk_liability_call_c
 
     })
 
-    it(`"huk_liability_call_center" - create vin: ${$car[0]}`, () => {
+    it.skip(`"huk_liability_call_center" - create vin: ${$car[0]}`, () => {
 
     })
-    it(`"huk_liability_call_center" - execute vin: ${$car[0]}`, () => {
+    it.skip(`"huk_liability_call_center" - execute vin: ${$car[0]}`, () => {
 
     })
+
+    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+      cy.GeneratePDFs(['huk_photos'])
+    }) //it PDF from commands
+
+    //
 
   })
 })

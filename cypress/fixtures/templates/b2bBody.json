@@ -62,10 +62,14 @@
     },
     {
       "questionId": "client-email",
-      "answer": ["sivanchevski1@soft2run.com"]
+      "answer": ["sivanchevski@soft2run.com"]
     },
     {
       "questionId": "client-mobile-phone-number",
+      "answer": ["123654789"]
+    },
+    {
+      "questionId": "client-phone-number",
       "answer": ["123654789"]
     },
     {

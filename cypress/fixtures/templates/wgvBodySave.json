@@ -1,0 +1,28 @@
+{
+  "claimNumber": "BROm345146",
+  "claimType": "01",
+  "damageCause": "storm",
+  "countryVehicleIdentification": "HSN/TSN",
+  "vin": "WBAUB310X0VN69014",
+  "firstRegistrationDate": "2012-04-20",
+  "licensePlate": "WGV45146BT",
+  "notificationDetails1": {
+    "equipmentList": [{}],
+    "gearType": "manual",
+    "pointOfImpact": "1",
+    "priorDamage": "no",
+    "repairShopContract": false,
+    "vehicleCondition": "bad",
+    "vehicleManufacturer": "BMW",
+    "vehicleModel": "3 Kombi"
+  },
+  "repairLocationZipCode": "1234",
+  "responsibleClerk": {
+    "firstName": "John",
+    "lastName": "Wick",
+    "phoneNumber": "0879123456",
+    "salutation": "Mr",
+    "type": "individual",
+    "email": "sivanchevski1@soft2run.com"
+  }
+}

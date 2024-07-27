@@ -72,7 +72,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   const file1 = [
- ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"]
+ ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV "]
 ]
   file1.forEach($car => {
     it.only(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{

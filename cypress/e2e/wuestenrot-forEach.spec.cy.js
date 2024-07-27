@@ -8,6 +8,7 @@ import file from '../fixtures/vinsArray.json'
 
 const logFilename = 'cypress/fixtures/logs/wuestenrot.log'
 const pdfPath = 'cypress/fixtures/Pdf/'
+const PathToImages ='cypress/fixtures/images/'
 
 describe('Start and complete wuestenrot standalone questionnaire', () => {
 
@@ -23,8 +24,12 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = false
+  const executePost = true
+  const executePost2 = true
+
   const sectionError = true
+  const photos_available = true
+  const client_email_for_upload = 'sivanchevski@soft2run.com'
 
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
@@ -41,29 +46,32 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
   }
 
   const file1 = [
-    [
-      "VF3VEAHXKLZ080921",
-      "MiniBusMidPanel",
-      "01.01.2017",
-      "Peugeot Expert 09/2020 "
-    ]
+
+    ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
   ]
   file1.forEach($car => {
-    it.only(`wuestenrot-comprehensive-call-center for vin: ${$car[0]}`, () => {
+    it(`wuestenrot-comprehensive-call-center for vin: ${$car[0]}`, () => {
 
       const $vin = $car[0]
 
-      cy.visit(`${baseUrl_lp}ui/questionnaire/zurich/#/login?theme=wuestenrot`,{ log : false })
-      cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
-      cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
-      cy.get('form').submit()
-      cy.wait('@token',{requestTimeout : $requestTimeout, log: false}).then(xhr => {
-        expect(xhr.response.statusCode).to.equal(200)
-        const access_token = xhr.response.body.access_token
+      // cy.visit(`${baseUrl_lp}ui/questionnaire/zurich/#/login?theme=wuestenrot`,{ log : false })
+      // cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
+      // cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
+      // cy.get('form').submit()
+      // cy.wait('@token',{requestTimeout : $requestTimeout, log: false}).then(xhr => {
+      //   expect(xhr.response.statusCode).to.equal(200)
+      //   const access_token = xhr.response.body.access_token
+      //   cy.then(function () {
+      //     questionnaire.authorization = `Bearer ${access_token}`
+      //   })
+      // })  //wait @token
+
+      //Login()
+      cy.standaloneLogin('wuestenrot').then(function (authorization) {
         cy.then(function () {
-          questionnaire.authorization = `Bearer ${access_token}`
+          questionnaire.authorization = authorization
         })
-      })  //wait @token
+      })
 
 
 
@@ -234,8 +242,14 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-04'){
-          cy.selectSingleList('photos-available',1)
-          cy.selectSingleList('photos-not-available-because',2)
+          if (!photos_available){
+            cy.selectSingleList('photos-available',1)
+            cy.selectSingleList('photos-not-available-because',2)
+          } else {
+            cy.selectSingleList('photos-available',0)
+            cy.selectSingleList('receive-upload-link-by-2',0)
+            cy.get('div#client-email-for-upload-link-2').find('input#client-email-for-upload-link-2-input').type(client_email_for_upload)
+          }
           nextBtn()
         }
       })
@@ -255,6 +269,135 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
         }
       })
     })  //it wuestenrot
+
+    it(`execute wuestenrot_comprehensive_self_service for vin: ${$car[0]}`, () => {
+
+      cy.viewport('samsung-note9','landscape')
+      const requestUrl = Cypress.env('requestUrl')
+      console.log(`requestUrl:${requestUrl}`);
+      cy.wait(4000)
+      cy.visit(requestUrl).then((contentWindow) => {
+        // contentWindow is the remote page's window object
+        console.log(`contentWindow : ${contentWindow}`)
+        console.log(`URL : ${contentWindow.document.URL}`)
+      })
+      const nextButtonLabel ='Speichern und Weiter'
+      const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
+      cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
+
+      currentPage()
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-01'){
+
+          cy.selectMultipleList('terms-of-service-acknowledgement',0)
+
+          cy.getBodyType($car,logFilename).then(function (bodyType) {
+            cy.then(function () {
+              questionnaire.bodyType = bodyType
+            })
+          })
+
+          nextBtn()
+          cy.wait(1000)
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-02'){
+
+          nextBtn()
+          cy.wait(1000)
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-03'){
+
+          nextBtn()
+          cy.wait(1000)
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-04'){
+          cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,'registration-part-1.jpg')
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-05'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-06'){
+          cy.uploadImage('vehicle-right-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
+          cy.uploadImage('vehicle-left-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-07'){
+          cy.uploadImage('vehicle-interior-front-photo-upload',PathToImages,'interior-front.jpg')
+          cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathToImages,'image dashboard-odometer.jpg')
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-08'){
+          cy.uploadImage('damage-photo-upload-overview-hood',PathToImages,'hood.jpg')
+          cy.uploadImage('damage-photo-upload-overview-windshield',PathToImages,'airbag.jpg')
+          cy.uploadImage('damage-photo-upload-overview-left-sill',PathToImages,'left-sill-o.jpg')
+          cy.uploadImage('damage-photo-upload-overview-roof',PathToImages,'roof.jpg')
+          cy.uploadImage('damage-photo-upload-overview-exhaust',PathToImages,'broken exhaust_1.jpg')
+          cy.uploadImage('damage-photo-upload-overview-right-taillight',PathToImages,'right-taillight-o.jpg')
+          cy.uploadImage('damage-photo-upload-other',PathToImages,'incident-location-photo-upload-1.jpg')
+          cy.uploadImage('damage-photo-upload-other',PathToImages,'incident-location-photo-upload-2.jpg')
+          cy.uploadImage('damage-photo-upload-other',PathToImages,'incident-location-photo-upload-3.jpg')
+
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-9'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-10'){
+          cy.get('input#client-bank-name-input').type('FiBank');
+          cy.get('input#client-bank-iban-input').type('IBAN1234');
+          cy.get('input#client-bank-bic-input').type('BIC');
+          cy.get('input#client-bank-account-holder-input').type('Account Holder');
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'summary-page'){
+          cy.get('textarea#summary-message-from-client-textarea').type('Hier können Sie eine persönliche Mitteilung für das Muster Versicherungs AG Schadenteam eintragen.')
+          if (executePost2) {
+            //pageId: "summary-page"
+            cy.selectMultipleList('summary-confirmation-acknowledgement',0)
+            cy.get('button[type="submit"]').contains('Senden').click()
+            cy.wait('@postPost',{ log: false }).then(xhr => {
+              cy.postPost(xhr,false).then(function (notificationId) {
+                console.log(`notificationId: ${notificationId}`);
+              })
+            })
+          }
+        }
+      })
+
+    })
+
 
     it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['wuestenrot_abschlussbericht'])

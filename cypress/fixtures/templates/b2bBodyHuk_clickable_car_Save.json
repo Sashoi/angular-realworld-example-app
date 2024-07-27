@@ -18,7 +18,7 @@
     },
     {
       "questionId": "client-insurance-claim-number",
-      "answer": "18-33-453/370421-S"
+      "answer": "43-33-469/726736-S"
     },
     {
       "questionId": "animal-species",
@@ -50,7 +50,7 @@
     },
     {
       "questionId": "vehicle-vin",
-      "answer": "VF3VEAHXKLZ080921"
+      "answer": "TMBJB7NS4K8027658"
     },
     {
       "questionId": "vehicle-first-registration-date",
@@ -58,15 +58,19 @@
     },
     {
       "questionId": "client-vehicle-license-plate",
-      "answer": "HSS 5-496"
+      "answer": "HSS 2-289"
     },
     {
       "questionId": "client-email",
-      "answer": ["sivanchevski1@soft2run.com"]
+      "answer": ["sivanchevski@soft2run.com"]
     },
     {
       "questionId": "client-mobile-phone-number",
-      "answer": ["123654789"]
+      "answer": "+359888795023"
+    },
+    {
+      "questionId": "client-phone-number",
+      "answer": "+359888795023"
     },
     {
       "questionId": "vehicle-mileage",

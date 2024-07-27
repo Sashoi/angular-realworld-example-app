@@ -1,1 +1,4 @@
-vin: 6FPGXXMJ2GEL59891 expected: PickUpSingleCabine real: PickUpSingleCabine desc: Ford Ranger single cabine, Pick-up  
+vin: W expected:                  F real:            Station desc: K 
+vin: V expected:                  a real:            Station desc: M 
+vin: 0 expected:                  1 real:            Station desc: 0 
+vin: F expected:                  o real:            Station desc: d 

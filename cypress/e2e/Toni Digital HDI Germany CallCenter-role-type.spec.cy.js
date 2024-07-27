@@ -31,8 +31,8 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60001;
-  const executePost = false
-  const role_type = 'client' //or claimant or client
+  const executePost = true
+  const role_type = 'claimant' //or claimant or client
   const selected_parts_count_gte4 = false
 
   function nextBtn() {
@@ -88,7 +88,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
   }
 
   const file1 = [
-    ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"]
+    ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"]
   ]
 
   file1.forEach($car => {
@@ -96,7 +96,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
 
       const vin = $car[0]
 
-      let claim1 = makeid(7)
+      let claim1 = 'HDI' + makeid(4)
       let claim2 = getRandomInt(10000,99999)
 
       let claimNumber = claim1 + claim2
@@ -116,6 +116,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
 
         b2bBody.supportInformation.claimNumber = claimNumber
         b2bBody.supportInformation.vin =  vin
+        b2bBody.qas.find(q => {return q.questionId === "licensePlate-vehicle-insurance-client"}).answer = licenseplate
         b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licenseplate
         b2bBody.qas.find(q => {return q.questionId === "role-type"}).answer = role_type
 

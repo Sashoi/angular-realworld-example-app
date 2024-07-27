@@ -89,6 +89,10 @@
       "answer": "licenseplate"
     },
     {
+      "questionId": "licensePlate-vehicle-insurance-client",
+      "answer": "licenseplate"
+    },
+    {
       "questionId": "incident-reporter-first-name",
       "answer": "Jhon"
     },

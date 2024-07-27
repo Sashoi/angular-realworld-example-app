@@ -2,7 +2,7 @@
   "qas": [
     {
       "questionId": "role-type",
-      "answer": "client"
+      "answer": "claimant"
     },
     {
       "questionId": "questionnaire-locale",
@@ -86,7 +86,11 @@
     },
     {
       "questionId": "client-vehicle-license-plate",
-      "answer": "HDI 8-201"
+      "answer": "HDI 8-977"
+    },
+    {
+      "questionId": "licensePlate-vehicle-insurance-client",
+      "answer": "HDI 8-977"
     },
     {
       "questionId": "incident-reporter-first-name",
@@ -122,8 +126,8 @@
     }
   ],
   "supportInformation": {
-    "vin": "WAUZZZ4B73N015435",
-    "claimNumber": "pVz3nem70810",
+    "vin": "WF03XXTTG3MG53806",
+    "claimNumber": "HDIP8wF74653",
     "workflowType": "hdiLiabilityCallCenter"
   }
 }

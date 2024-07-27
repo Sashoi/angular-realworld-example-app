@@ -54,22 +54,22 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
     cy.waitingFor('@currentPageR',goingPage,questionnaire)
   }
 
-  function Login(){
-    cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/zurich/#/login?theme=allianz`,{ log : false })
-      // login
-      cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
-      cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
-      cy.get('form').submit()
+  // function Login(){
+  //   cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/zurich/#/login?theme=allianz`,{ log : false })
+  //     // login
+  //     cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
+  //     cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
+  //     cy.get('form').submit()
 
-      cy.wait('@token',{requestTimeout : $requestTimeout}).then(xhr => {
-        expect(xhr.response.statusCode).to.equal(200)
-        const access_token = xhr.response.body.access_token
-        cy.then(function () {
-          questionnaire.authorization = `Bearer ${access_token}`
-        })
-      })
-      cy.wait(500)
-  }
+  //     cy.wait('@token',{requestTimeout : $requestTimeout}).then(xhr => {
+  //       expect(xhr.response.statusCode).to.equal(200)
+  //       const access_token = xhr.response.body.access_token
+  //       cy.then(function () {
+  //         questionnaire.authorization = `Bearer ${access_token}`
+  //       })
+  //     })
+  //     cy.wait(500)
+  // }
 
   const file1 = [
   ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
@@ -78,7 +78,12 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
     it(`allianz standalone - allianz_liability_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
-      Login()
+      //Login()
+      cy.standaloneLogin('allianz').then(function (authorization) {
+        cy.then(function () {
+          questionnaire.authorization = authorization
+        })
+      })
 
       const intS3 = getRandomInt(100,999).toString()
       const intS4 = getRandomInt(1000,9999).toString()
@@ -187,6 +192,16 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
               cy.selectSingleList('hood-damage-size',2)
             }
 
+            if (xhr.response.body.search('g id="right-headlight"') > 0){
+              cy.selectSVG('right-headlight')
+              cy.selectSingleList('right-headlight-loose-shifted-by-hand',0)
+            }
+
+            if (xhr.response.body.search('g id="left-headlight"') > 0){
+              cy.selectSVG('left-headlight')
+              cy.selectSingleList('left-headlight-loose-shifted-by-hand',0)
+            }
+
             //cy.selectSingleList('vehicle-safe-to-drive',0)
             //cy.selectSingleList('vehicle-ready-to-drive',0)
             //cy.selectSingleList('unrepaired-pre-damages',1)
@@ -224,11 +239,16 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
               cy.selectMultipleList('leftRearWheelRim-DT2',0)
               cy.selectMultipleList('leftRearWheelRim-DT2',1)
             }
-            if (xhr.response.body.search('g id="leftFrontTire"') > 0){
-              cy.selectSVG('leftFrontTire')
+            if (xhr.response.body.search('g id="right-front-wheel"') > 0){
+              cy.selectSVG('right-front-wheel')
+              cy.selectSingleList('right-front-wheel-equipment-rims-type',0)
+              cy.selectMultipleList('right-front-wheel-damage-type',0)
             }
-            if (xhr.response.body.search('g id="leftRearTire"') > 0){
-              cy.selectSVG('leftRearTire')
+
+            if (xhr.response.body.search('g id="left-front-wheel"') > 0){
+              cy.selectSVG('left-front-wheel')
+              cy.selectSingleList('left-front-wheel-equipment-rims-type',0)
+              cy.selectMultipleList('left-front-wheel-damage-type',0)
             }
 
             cy.get('@bodyType').then(function (bodyType) {
@@ -287,7 +307,12 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
       console.log(`claimNumber: ${claimNumber}`)
       //console.log(`licensePlate: ${licensePlate}`)
 
-      Login()
+      //Login()
+      cy.standaloneLogin('allianz').then(function (authorization) {
+        cy.then(function () {
+          questionnaire.authorization = authorization
+        })
+      })
 
       cy.get('a#OPEN_EXISTING-link').click()
       cy.get('select[name="processGroup"]').select(1)

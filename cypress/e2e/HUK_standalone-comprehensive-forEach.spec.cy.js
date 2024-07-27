@@ -71,7 +71,7 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
     "WVWZZZ6RZGY304402",
     "Hatch5",
     "01.01.2017",
-    "Volkswagen Polo Limousine  5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
+    "Volkswagen  Polo Limousine  5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
   ]
 ]
   file1.forEach($car => {
@@ -283,7 +283,12 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
       console.log(`claimNumber: ${claimNumber}`)
       console.log(`licensePlate: ${licensePlate}`)
 
-      Login()
+      //Login()
+      cy.standaloneLogin('huk').then(function (authorization) {
+        cy.then(function () {
+          questionnaire.authorization = authorization
+        })
+      })
 
       cy.get('a#OPEN_EXISTING-link').click()
       cy.get('input[name="claimNumber"]').type(claimNumber)

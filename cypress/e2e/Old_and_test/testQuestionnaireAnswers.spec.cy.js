@@ -73,13 +73,13 @@ describe('Execute test questionnaireAnswers', () =>{
   })
 
   it.only(`test questionnaire pages questions`, () =>{
-    const showDetailLog = false
+    const showDetailLog = true
     cy.authenticate().then(function (authorization) {
       cy.then(function () {
         questionnaire.authorization = authorization
       })
       cy.then(function () {
-        questionnaire.Id = 'VrKlTncUIl9lTTpbA9VvA'
+        questionnaire.Id = 'RFa79HuWcIAe6qxzlMFKO'//'VrKlTncUIl9lTTpbA9VvA'
       })
       cy.get('@questionnaireId').then(function (questionnaireId) {
         Cypress._.merge(header, {'authorization' : authorization});
@@ -108,6 +108,12 @@ describe('Execute test questionnaireAnswers', () =>{
           response.body.pages.forEach((page, index) => {
               if (showDetailLog) {
                 console.log(`page id : ${page.id} pageType : ${page.pageType} index :  ${index}.`)
+                const pageShowCriteria = page.pageShowCriteria;
+                let pageShowCriteriaStr = 'null'
+                if (!(pageShowCriteria == undefined || pageShowCriteria == null)){
+                  pageShowCriteriaStr = JSON.stringify(pageShowCriteria)
+                }
+                console.log(`pageShowCriteria : ${pageShowCriteriaStr}.`)
               }
               const questions = page.elements.length
               if (page.pageType == "summary"){

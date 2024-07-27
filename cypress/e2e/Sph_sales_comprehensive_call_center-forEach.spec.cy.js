@@ -8,6 +8,7 @@ import file from '../fixtures/vinsArray.json'
 import emailBody from '../fixtures/templates/emailBodyA.json'
 import b2bBody from '../fixtures/templates/b2bBodySphSales.json'
 import header from '../fixtures/header.json'
+const b2bBodySave = 'cypress/fixtures/templates/sph_sales_comprehensive_call_centerSave.json'
 
 const logFilename = 'cypress/fixtures/logs/SphSalesComprehensiveCallCenter.log'
 const PathToImages ='cypress/fixtures/images/'
@@ -27,7 +28,7 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = true
+  const executePost = false
   const executePostR = true
   const executePost2 = true
 
@@ -107,6 +108,7 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
           (response) => {
           // response.body is automatically serialized into JSON
           expect(response.status).to.eq(200) // true
+          cy.writeFile(b2bBodySave, b2bBody)
           const questionnaireId = response.body.questionnaireId;
           cy.then(function () {
             questionnaire.Id = questionnaireId

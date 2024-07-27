@@ -37,6 +37,7 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
   const interceptDekraStandalone = false
   const vehicle_hsn_tsn = '0588AUC'
   const vehicle_identification_by_hsn_tsn = false
+  const $equipment_2_loading_doors = true
 
   function printUiBlocks(uiBlocks){
     uiBlocks.forEach((uiBlock, index1) => {
@@ -57,6 +58,18 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
 
   const file1 = [
     [
+      "TMBJB7NS4K8027658",
+      "SUV",
+      "01.09.2018",
+      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
+    ],
+    [
+      "WVWZZZ3CZME020680",
+      "Station",
+      "01.09.2020",
+      "Passat Variant 1.4 TSI Plug-In-Hybrid DSG GTE"
+    ],
+    [
       "VF3VEAHXKLZ080921",
       "MiniBusMidPanel",
       "01.01.2017",
@@ -64,31 +77,38 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
     ]
   ]
   file1.forEach($car => {
-    it(`dekra_int_comprehensive_call_center standalone questionnaire, vin ${$car[0]}`, () => {
+    it.only(`dekra_int_comprehensive_call_center standalone questionnaire, vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
 
-      cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/dekra/#/standalone/home`,{ log : false })
-      // login
-      cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
-      cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
-      cy.get('form').submit()
+      // cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/dekra/#/standalone/home`,{ log : false })
+      // // login
+      // cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
+      // cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
+      // cy.get('form').submit()
 
 
-      cy.wait('@token',{requestTimeout : $requestTimeout}).then(xhr => {
-        expect(xhr.response.statusCode).to.equal(200)
-        const access_token = xhr.response.body.access_token
+      // cy.wait('@token',{requestTimeout : $requestTimeout}).then(xhr => {
+      //   expect(xhr.response.statusCode).to.equal(200)
+      //   const access_token = xhr.response.body.access_token
+      //   cy.then(function () {
+      //     questionnaire.authorization = `Bearer ${access_token}`
+      //   })
+      // })  //wait @token
+
+      // cy.wait(500)
+
+      //Login()
+      cy.standaloneLogin('dekra_cc').then(function (authorization) {
         cy.then(function () {
-          questionnaire.authorization = `Bearer ${access_token}`
+          questionnaire.authorization = authorization
         })
-      })  //wait @token
-
-      cy.wait(500)
+      })
 
       //const intS2 = getRandomInt(1000000,9999999).toString()
       const intS11 = getRandomInt(10000000000,99999999999).toString()
       const intS4 = getRandomInt(1000,9999).toString()
-      const $equipment_2_loading_doors = true
+
 
 
       const first_registration_date = $car[2] //"2024-02-01";
@@ -372,12 +392,8 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
       })
     }) //it
 
-    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
-      cy.GeneratePDFs(['zurich_default','zurich_pg1_schadenbericht','zurich_pg1_schadenprotokoll'])
-    }) //it PDF from commands
-
-    it(`dekra_int_comprehensive_self_service_app create vin ${$car[0]}`, () => {
-      const notificationId = 'kltjnKARCYpXoovcyDPMh'//Cypress.env('notificationId') //`kltjnKARCYpXoovcyDPMh`
+    it.skip(`dekra_int_comprehensive_self_service_app create vin ${$car[0]}`, () => {
+      const notificationId = 'X0E6VlLyPESJIx28b3y38'//Cypress.env('notificationId') //`kltjnKARCYpXoovcyDPMh`
       cy.authenticate().then(function (authorization) {
         cy.then(function () {
           questionnaire.authorization = authorization
@@ -405,7 +421,7 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
       })
     })
 
-    it(`dekra_int_comprehensive_self_service_app execute vin ${$car[0]}`, () => {
+    it.skip(`dekra_int_comprehensive_self_service_app execute vin ${$car[0]}`, () => {
       cy.viewport('samsung-note9')
       const requestUrl = Cypress.env('requestUrl')
       console.log(`Start ${Cypress.env('templateId')} from url: ${requestUrl}.`)
@@ -438,6 +454,22 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-03'){
+          cy.get('@bodyType').then(function (bodyType) {
+            if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
+              cy.wait(2000)
+              cy.selectSingleList('equipment-slide-door',1)
+              cy.selectSingleList('equipment-2-loading-doors',Number($equipment_2_loading_doors))
+
+              cy.selectSingleList('equipment-length',0)
+              cy.selectSingleList('equipment-height',0)
+              cy.selectSingleList('equipment-vehicle-rear-glassed',0)
+              cy.selectSingleList('vehicle-customized-interior',0)
+            }
+            if (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine'){
+              cy.wait(2000)
+              cy.selectSingleList('equipment-loading-area-cover-type',1)
+            }
+          })
           nextBtn()
         }
       })
@@ -449,7 +481,7 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
             const SVGbody = xhr.response.body;
             cy.get('@bodyType').then(function (bodyType) {
               if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
-                cy.selectSingleList('loading-floor-area-bend', 0)
+                //cy.selectSingleList('loading-floor-area-bend', 0)
                 //load-doors and rear-windows
                 if ($equipment_2_loading_doors){
                   if (SVGbody.search('g id="right-load-door"') > 0 ){
@@ -624,6 +656,14 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
       })
 
     })
+
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+      cy.GeneratePDFs([
+        'dekra_abschlussbericht', 'dekra_default', 'dekra_huk_pilot', 'dekra_huk_pilot_2020' ,'dekra_int_abschlussbericht' , 'dekra_int_en_abschlussbericht',
+        'dekra_int_en_schadenbilder', 'dekra_int_schadenbilder', 'dekra_schadenbilder', 'dekra_signaliduna_schadenbilder', 'dekra_stornobericht',
+        'dekra_tele_prognose', 'dekra_uebergabebericht', 'dekra_us_abschlussbericht', 'dekra_us_schadenbilder'
+      ])
+    }) //it PDF from commands
 
   })  //forEach
 }) //describe

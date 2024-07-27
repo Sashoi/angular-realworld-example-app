@@ -32,7 +32,7 @@ describe('Start and complete dekra_int_liability_call_center standalone question
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = false
+  const executePost = true
   const executePost2 = false
   const interceptDekraStandalone = false
   const vehicle_hsn_tsn = '0588AUC'
@@ -66,22 +66,28 @@ describe('Start and complete dekra_int_liability_call_center standalone question
 
       const $vin = $car[0]
 
-      cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/dekra/#/standalone/home`,{ log : false })
-      // login
-      cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
-      cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
-      cy.get('form').submit()
+      // cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/dekra/#/standalone/home`,{ log : false })
+      // // login
+      // cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
+      // cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
+      // cy.get('form').submit()
 
 
-      cy.wait('@token',{requestTimeout : $requestTimeout}).then(xhr => {
-        expect(xhr.response.statusCode).to.equal(200)
-        const access_token = xhr.response.body.access_token
+      // cy.wait('@token',{requestTimeout : $requestTimeout}).then(xhr => {
+      //   expect(xhr.response.statusCode).to.equal(200)
+      //   const access_token = xhr.response.body.access_token
+      //   cy.then(function () {
+      //     questionnaire.authorization = `Bearer ${access_token}`
+      //   })
+      // })  //wait @token
+
+      // cy.wait(500)
+
+      cy.standaloneLogin('dekra_cc').then(function (authorization) {
         cy.then(function () {
-          questionnaire.authorization = `Bearer ${access_token}`
+          questionnaire.authorization = authorization
         })
-      })  //wait @token
-
-      cy.wait(500)
+      })
 
       const intS1 = getRandomInt(10,99).toString()
       const intS2 = getRandomInt(1000000,9999999).toString()
@@ -366,12 +372,9 @@ describe('Start and complete dekra_int_liability_call_center standalone question
       })
     }) //it
 
-    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
-      cy.GeneratePDFs(['zurich_default','zurich_pg1_schadenbericht','zurich_pg1_schadenprotokoll'])
-    }) //it PDF from commands
 
     it(`dekra_int_liability_self_service_app create vin ${$car[0]}`, () => {
-      const notificationId = 'XO6TmDF2ZSFTMEdGEATDq'//Cypress.env('notificationId') //`kltjnKARCYpXoovcyDPMh`
+      const notificationId = 'LO3ECHNEEBAoUNYDWyLuI'//Cypress.env('notificationId') //`kltjnKARCYpXoovcyDPMh`
       cy.authenticate().then(function (authorization) {
         cy.then(function () {
           questionnaire.authorization = authorization
@@ -626,6 +629,14 @@ describe('Start and complete dekra_int_liability_call_center standalone question
       })
 
     })
+
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+      cy.GeneratePDFs([
+        'dekra_abschlussbericht', 'dekra_default', 'dekra_huk_pilot', 'dekra_huk_pilot_2020' ,'dekra_int_abschlussbericht' , 'dekra_int_en_abschlussbericht',
+        'dekra_int_en_schadenbilder', 'dekra_int_schadenbilder', 'dekra_schadenbilder', 'dekra_signaliduna_schadenbilder', 'dekra_stornobericht',
+        'dekra_tele_prognose', 'dekra_uebergabebericht', 'dekra_us_abschlussbericht', 'dekra_us_schadenbilder'
+      ])
+    }) //it PDF from commands
 
   })  //forEach
 }) //describe
