@@ -56,6 +56,11 @@ describe('Start and complete dekra_int_liability_call_center standalone question
     cy.waitingFor('@currentPage',goingPage,questionnaire)
   }
 
+  function convertDate(dateString){
+    var p = dateString.split(/\D/g)
+    return [p[2],p[1],p[0] ].join("-")
+  }
+
   const file1 = [
 
     ["W1V44760313930767", "Van", "01.01.2020", "Mercedes Vito 09/2021 "]
@@ -95,8 +100,7 @@ describe('Start and complete dekra_int_liability_call_center standalone question
       const intS4 = getRandomInt(1,9).toString()
 
 
-
-      const first_registration_date = $car[2] //"2024-02-01";
+      const first_registration_date = convertDate($car[2]) //"2024-02-01";
       let f_first_registration_date = $car[2] //'01.02.2024';
       console.log(`vin: ${$vin}, bodyType: ${$car[1]}, description: ${$car[3]}`)
       console.log(`first_registration_date: ${first_registration_date}`)

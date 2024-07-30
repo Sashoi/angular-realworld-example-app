@@ -1,4 +1,2 @@
-vin: W expected:                  F real:            Station desc: K 
-vin: V expected:                  a real:            Station desc: M 
-vin: 0 expected:                  1 real:            Station desc: 0 
-vin: F expected:                  o real:            Station desc: d 
+vin: WF0KXXTTRKMC81361 expected:        VanMidPanel real:        VanMidPanel desc: Ford Transit 06/2021 
+vin: WF0KXXTTRKMC81361 expected:        VanMidPanel real:        VanMidPanel desc: Ford Transit 06/2021 

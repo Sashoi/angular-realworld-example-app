@@ -193,7 +193,7 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
             cy.selectSingleList('unrepaired-pre-damages',1)
             cy.selectSingleList('vehicle-damage-repaired',0)
             cy.get('textarea#unrepaired-pre-damages-description-textarea').clear().type('Bitte beschreiben Sie die unreparierten Vorschäden')
-            cy.get('#repair-location-zip-code-input').clear().type('22222')
+            cy.get('#repair-location-zip-code-input').clear().type('04158') //04158  22222
 
             if (xhr.response.body.search('g id="rightFrontWheelRim"') > 0){
               cy.selectSVG('rightFrontWheelRim')

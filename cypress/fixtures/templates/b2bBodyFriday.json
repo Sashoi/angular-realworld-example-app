@@ -1,0 +1,65 @@
+{
+  "qas": [
+    {
+      "questionId": "odometer-unit",
+      "answer": ["km"]
+    },
+    {
+      "questionId": "standalone",
+      "answer": ["yes"]
+    },
+    {
+      "questionId": "loss-cause",
+      "answer": "collisionsingle"
+    },
+    {
+      "questionId": "coverage-type",
+      "answer": "fullCoverage"
+    },
+    {
+      "questionId": "accident-date",
+      "answer": "2024-07-01"
+    },
+    {
+      "questionId": "license-plate",
+      "answer": "FRI 1515"
+    },
+    {
+      "questionId": "client-vehicle-license-plate",
+      "answer": "FRI 1515"
+    },
+    {
+      "questionId": "claimant-vehicle-license-plate",
+      "answer": "FRI 1515"
+    },
+    {
+      "questionId": "repair-location-zipcode",
+      "answer": "10115"
+    },
+    {
+      "questionId": "first-registration-date",
+      "answer": "2024-07-01"
+    },
+    {
+      "questionId": "odometer-reading",
+      "answer": 123123
+    },
+    {
+      "questionId": "damage-cause",
+      "answer": "collisionsingle"
+    },
+    {
+      "questionId": "process-type",
+      "answer": "fridayCallCenter"
+    },
+    {
+      "questionId": "claim-number",
+      "answer": "457-67-536756"
+    }
+  ],
+  "supportInformation": {
+    "claimNumber": "457-67-536756",
+    "countryVehicleIdentification": "",
+    "vin": "WVWZZZ6RZGY304402"
+  }
+}

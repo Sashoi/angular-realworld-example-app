@@ -1,4 +1,4 @@
-/// <reference types="cypress" />
+
 import * as util from 'util' // has no default export
 //import { inspect } from 'util' // or directly
 // or
@@ -9,23 +9,26 @@ import { getPageTitle } from "../support/utils/common.js";
 import { questionnaire } from "../support/utils/common.js";
 import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
-//import b2bBody from '../fixtures/templates/dekraIntLiabilityCallCenterBody.json'liability
-//import injectQuestions from '../fixtures/templates/injectQuestions.json'
+import b2bBody from '../fixtures/templates/b2bBodyFriday.json'
+
 import emailBody from '../fixtures/templates/emailBodyD.json'
 import header from '../fixtures/header.json'
 
+//https://dev02.spearhead-ag.ch/questionnaire/friday_callCenter/start
 
-const logFilename = 'cypress/fixtures/logs/beresa_call_center.log'
+
+const logFilename = 'cypress/fixtures/logs/friday_call_center.log'
 const PathToImages ='cypress/fixtures/images/'
+const b2bBodySave = 'cypress/fixtures/templates/b2bBodyFridaySave.json'
 
-describe('Start and complete beresa_call_center standalone questionnaire', () =>{
+describe('Start and complete friday_call_center standalone questionnaire', () =>{
 
   before('clear log file', () => {
     cy.writeFile(logFilename, '')
   })
 
   beforeEach('Setting up integrations and common variables', () =>{
-    cy.intercept('POST', `/b2b/integration/pnw/dekraGarageCallCenter`).as('dekraGarageCallCenter')
+    //cy.intercept('POST', `questionnaire//friday_callCenter/start`).as('/fridayCC')
     cy.commanBeforeEach(goingPage,questionnaire)
   })
 
@@ -35,7 +38,6 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
   const executePost = true
   const executePost2 = false
   const sendSMS = false
-  const interceptBeresaStandalone = false
   const $equipment_2_loading_doors = true
 
   function printUiBlocks(uiBlocks){
@@ -55,69 +57,76 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
     cy.waitingFor('@currentPage',goingPage,questionnaire)
   }
 
+  function convertDate(dateString){
+    var p = dateString.split(/\D/g)
+    return [p[2],p[1],p[0] ].join("-")
+  }
+
   const file1 = [
 
-    ["W1V44760313930767", "Van", "01.01.2020", "Mercedes Vito 09/2021 "]
+    [
+      "TMBJB7NS4K8027658",
+      "SUV",
+      "01.09.2018",
+      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
+    ]
 
   ]
   file1.forEach($car => {
-    it(`beresa_call_center standalone questionnaire, vin ${$car[0]}`, () => {
+    it(`friday_call_center standalone questionnaire, vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
+      const first_registration_date = convertDate($car[2]) //"2024-02-01";
+      const intS2 = getRandomInt(10,99).toString()
+      const intS6 = getRandomInt(100000,999999).toString()
+      const intS3 = getRandomInt(100,999).toString()
+      const intS4 = getRandomInt(1000,9999).toString()
 
-      cy.standaloneLogin('dekra_bodyshop_cc').then(function (authorization) {
+      console.log(`vin: ${$vin}, bodyType: ${$car[1]}, description: ${$car[3]}`)
+
+      cy.authenticate().then(function (authorization) {
         cy.then(function () {
           questionnaire.authorization = authorization
         })
+
+        const claimNumber = `${intS3}-${intS2}-${intS6}`
+        const licensePlate = `FRI ${intS4}`
+        console.log(`claimNumber: ${claimNumber}`)
+
+        b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licensePlate
+        b2bBody.qas.find(q => {return q.questionId === "claimant-vehicle-license-plate"}).answer = licensePlate
+        b2bBody.qas.find(q => {return q.questionId === "license-plate"}).answer = licensePlate
+        b2bBody.qas.find(q => {return q.questionId === "first-registration-date"}).answer = first_registration_date
+        b2bBody.qas.find(q => {return q.questionId === "claim-number"}).answer = claimNumber
+        b2bBody.supportInformation.claimNumber = claimNumber
+        b2bBody.supportInformation.vin = $vin
+
+        Cypress._.merge(header, {'authorization' : authorization});
+
+        const options = {
+          method: 'POST',
+          url: `${baseUrl_lp}questionnaire/friday_callCenter/start`,
+          body: b2bBody,
+          headers: header
+        };
+        cy.request(options).then(
+          (response) => {
+          // response.body is automatically serialized into JSON
+          expect(response.status).to.eq(200) // true
+          const questionnaireId = response.body.questionnaireId;
+          cy.then(function () {
+            questionnaire.Id = questionnaireId
+          })
+          const uiUrl = response.body.uiUrl;
+          console.log(`friday_callCenter questionnaireId: ${questionnaireId}`)
+          console.log(`friday_callCenter uiUrl: ${uiUrl}`)
+          cy.writeFile(b2bBodySave, b2bBody)
+          cy.visit(uiUrl,{ log : false })
+        })
       })
 
-      const intS1 = getRandomInt(10,99).toString()
-      const intS2 = getRandomInt(1000000,9999999).toString()
-      const intS3 = getRandomInt(1000,9999).toString()
-      const intS4 = getRandomInt(1,9).toString()
-
-
-
-
-      console.log(`vin: ${$vin}, bodyType: ${$car[1]}, description: ${$car[3]}`)
       const nextButtonLabel ='Weiter'
       const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
-      const claimNumber = `${intS2}`
-      const licensePlate = `BER${intS2}`
-      console.log(`claimNumber: ${claimNumber}`)
-
-      // Fulfill standalone form
-      cy.get('input[name="claimNumber"]').type(claimNumber);
-
-      cy.get('input#licensePlate').type(licensePlate)
-
-
-      if (interceptBeresaStandalone){
-       // with this intercept I'm replacing the body of standalone
-        cy.intercept('POST', `/b2b/integration/pnw/dekraGarageCallCenter`, (req) => {
-          b2bBody.qas.find(q => {return q.questionId === "license-plate"}).answer = licensePlate
-          b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licensePlate
-          b2bBody.qas.find(q => {return q.questionId === "claimant-vehicle-license-plate"}).answer = licensePlate
-          b2bBody.qas.find(q => {return q.questionId === "claim-number"}).answer = claimNumber
-          b2bBody.supportInformation.claimNumber = claimNumber
-          b2bBody.supportInformation.vin = $vin
-
-          req.body = b2bBody
-        })
-      }
-      cy.get('button[data-test="standalone_submit"]').click()
-
-      cy.wait('@dekraGarageCallCenter',{requestTimeout : $requestTimeout}).then(xhr => {
-        expect(xhr.response.statusCode).to.equal(200)
-        const questionnaireId = xhr.response.body.questionnaireId
-        console.log(`b2b questionnaireId: ${questionnaireId}`);
-        cy.then(function () {
-          questionnaire.Id = questionnaireId
-        })
-        const uiUrl = xhr.response.body.uiUrl
-        console.log(`b2b uiUrl: ${uiUrl}`);
-      }) //wait('@dekraGarageCallCenter',
-
       cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
 
       currentPage()
@@ -130,12 +139,14 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
             })
           })
 
-          cy.get('input#accident-date-input').type('01.05.2024')
-          cy.selectSingleList('coverage-type', 2)
-          cy.selectSingleList('loss-cause', 0)
-          cy.selectDropDown('dropdown-selection-company-branch',3)
-          cy.wait(4000)
-          cy.selectDropDown('dropdown-selection-beresa-ahl-employee',2)
+          cy.get('input#insured-email-address-input').type('sivanchevski@soft2run.com',{delay : 200})
+          cy.get('input#insured-mobile-phone-number-input').type('+359888779933')
+          cy.get('input#insured-first-name-input').type('First name')
+          cy.get('input#insured-last-name-input').type('Last name')
+
+          cy.selectSingleList('receive-upload-link-by',0)
+          cy.selectSingleList('insured-salutation',1)
+
           nextBtn()
         }
       })
@@ -147,7 +158,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
             console.log(`from summary-page, saved questionnaireId: ${Id}`);
           })
           if (executePost) {
-            cy.get('button[type="submit"]').contains('Vorgangsanlage abschließen und Self-Service Link versenden').click()
+            cy.get('button[type="submit"]').contains('Link senden').click()
             cy.wait('@postPost').then(xhr => {
               cy.postPost(xhr)
             })
@@ -157,69 +168,9 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
     }) //it
 
 
-    it(`beresa_self_service_app_employee create vin ${$car[0]}`, () => {
-      const notificationId = Cypress.env('notificationId')
-      cy.authenticate().then(function (authorization) {
-        cy.then(function () {
-          questionnaire.authorization = authorization
-        })
-        Cypress._.merge(header, {'authorization':authorization});
-        const options = {
-          method: 'POST',
-          url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/beresa_self_service_app_employee?unknownReceiver=true`,
-          body: emailBody,
-          headers: header
-        };
-        cy.request(options).then(
-          (response) => {
-            // response.body is automatically serialized into JSON
-            expect(response.status).to.eq(200) // true
-            //console.log(`dekra_int_liability_self_service_app:`);
-            const arrLength = response.body.requestedInformation.length
-            const requestUrl = response.body.requestedInformation[arrLength - 1].requestUrl
-            const templateId = response.body.requestedInformation[arrLength - 1].templateId
-            console.log(`requestUrl : ${requestUrl}`);
-            console.log(`templateId : ${templateId}`);
-            Cypress.env('requestUrl', requestUrl)
-            Cypress.env('templateId', templateId)
-            //cy.printRequestedInformation(response.body.requestedInformation);
-        })
-        if (sendSMS){
-          const options = {
-            method: 'POST',
-            url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/beresa_self_service_app_employee`,
-            body : `{
-              "receiver": "+359888795023",
-              "contact": {
-                "firstName": "first name",
-                "lastName": "lastName",
-                "mobileNumber": "+359888795023",
-                "type": "PERSON"
-              },
-              "smsTemplate": "dekra_sms_self_service_2_customer"
-            }`,
-            headers: header
-          };
-          cy.request(options).then(
-            (response) => {
-              // response.body is automatically serialized into JSON
-              expect(response.status).to.eq(200) // true
-              const arrLength = response.body.requestedInformation.length
-              const requestUrl = response.body.requestedInformation[arrLength - 1].requestUrl
-              const templateId = response.body.requestedInformation[arrLength - 1].templateId
-              console.log(`notificationId : ${notificationId}`);
-              console.log(`SMS templateId : ${templateId}`);
-              console.log(`SMS requestUrl : ${requestUrl}`);
-              //Cypress.env('requestUrl', requestUrl)
-              //Cypress.env('templateId', response.body.requestedInformation[arrLength - 1].templateId)
-              //cy.printRequestedInformation(response.body.requestedInformation);
-          })
-        }
-      })
 
-    })
 
-    it(`beresa_self_service_app_employee execute vin ${$car[0]}`, () => {
+    it.skip(`friday_self_service execute vin ${$car[0]}`, () => {
       cy.viewport('samsung-note9')
       const requestUrl = Cypress.env('requestUrl')
       console.log(`Start ${Cypress.env('templateId')} from url: ${requestUrl}.`)
@@ -385,11 +336,11 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
     })
 
     it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
-      cy.GeneratePDFs(['beresa_abschlussbericht'])
+      cy.GeneratePDFs(['friday_default'])
     }) //it PDF from commands
 
-    it.only(`friday_self_service create vin ${$car[0]}`, () => {
-      const notificationId = 'pYmPmFJl0IgVvGFZLDbyF'//Cypress.env('notificationId')
+    it(`friday_self_service create vin ${$car[0]}`, () => {
+      const notificationId = Cypress.env('notificationId')
       cy.authenticate().then(function (authorization) {
         cy.then(function () {
           questionnaire.authorization = authorization
@@ -418,7 +369,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
         if (sendSMS){
           const options = {
             method: 'POST',
-            url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/beresa_self_service_app_employee`,
+            url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/friday_self_service`,
             body : `{
               "receiver": "+359888795023",
               "contact": {

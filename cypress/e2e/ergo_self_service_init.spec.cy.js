@@ -9,7 +9,7 @@ import header from '../fixtures/headerXML.json'
 
 const logFilename = 'cypress/fixtures/logs/ErgoSelfServiceInit.log'
 const PathToImages ='cypress/fixtures/images/'
-const b2bBody = 'cypress/fixtures/templates/ergoBody.xml'
+const b2bBody = 'cypress/fixtures/templates/ergoBodyL.xml' // or ergoBodyL where <PLZ>04158</PLZ> Leipzig
 const b2bBodySave = 'cypress/fixtures/templates/ergoBodySave.xml'
 
 describe('Ergo Self Service init', () =>{
@@ -68,7 +68,7 @@ describe('Ergo Self Service init', () =>{
 
 
   const file1 = [
-    "WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"
+    ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
   ]
 
   file1.forEach($car => {

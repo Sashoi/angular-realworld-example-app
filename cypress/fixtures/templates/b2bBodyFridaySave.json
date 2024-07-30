@@ -1,0 +1,65 @@
+{
+  "qas": [
+    {
+      "questionId": "odometer-unit",
+      "answer": ["km"]
+    },
+    {
+      "questionId": "standalone",
+      "answer": ["yes"]
+    },
+    {
+      "questionId": "loss-cause",
+      "answer": "collisionsingle"
+    },
+    {
+      "questionId": "coverage-type",
+      "answer": "fullCoverage"
+    },
+    {
+      "questionId": "accident-date",
+      "answer": "2024-07-01"
+    },
+    {
+      "questionId": "license-plate",
+      "answer": "FRI 8228"
+    },
+    {
+      "questionId": "client-vehicle-license-plate",
+      "answer": "FRI 8228"
+    },
+    {
+      "questionId": "claimant-vehicle-license-plate",
+      "answer": "FRI 8228"
+    },
+    {
+      "questionId": "repair-location-zipcode",
+      "answer": "10115"
+    },
+    {
+      "questionId": "first-registration-date",
+      "answer": "2018-09-01"
+    },
+    {
+      "questionId": "odometer-reading",
+      "answer": 123123
+    },
+    {
+      "questionId": "damage-cause",
+      "answer": "collisionsingle"
+    },
+    {
+      "questionId": "process-type",
+      "answer": "fridayCallCenter"
+    },
+    {
+      "questionId": "claim-number",
+      "answer": "415-33-887822"
+    }
+  ],
+  "supportInformation": {
+    "claimNumber": "415-33-887822",
+    "countryVehicleIdentification": "",
+    "vin": "TMBJB7NS4K8027658"
+  }
+}
