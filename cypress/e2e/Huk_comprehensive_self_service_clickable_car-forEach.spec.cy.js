@@ -30,8 +30,8 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   const $requestTimeout = 60000
   const executePost = false
   const generatePdfCondition = executePost && true
-  const newPhoneNumber = `+359888795023`
-  const initOnly = true
+  const newPhoneNumber = `+3598887950`
+  const initOnly = false
 
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
@@ -126,14 +126,16 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
               cy.request(options3).then(
                 (response3) => {
                 expect(response3.status).to.eq(200) // true
-                const questionnaireUrl = response3.body.body.requestedInformation[0].requestUrl;
+                const requestUrl = response3.body.body.requestedInformation[0].requestUrl;
                 const questionnaireId2 = response3.body.body.requestedInformation[0].questionnaireId;
                 console.log(`Real questionnaireId: ${questionnaireId2}`)
                 cy.then(function () {
                   questionnaire.Id = questionnaireId2
                 })
-                console.log(`questionnaireUrl: ${questionnaireUrl}`)
-                cy.visit(questionnaireUrl,{log : false})
+                console.log(`requestUrl : ${requestUrl}`)
+
+
+                cy.visit(requestUrl, {log : false})
 
                 const nextButtonLabel ='Weiter' //Speichern und Weiter
                 const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
@@ -597,7 +599,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
     }) //it PDF from commands
 
     it(`huk_comprehensive_self_service_clickable_car create vin ${$car[0]}`, () => {
-      const notificationId = Cypress.env('notificationId')
+      const notificationId = 'daJfVgPWDOGsNcqXjuRAZ'//Cypress.env('notificationId')
       cy.authenticate().then(function (authorization) {
         cy.then(function () {
           questionnaire.authorization = authorization
@@ -607,11 +609,11 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
           method: 'POST',
           url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/huk_comprehensive_self_service_clickable_car`,
           body : `{
-            "receiver": "+359888795023",
+            "receiver": "+3598887950",
             "contact": {
               "firstName": "first name",
               "lastName": "lastName",
-              "mobileNumber": "+359888795023",
+              "mobileNumber": "+3598887950",
               "type": "PERSON"
             },
             "smsTemplate": "dekra_sms_self_service_2_customer"

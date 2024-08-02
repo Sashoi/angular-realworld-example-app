@@ -234,11 +234,11 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-01'){
-          cy.getBodyType($car,logFilename).then(function (bodyType) {
-            cy.then(function () {
-              questionnaire.bodyType = bodyType
-            })
-          })
+          // cy.getBodyType($car,logFilename).then(function (bodyType) {
+          //   cy.then(function () {
+          //     questionnaire.bodyType = bodyType
+          //   })
+          // })
           nextBtn()
         }
       })
@@ -265,13 +265,18 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-05'){
-          cy.selectSingleList('vehicle-body-type',3)
+          cy.selectSingleList('vehicle-body-type',10) //0..10
           nextBtn()
         }
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-06'){
+          cy.getBodyType($car,logFilename).then(function (bodyType) {
+            cy.then(function () {
+              questionnaire.bodyType = bodyType
+            })
+          })
           cy.get('@bodyType').then(function (bodyType) {
             if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
               //cy.selectSingleList('loading-floor-area-bend', 0)
@@ -306,10 +311,13 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
                   bodyType == 'Coupe' || bodyType == 'Cabrio' || bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine' ||
                   bodyType == 'SUV'){}
             }) //get('@bodyType'
-
-            if (xhr.response.body.search('g id="hood"') > 0){
-              cy.selectSVG('hood')
-            }
+            const SVGs = ['hood','roof','grill','leftRearWindow','right-front-door']
+            SVGs.forEach((svg) => {
+              //console.log(svg)
+              if (SVGbody.search(`g id="${svg}"`) > 0){
+                cy.selectSVG(svg)
+              }
+            });
             //cy.selectSVG('windshield')
           }) //wait('@clickableCar'
           nextBtn()
@@ -343,10 +351,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-11'){
-          cy.uploadImage('damage-photo-upload-overview-hood',PathToImages,'airbag.jpg')
-          cy.uploadImage('damage-photo-upload-detail-hood',PathToImages,'airbag.jpg')
-          //cy.uploadImage('damage-photo-upload-overview-windshield',PathToImages,'airbag.jpg')
-          //cy.uploadImage('damage-photo-upload-detail-windshield',PathToImages,'airbag.jpg')
+          cy.uploadAllImagesOnPage(PathToImages)
           cy.get('input#damage-photo-upload-remarks-hood-input').type('damage-photo-upload-remarks-hood')
           nextBtn()
         }
@@ -354,14 +359,28 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-12'){
-          //"additional-vehicle-photos-upload"
+          cy.get('form').each(($form, index, $list) => {
+            cy.wrap($form)
+            .invoke('attr', 'id')
+            .then((id) => {
+              console.log(`$form[${index}] : ${id}.`) //prints id
+              cy.uploadImage(id,PathToImages,'airbag.jpg')
+              cy.uploadImage(id,PathToImages,'airbag.jpg')
+              cy.uploadImage(id,PathToImages,'airbag.jpg')
+              cy.uploadImage(id,PathToImages,'airbag.jpg')
+              cy.uploadImage(id,PathToImages,'airbag.jpg')
+            })
+          })
           nextBtn()
         }
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-13'){
-          cy.get('textarea#additional-remarks-textarea').type('additional-remarks.')
+          cy.get('@bodyType').then(function (bodyType) {
+            const remarks = `additional-remarks for bodyType : ${bodyType}.`
+            cy.get('textarea#additional-remarks-textarea').type(remarks)
+          })
           nextBtn()
         }
       })
@@ -384,71 +403,9 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
 
     })
 
-    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
-      cy.GeneratePDFs(['beresa_abschlussbericht'])
-    }) //it PDF from commands
-
-    it.only(`friday_self_service create vin ${$car[0]}`, () => {
-      const notificationId = 'pYmPmFJl0IgVvGFZLDbyF'//Cypress.env('notificationId')
-      cy.authenticate().then(function (authorization) {
-        cy.then(function () {
-          questionnaire.authorization = authorization
-        })
-        Cypress._.merge(header, {'authorization':authorization});
-        const options = {
-          method: 'POST',
-          url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/friday_self_service?unknownReceiver=true`,
-          body: emailBody,
-          headers: header
-        };
-        cy.request(options).then(
-          (response) => {
-            // response.body is automatically serialized into JSON
-            expect(response.status).to.eq(200) // true
-            //console.log(`dekra_int_liability_self_service_app:`);
-            const arrLength = response.body.requestedInformation.length
-            const requestUrl = response.body.requestedInformation[arrLength - 1].requestUrl
-            const templateId = response.body.requestedInformation[arrLength - 1].templateId
-            console.log(`requestUrl : ${requestUrl}`);
-            console.log(`templateId : ${templateId}`);
-            Cypress.env('requestUrl', requestUrl)
-            Cypress.env('templateId', templateId)
-            //cy.printRequestedInformation(response.body.requestedInformation);
-        })
-        if (sendSMS){
-          const options = {
-            method: 'POST',
-            url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/beresa_self_service_app_employee`,
-            body : `{
-              "receiver": "+359888795023",
-              "contact": {
-                "firstName": "first name",
-                "lastName": "lastName",
-                "mobileNumber": "+359888795023",
-                "type": "PERSON"
-              },
-              "smsTemplate": "dekra_sms_self_service_2_customer"
-            }`,
-            headers: header
-          };
-          cy.request(options).then(
-            (response) => {
-              // response.body is automatically serialized into JSON
-              expect(response.status).to.eq(200) // true
-              const arrLength = response.body.requestedInformation.length
-              const requestUrl = response.body.requestedInformation[arrLength - 1].requestUrl
-              const templateId = response.body.requestedInformation[arrLength - 1].templateId
-              console.log(`notificationId : ${notificationId}`);
-              console.log(`SMS templateId : ${templateId}`);
-              console.log(`SMS requestUrl : ${requestUrl}`);
-              //Cypress.env('requestUrl', requestUrl)
-              //Cypress.env('templateId', response.body.requestedInformation[arrLength - 1].templateId)
-              //cy.printRequestedInformation(response.body.requestedInformation);
-          })
-        }
-      })
-
-    })
+    // it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    //   cy.GeneratePDFs(['beresa_abschlussbericht'])
+    // }) //it PDF from commands
 
   })  //forEach
 }) //describe

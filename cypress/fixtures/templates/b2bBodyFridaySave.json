@@ -22,15 +22,15 @@
     },
     {
       "questionId": "license-plate",
-      "answer": "FRI 8228"
+      "answer": "FRI 2740"
     },
     {
       "questionId": "client-vehicle-license-plate",
-      "answer": "FRI 8228"
+      "answer": "FRI 2740"
     },
     {
       "questionId": "claimant-vehicle-license-plate",
-      "answer": "FRI 8228"
+      "answer": "FRI 2740"
     },
     {
       "questionId": "repair-location-zipcode",
@@ -38,7 +38,7 @@
     },
     {
       "questionId": "first-registration-date",
-      "answer": "2018-09-01"
+      "answer": "2020-09-01"
     },
     {
       "questionId": "odometer-reading",
@@ -54,12 +54,12 @@
     },
     {
       "questionId": "claim-number",
-      "answer": "415-33-887822"
+      "answer": "632-88-287126"
     }
   ],
   "supportInformation": {
-    "claimNumber": "415-33-887822",
+    "claimNumber": "632-88-287126",
     "countryVehicleIdentification": "",
-    "vin": "TMBJB7NS4K8027658"
+    "vin": "WVWZZZ3CZME020680"
   }
 }

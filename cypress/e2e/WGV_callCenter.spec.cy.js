@@ -28,7 +28,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
   const executePost = true
-  const executePost2 = true
+  const executePost2 = false
   const createNewQuestionnaires = executePost && true
   const newQuestionnaire = 2 //1 - wgv_comprehensive_self_service_app, 2 - wgv_liability_self_service_app
   const interceptWGV = false
@@ -42,6 +42,28 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   function currentPage() {
     cy.waitingFor('@currentPage',goingPage,questionnaire)
   }
+
+  function isPartSelected(selectedParts,searchPart) {
+    if (Array.isArray(selectedParts)){
+      if (selectedParts.length > 0){
+        const value = selectedParts[0][searchPart]
+        if (value != undefined){
+          //console.log(`searchPart: ${searchPart} value: ${value}`);
+          if (value != undefined){
+            const res = value == 'yes'
+            console.log(`value == 'yes': ${res}`);
+            return res
+          }
+        } else {
+          //console.log(`searchPart: ${searchPart} value: ${value}`);
+          return false
+        }
+      }
+      return false
+    }
+    return false
+  }
+
 
   const damageCauseArr =[
     [ 0, "collisionsingle", "Kollision mit anderem Fahrzeug"],
@@ -60,15 +82,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
       "PickUpDoubleCabine",
       "01.01.2012",
       "Ford Ranger double cabine, Pick-up"
-    ],
-    [
-      "6FPGXXMJ2GEL59891",
-      "PickUpSingleCabine",
-      "01.01.2012",
-      "Ford Ranger single cabine, Pick-up"
-    ],
-    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"],
-    ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"]
+    ]
   ]
 
   damageCauseArr1.forEach($damageCause => {
@@ -187,43 +201,52 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
 
             cy.get('@goingPageId').then(function (aliasValue) {
               if (aliasValue == 'page-03'){
+                cy.wait('@clickableCar',{requestTimeout : $requestTimeout}).then(xhr => {
+                  const SVGs = ['hood','roof']
+                  SVGs.forEach((svg) => {
+                    //console.log(svg)
+                    if (xhr.response.body.search(`g id="${svg}"`) > 0){
+                      cy.selectSVG(svg)
+                    }
+                  });
 
-                cy.selectSVG('hood')
-                cy.selectMultipleList('hood-damage-type',0)
+                  //cy.selectSVG('hood')
+                  cy.selectMultipleList('hood-damage-type',0)
 
-                cy.selectSVG('roof')
-                cy.selectMultipleList('roof-damage-type',0)
+                  //cy.selectSVG('roof')
+                  cy.selectMultipleList('roof-damage-type',0)
 
-                cy.get('@bodyType').then(function (bodyType) {
-                  if (bodyType == 'Cabrio'){
-                    // and roof is selected
-                    cy.selectSingleList('roof-equipment-convertible-roof-material',0)
-                  }
-                  if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
-                    cy.selectSingleList('loading-floor-area-bend',0)
-                  }
-                  if (bodyType == 'Coupe' || bodyType == 'Hatch3' || bodyType == 'Sedan' || bodyType == 'Hatch5' || bodyType == 'Station' || bodyType == 'SUV' || bodyType == 'MPV'){
-                    // and roof is selected
-                    cy.selectSingleList('roof-equipment-panorama-roof',0)
-                  }
+                  cy.get('@bodyType').then(function (bodyType) {
+                    if (bodyType == 'Cabrio'){
+                      // and roof is selected
+                      cy.selectSingleList('roof-equipment-convertible-roof-material',0)
+                    }
+                    if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
+                      cy.selectSingleList('loading-floor-area-bend',0)
+                    }
+                    if (bodyType == 'Coupe' || bodyType == 'Hatch3' || bodyType == 'Sedan' || bodyType == 'Hatch5' || bodyType == 'Station' || bodyType == 'SUV' || bodyType == 'MPV'){
+                      // and roof is selected
+                      cy.selectSingleList('roof-equipment-panorama-roof',0)
+                    }
+                  })
+
+                  cy.selectSVG('windshield')
+                  cy.wait(500)
+
+                  cy.selectSingleList('windshield-equipment-windshield-electric',0)
+
+                  cy.selectMultipleList('windshield-damage-type',0)
+                  cy.selectMultipleList('windshield-damage-type',2)
+                  cy.selectSVG('zone-b')
+                  cy.selectSVG('zone-d')
+                  cy.selectSingleList('windshield-damage-quantity',3)
+                  cy.selectSingleList('windshield-damage-size-scratch-bigger-5cm',0)
+                  cy.selectSingleList('windshield-damage-size-crack-bigger-2cm',0)
+
+                  cy.wait(500)
+                  nextBtn()
+                  cy.wait(500)
                 })
-
-                cy.selectSVG('windshield')
-                cy.wait(500)
-
-                cy.selectSingleList('windshield-equipment-windshield-electric',0)
-
-                cy.selectMultipleList('windshield-damage-type',0)
-                cy.selectMultipleList('windshield-damage-type',2)
-                cy.selectSVG('zone-b')
-                cy.selectSVG('zone-d')
-                cy.selectSingleList('windshield-damage-quantity',3)
-                cy.selectSingleList('windshield-damage-size-scratch-bigger-5cm',0)
-                cy.selectSingleList('windshield-damage-size-crack-bigger-2cm',0)
-
-                cy.wait(500)
-                nextBtn()
-                cy.wait(500)
               }
             })
 
@@ -284,14 +307,6 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
                   cy.wait('@postPost',{ log: false }).then(xhr => {
                     cy.postPost(xhr).then(function (notificationId) {
                       if (createNewQuestionnaires) {
-
-                        // let _headers = {
-                        //   'Accept': '*/*',
-                        //   'Accept-Encoding':'gzip, deflate, br',
-                        //   'Content-Type': 'application/json',
-                        //   authorization
-                        // }
-
 
                         const options2 = {
                           method: 'POST',
@@ -416,10 +431,21 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
         cy.get('@goingPageId').then(function (aliasValue) {
           if (aliasValue == 'page-07'){
             cy.wait('@clickableCar',{requestTimeout : $requestTimeout}).then(xhr => {
-
               expect(xhr.response.statusCode).to.equal(200)
               console.log(`Comming SVG with clickableCar`)
-              cy.selectSVG('hood')
+              const SVGs = ['hood','roof','grill','right-front-door']
+              SVGs.forEach((svg) => {
+                //console.log(svg)
+                if (xhr.response.body.search(`g id="${svg}"`) > 0){
+                  cy.selectSVG(svg)
+                }
+              });
+
+              // cy.selectSVG('hood')
+              // cy.selectSVG('roof')
+              // cy.selectSVG('grill')
+              // cy.selectSVG('right-front-door')
+
               nextBtn()
             })
           }
@@ -427,6 +453,14 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
 
         cy.get('@goingPageId').then(function (aliasValue) {
           if (aliasValue == 'page-08'){
+            cy.getQuestionAnswer('selected-parts').then(function (selectedParts) {
+              console.log(`selectedParts: ${JSON.stringify(selectedParts)}`);
+              console.log(`selectedParts isArray: ${Array.isArray(selectedParts)}`);
+              for (const obj of selectedParts) {
+                console.log(obj);
+              }
+              console.log(`answer: ${isPartSelected(selectedParts,'roof1')}`); //windshield
+            })
             cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,'registration-part-1.jpg')
             nextBtn()
           }
@@ -449,7 +483,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
 
         cy.get('@goingPageId').then(function (aliasValue) {
           if (aliasValue == 'page-11'){
-            cy.uploadImage('damage-photo-upload-overview-hood',PathToImages,'hood.jpg')
+            cy.uploadAllImagesOnPage(PathToImages)
             nextBtn()
           }
         })

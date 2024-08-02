@@ -62,15 +62,39 @@ describe('Start and complete friday_call_center standalone questionnaire', () =>
     return [p[2],p[1],p[0] ].join("-")
   }
 
+  function cleanStringify(object) {
+    if (object && typeof object === 'object') {
+        object = copyWithoutCircularReferences([object], object);
+    }
+    return JSON.stringify(object);
+
+    function copyWithoutCircularReferences(references, object) {
+        var cleanObject = {};
+        Object.keys(object).forEach(function(key) {
+            var value = object[key];
+            if (value && typeof value === 'object') {
+                if (references.indexOf(value) < 0) {
+                    references.push(value);
+                    cleanObject[key] = copyWithoutCircularReferences(references, value);
+                    references.pop();
+                } else {
+                    cleanObject[key] = '###_Circular_###';
+                }
+            } else if (typeof value !== 'function') {
+                cleanObject[key] = value;
+            }
+        });
+        return cleanObject;
+    }
+  }
+
   const file1 = [
-
     [
-      "TMBJB7NS4K8027658",
-      "SUV",
-      "01.09.2018",
-      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
+      "WVWZZZ3CZME020680",
+      "Station",
+      "01.09.2020",
+      "Passat Variant 1.4 TSI Plug-In-Hybrid DSG GTE"
     ]
-
   ]
   file1.forEach($car => {
     it(`friday_call_center standalone questionnaire, vin ${$car[0]}`, () => {
@@ -139,7 +163,7 @@ describe('Start and complete friday_call_center standalone questionnaire', () =>
             })
           })
 
-          cy.get('input#insured-email-address-input').type('sivanchevski@soft2run.com',{delay : 200})
+          cy.get('input#insured-email-address-input').type('sivanchevski@soft2run.com',{delay : 100})
           cy.get('input#insured-mobile-phone-number-input').type('+359888779933')
           cy.get('input#insured-first-name-input').type('First name')
           cy.get('input#insured-last-name-input').type('Last name')
@@ -167,178 +191,6 @@ describe('Start and complete friday_call_center standalone questionnaire', () =>
       })
     }) //it
 
-
-
-
-    it.skip(`friday_self_service execute vin ${$car[0]}`, () => {
-      cy.viewport('samsung-note9')
-      const requestUrl = Cypress.env('requestUrl')
-      console.log(`Start ${Cypress.env('templateId')} from url: ${requestUrl}.`)
-
-      cy.visit(requestUrl,{log : false})
-
-      const nextButtonLabel ='Weiter'
-      const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
-      cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
-
-      currentPage()
-
-      cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-01'){
-          cy.getBodyType($car,logFilename).then(function (bodyType) {
-            cy.then(function () {
-              questionnaire.bodyType = bodyType
-            })
-          })
-          nextBtn()
-        }
-      })
-
-      cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-02'){
-          cy.uploadImage('order-form-upload-beresa-ahl',PathToImages,'airbag.jpg')
-          nextBtn()
-        }
-      })
-
-      cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-03'){
-          cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,'registration-part-1.jpg')
-          nextBtn()
-        }
-      })
-      cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-04'){
-          //vehicle-vin-photo-upload
-          nextBtn()
-        }
-      })
-
-      cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-05'){
-          cy.selectSingleList('vehicle-body-type',3)
-          nextBtn()
-        }
-      })
-
-      cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-06'){
-          cy.get('@bodyType').then(function (bodyType) {
-            if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
-              //cy.selectSingleList('loading-floor-area-bend', 0)
-              cy.wait(2000)
-              cy.selectSingleList('equipment-slide-door',1)
-              cy.selectSingleList('equipment-2-loading-doors',Number($equipment_2_loading_doors))
-
-              cy.selectSingleList('equipment-length',0)
-              cy.selectSingleList('equipment-height',0)
-              cy.selectSingleList('equipment-vehicle-rear-glassed',0)
-              cy.selectSingleList('vehicle-customized-interior',0)
-            }
-            if (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine'){
-              cy.wait(2000)
-              cy.selectSingleList('equipment-loading-area-cover-type',1)
-            }
-          })
-          nextBtn()
-        }
-      })
-
-      cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-07'){
-          cy.wait('@clickableCar',{requestTimeout : $requestTimeout, log : false}).then(xhr => {
-            expect(xhr.response.statusCode).to.equal(200)
-            console.log(`Comming SVG with clickableCar`)
-            const SVGbody = xhr.response.body;
-            cy.get('@bodyType').then(function (bodyType) {
-              if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){}
-
-              if (bodyType == 'MPV' || bodyType == 'Hatch3' || bodyType == 'Hatch5' || bodyType == 'Sedan' ||
-                  bodyType == 'Coupe' || bodyType == 'Cabrio' || bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine' ||
-                  bodyType == 'SUV'){}
-            }) //get('@bodyType'
-
-            if (xhr.response.body.search('g id="hood"') > 0){
-              cy.selectSVG('hood')
-            }
-            //cy.selectSVG('windshield')
-          }) //wait('@clickableCar'
-          nextBtn()
-        }
-      })
-
-      cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-08'){
-          cy.uploadImage('vehicle-interior-front-photo-upload',PathToImages,'interior-front.jpg')
-          nextBtn()
-        }
-      })
-
-      cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-09'){
-          cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathToImages,'image dashboard-odometer.jpg')
-          cy.get('input#vehicle-mileage-input').type('321334')
-          nextBtn()
-        }
-      })
-
-      cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-10'){
-          cy.uploadImage('vehicle-right-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
-          cy.uploadImage('vehicle-left-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
-          cy.uploadImage('vehicle-left-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
-          cy.uploadImage('vehicle-right-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
-          nextBtn()
-        }
-      })
-
-      cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-11'){
-          cy.uploadImage('damage-photo-upload-overview-hood',PathToImages,'airbag.jpg')
-          cy.uploadImage('damage-photo-upload-detail-hood',PathToImages,'airbag.jpg')
-          //cy.uploadImage('damage-photo-upload-overview-windshield',PathToImages,'airbag.jpg')
-          //cy.uploadImage('damage-photo-upload-detail-windshield',PathToImages,'airbag.jpg')
-          cy.get('input#damage-photo-upload-remarks-hood-input').type('damage-photo-upload-remarks-hood')
-          nextBtn()
-        }
-      })
-
-      cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-12'){
-          //"additional-vehicle-photos-upload"
-          nextBtn()
-        }
-      })
-
-      cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-13'){
-          cy.get('textarea#additional-remarks-textarea').type('additional-remarks.')
-          nextBtn()
-        }
-      })
-
-
-      cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'summary-page'){
-          if (executePost2) {
-            //pageId: "summary-page"
-            //cy.selectMultipleList('`summary-confirmation-acknowledgement`',0)
-            cy.get('button[type="submit"]').contains('Senden').click()
-            cy.wait('@postPost',{ log: false }).then(xhr => {
-              cy.postPost(xhr,false).then(function (notificationId) {
-                console.log(`notificationId: ${notificationId}`);
-              })
-            })
-          }
-        }
-      })
-
-    })
-
-    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
-      cy.GeneratePDFs(['friday_default'])
-    }) //it PDF from commands
-
     it(`friday_self_service create vin ${$car[0]}`, () => {
       const notificationId = Cypress.env('notificationId')
       cy.authenticate().then(function (authorization) {
@@ -349,6 +201,7 @@ describe('Start and complete friday_call_center standalone questionnaire', () =>
         const options = {
           method: 'POST',
           url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/friday_self_service?unknownReceiver=true`,
+          //url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/wgv_self_service_upload?unknownReceiver=true`,
           body: emailBody,
           headers: header
         };
@@ -400,6 +253,194 @@ describe('Start and complete friday_call_center standalone questionnaire', () =>
       })
 
     })
+
+
+    it(`friday_self_service execute vin ${$car[0]}`, () => {
+      cy.viewport('samsung-note9')
+      cy.intercept('GET', `/questionnaire/extended_generic_elements/attachment/*`,{ log: false }).as('clickableCarFri')
+      const requestUrl = Cypress.env('requestUrl')
+      console.log(`Start ${Cypress.env('templateId')} from url: ${requestUrl}.`)
+
+      cy.visit(requestUrl,{log : false})
+
+      const nextButtonLabel ='Weiter'
+      const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
+      cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
+
+      currentPage()
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-01'){
+          cy.getBodyType($car,logFilename).then(function (bodyType) {
+            cy.then(function () {
+              questionnaire.bodyType = bodyType
+            })
+          })
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-02-part-selection'){
+          cy.wait('@clickableCarFri',{requestTimeout : $requestTimeout, log : false}).then(xhr => {
+            expect(xhr.response.statusCode).to.equal(200)
+            console.log(`Comming SVG with clickableCar`)
+            const SVGbody = xhr.response.body;
+            cy.get('@bodyType').then(function (bodyType) {
+              if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){}
+
+              if (bodyType == 'MPV' || bodyType == 'Hatch3' || bodyType == 'Hatch5' || bodyType == 'Sedan' ||
+                  bodyType == 'Coupe' || bodyType == 'Cabrio' || bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine' ||
+                  bodyType == 'SUV'){}
+            }) //get('@bodyType'
+
+            // if (xhr.response.body.search('g id="hood"') > 0){
+            //   cy.selectSVG('hood')
+            // }
+            const SVGs = ['hood','roof','grill','rightSill','leftSill','leftRearWindow','leftFrontWheelRim']
+            SVGs.forEach((svg) => {
+              //console.log(svg)
+              if (xhr.response.body.search(`g id="${svg}"`) > 0){
+                cy.selectSVG(svg)
+              }
+            });
+
+            //cy.selectSVG('windshield')
+            // cy.selectSVG('roof')
+            // cy.selectSVG('grill')
+            // cy.selectSVG('rightSill')
+            // cy.selectSVG('leftSill')
+            // cy.selectSVG('leftRearWindow')
+            // cy.selectSVG('leftFrontWheelRim')
+          }) //wait('@clickableCarFri'
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-03-damage-description'){
+          // cy.selectSingleList('vehicleStatus-CI1',0)
+          // cy.selectSingleList('hood-DS7',0)
+          // cy.selectMultipleList('hood-DT2',0)
+          // cy.selectMultipleList('roof-DT2',0)
+          // cy.selectMultipleList('grill-DT2',0)
+          // cy.selectMultipleList('rightSill-DT2',0)
+          // cy.selectSingleList('frontZone-HD1',0)
+
+          cy.selectAllSingleLists(0)
+          cy.selectAllMultipleList(0)
+
+
+
+          // cy.get('div.single-list-container')
+          // .should('be.visible')
+          // .each(($container, index, $list) => {
+          //   //const firstDit = $container
+          //   cy.wrap($container)
+          //   .find('label.form-check-label').then(labels =>{
+          //     //cy.wrap(labels).first().click({ force: true })
+          //     cy.wrap(labels).first().invoke('attr','for').then($for => {
+          //       console.log(`sls: ${$for.slice(0, -2)}`)
+          //       cy.selectSingleList($for.slice(0, -2),0)
+          //     })
+          //   })
+          // })
+
+          // cy.get('div.multiple-list-container')
+          // .should('be.visible')
+          // .each(($container, index, $list) => {
+          //   //const firstDit = $container
+          //   cy.wrap($container)
+          //   .find('label.form-check-label').then(labels =>{
+          //     //cy.wrap(labels).first().click({ force: true })
+          //     cy.wrap(labels).first().invoke('attr','for').then($for => {
+          //       console.log(`mls : ${$for.slice(0, -2)}`)
+          //       cy.selectMultipleList($for.slice(0, -2),0)
+          //     })
+          //   })
+          // })
+
+          //cy.selectSingleList('stopHere',0)
+
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-04-photos'){
+          //cy.uploadImage('vehicle-photo-upload-front-view',PathToImages,'vehicle-right-front-photo.jpg')
+          //cy.uploadImage('vehicle-photo-upload-rear-view',PathToImages,'vehicle-left-rear-photo1.jpg')
+          cy.uploadAllImagesOnPage(PathToImages)
+          nextBtn()
+        }
+      })
+
+      // cy.get('@goingPageId').then(function (aliasValue) {
+      //   if (aliasValue == 'page-05'){
+      //     cy.uploadImage('odometer-photo-upload',PathToImages,'image dashboard-odometer.jpg')
+      //     nextBtn()
+      //   }
+      // })
+
+      // cy.get('@goingPageId').then(function (aliasValue) {
+      //   if (aliasValue == 'page-06-multi-upload-damaged-parts'){
+      //     cy.uploadAllImagesOnPage(PathToImages)
+      //     cy.get('form').each(($form, index, $list) => {
+      //       cy.wrap($form)
+      //       .invoke('attr', 'id')
+      //       .then((id) => {
+      //         if (id.includes('hood')){
+      //           console.log(`$form[${index}] : ${id}.`) //prints id
+      //           cy.uploadImage(id,PathToImages,'hood.jpg')
+      //           cy.uploadImage(id,PathToImages,'hood.jpg')
+      //         }
+      //       })
+      //     })
+      //     //
+      //     nextBtn()
+      //   }
+      // })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'summary-page'){
+          if (executePost2) {
+            //pageId: "summary-page"
+            cy.selectMultipleList('summary-confirmation-acknowledgement',0)
+            cy.get('button[type="submit"]').contains('Unverbindliches Angebot erhalten').click()
+            cy.wait('@postPost',{ log: false }).then(xhr => {
+              cy.postPost(xhr,false).then(function (notificationId) {
+                console.log(`notificationId: ${notificationId}`);
+              })
+            })
+          }
+        }
+      })
+
+    })
+
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+      cy.GeneratePDFs(['friday_default'])
+    }) //it PDF from commands
+
+    it.skip('log browser info', function () {
+      console.log(Cypress.browser)
+      console.log(Cypress.spec)
+
+      // {
+      //   channel: 'stable',
+      //   displayName: 'Chrome',
+      //   family: 'chromium',
+      //   isChosen: true,
+      //   majorVersion: 80,
+      //   name: 'chrome',
+      //   path: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      //   version: '80.0.3987.87',
+      //   isHeaded: true,
+      //   isHeadless: false
+      // }
+    })
+
+
 
   })  //forEach
 }) //describe

@@ -73,13 +73,25 @@ Cypress.Commands.add('selectSVG_VZ', (selectorId) =>{
   })
 })
 
-function selectFromList(selectorId,option,classValue){
+function selectFromListOld(selectorId,option,classValue){
   cy.get(`div#${selectorId}`,{ log : false }).find(`label[for="${selectorId}_${option}"]`,{ log : false }).parent('div').then(($parent) => {
     const classList = Array.from($parent[0].classList);
     if (!classList.includes(classValue)){
       cy.get(`div#${selectorId}`,{ log : false }).find(`label[for="${selectorId}_${option}"]`,{ log : false }).click({ force: true, log : false })
     }
-    cy.get(`div#${selectorId}`,{ log : false }).find(`label[for="${selectorId}_${option}"]`,{ log : false }).parent('div').should('have.class', classValue)
+    cy.get(`div#${selectorId}`,{ log : false })
+    .find(`label[for="${selectorId}_${option}"]`,{ log : false }).parent('div').should('have.class', classValue)
+  })
+}
+
+function selectFromList(selectorId,option,classValue){
+  cy.get(`div[id="${selectorId}"]`,{ log : false }).find(`label[for="${selectorId}_${option}"]`,{ log : false }).parent('div').then(($parent) => {
+    const classList = Array.from($parent[0].classList);
+    if (!classList.includes(classValue)){
+      cy.get(`div[id="${selectorId}"]`,{ log : false }).find(`label[for="${selectorId}_${option}"]`,{ log : false }).click({ force: true, log : false })
+    }
+    cy.get(`div[id="${selectorId}"]`,{ log : false })
+    .find(`label[for="${selectorId}_${option}"]`,{ log : false }).parent('div').should('have.class', classValue)
   })
 }
 
@@ -91,6 +103,36 @@ Cypress.Commands.add('selectMultipleList', (selectorId, option) =>{
 Cypress.Commands.add('selectSingleList', (selectorId, option) =>{
   selectFromList(selectorId,option,'radio--checked');
 })
+
+function selectAllFromLists(containerClass,option){
+  cy.get(`div.${containerClass}`)
+          .should('be.visible')
+          .each(($container, index, $list) => {
+            //const firstDit = $container
+            cy.wrap($container)
+            .find('label.form-check-label').then(labels =>{
+              //cy.wrap(labels).first().click({ force: true })
+              cy.wrap(labels).first().invoke('attr','for').then($for => {
+                console.log(`${containerClass} : ${$for.slice(0, -2)}`)
+                if ( containerClass == 'single-list-container'){
+                  cy.selectSingleList($for.slice(0, -2),option)
+                } else {
+                  cy.selectMultipleList($for.slice(0, -2),option)
+                }
+              })
+            })
+          })
+}
+
+Cypress.Commands.add('selectAllMultipleList', (option) =>{
+  selectAllFromLists('multiple-list-container',option)
+})
+
+Cypress.Commands.add('selectAllSingleLists', (option) =>{
+  selectAllFromLists('single-list-container',option)
+})
+
+
 
 Cypress.Commands.add('selectDropDown', (selectorId, option) =>{
   cy.get(`select#${selectorId}`).invoke('attr', 'class').then($classNames => {
@@ -112,7 +154,7 @@ Cypress.Commands.add('selectorHasAttrClass', (selector, attr) =>{
 
 Cypress.Commands.add('uploadImage', (selectorId,toPath,fileName) =>{
   cy.intercept('POST', `/questionnaire/*/attachment/answer/${selectorId}/index-*?locale=de`).as(`attachmentAnswer-${selectorId}`)
-  cy.get(`form#${selectorId}`).find('button').selectFile(`${toPath}${fileName}`, {
+  cy.get(`form#${selectorId}`).find('button').last().selectFile(`${toPath}${fileName}`, {
     action: 'drag-drop',
   })
   cy.wait([`@attachmentAnswer-${selectorId}`],{log : false, timeout : c_requestTimeout}).then(xhr => {
@@ -123,6 +165,46 @@ Cypress.Commands.add('uploadImage', (selectorId,toPath,fileName) =>{
   })
   cy.get(`form#${selectorId}`).find(`img[alt="${fileName}"]`).invoke('attr', 'alt').should('eq', fileName)
   cy.get(`form#${selectorId}`).find(`img[alt="${fileName}"]`).should('exist')
+})
+
+Cypress.Commands.add('uploadAllImagesOnPage', (PathToImages) =>{
+  cy.get('form').each(($form, index, $list) => {
+    cy.wrap($form)
+    .invoke('attr', 'id')
+    .then((id) => {
+      console.log(`$form[${index}] : ${id}.`) //prints id
+      if (id.includes('hood')){
+        cy.uploadImage(id,PathToImages,'hood.jpg')
+      } else if (id.includes('roof')){
+        cy.uploadImage(id,PathToImages,'roof.jpg')
+      } else if (id.includes('window')){
+        cy.uploadImage(id,PathToImages,'broken front window_2.jpg')
+      } else if (id.includes('odometer')){
+        cy.uploadImage(id,PathToImages,'image dashboard-odometer.jpg')
+      } else if (id.includes('interior-front')){
+        cy.uploadImage(id,PathToImages,'interior-front.jpg')
+      }  else if (id.includes('-sill')){
+        cy.uploadImage(id,PathToImages,'left-sill-d.jpg')
+      } else if (id.includes('left-taillight')){
+        cy.uploadImage(id,PathToImages,'left-taillight.jpg')
+      } else if (id.includes('right-taillight')){
+        cy.uploadImage(id,PathToImages,'right-taillight-o.jpg')
+      } else if (id.includes('registration-part')){
+        cy.uploadImage(id,PathToImages,'registration-part-1.jpg')
+      } else if (id.includes('vehicle-left-rear') || id.includes('rear-view')){
+        cy.uploadImage(id,PathToImages,'vehicle-left-rear-photo.jpg')
+      } else if (id.includes('vehicle-right-front') || id.includes('front-view')){
+        cy.uploadImage(id,PathToImages,'vehicle-right-front-photo.jpg')
+      } else if (id.includes('door')){
+        cy.uploadImage(id,PathToImages,'door-2.jpg')
+      }  else if (id.includes('grill')){
+        cy.uploadImage(id,PathToImages,'grill-2.jpg')
+      } else {
+        cy.uploadImage(id,PathToImages,'airbag.jpg')
+      }
+
+    })
+  })
 })
 
 Cypress.Commands.add('getBodyType', ($car,logFilename) =>{
