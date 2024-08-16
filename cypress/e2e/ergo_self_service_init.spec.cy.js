@@ -9,7 +9,7 @@ import header from '../fixtures/headerXML.json'
 
 const logFilename = 'cypress/fixtures/logs/ErgoSelfServiceInit.log'
 const PathToImages ='cypress/fixtures/images/'
-const b2bBody = 'cypress/fixtures/templates/ergoBodyL.xml' // or ergoBodyL where <PLZ>04158</PLZ> Leipzig
+const b2bBody = 'cypress/fixtures/templates/ergoBody.xml' // or ergoBodyL where <PLZ>04158</PLZ> Leipzig
 const b2bBodySave = 'cypress/fixtures/templates/ergoBodySave.xml'
 
 describe('Ergo Self Service init', () =>{
@@ -68,145 +68,129 @@ describe('Ergo Self Service init', () =>{
 
 
   const file1 = [
-    ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
+    ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021 "]
   ]
 
   file1.forEach($car => {
     it.only(`Execute /questionnaire/ergo_self_service_init with vin:${$car[0]}`, () =>{
       cy.readFile(b2bBody).then(xml => {
         const xmlDocument = new DOMParser().parseFromString(xml,'text/xml')
-        /* let vin = xmlDocument.querySelector("Fin").textContent
-        let claimNumber = xmlDocument.querySelector("SchadenNummer").textContent
-        xmlDocument.querySelector("Fin").textContent = $car[0]
-        xmlDocument.querySelector("SchadenNummer").textContent = `KS${getRandomInt(10000000,99999999)}-${getRandomInt(1000,9999)}`
-        //<Bezeichnung>sivanchevski@soft2run.com</Bezeichnung>
-        xmlDocument.querySelector("Bezeichnung").textContent = `sivanchevski1@soft2run.com`
-        //console.log(`vin: ${xmlDocument.querySelector("Fin").textContent}`);
-        //console.log(`claimNumber: ${claimNumber}`);
-        if (vehicle_identification_by_hsn_tsn){
-          xmlDocument.querySelector("Fin").textContent = ''
-          xmlDocument.querySelector("KbaNr2Hersteller").textContent = vehicle_hsn_tsn_1
-          xmlDocument.querySelector("KbaNr3Typ").textContent = vehicle_hsn_tsn_2
-          console.log(`vehicle identification by hsn_tsn: ${xmlDocument.querySelector("KbaNr2Hersteller").textContent}/${xmlDocument.querySelector("KbaNr3Typ").textContent}`);
-        }
-        console.log(`vin: ${xmlDocument.querySelector("Fin").textContent}`);
-        console.log(`claimNumber: ${xmlDocument.querySelector("SchadenNummer").textContent}`); */
 
-      expect(xmlDocument.getElementsByTagName("RollenTyp").length).to.gt(0)
+        expect(xmlDocument.getElementsByTagName("RollenTyp").length).to.gt(0)
 
-      let roleTypeElement;
+        let roleTypeElement;
 
-      //let roleTypeElement = xmlDocument.getElementsByTagName("RollenTyp")[0]
-      Array.from(xmlDocument.getElementsByTagName("RollenTyp")).forEach(element => {
-        console.log(`element: ${element.textContent}`);
-        if (element.textContent == 'ZN'){
-         roleTypeElement = element
-        }
-      })
-
-      if ( !roleTypeElement ) {
-        throw new Error(`test fails, cannot find roleType ZN`)
-      }
-
-      console.log(`roleType: ${roleTypeElement.textContent}`);
-
-      let parentElement = roleTypeElement.parentElement
-      const loop = [1,2,3,4,5,6]
-      loop.forEach((v, index, arr) => {
-        console.log(`parent ${v} of roleType: ${parentElement.nodeName }`);
-        if (parentElement.nodeName == 'body') {
-          arr.length = index + 1; // Behaves like `break`
-        }
-        parentElement = parentElement.parentElement
-      })
-
-      expect(parentElement.getElementsByTagName("Fin").length).to.eq(1)
-      let vinElement = parentElement.getElementsByTagName("Fin")[0]
-      console.log(`vin: ${vinElement.textContent}`);
-
-      expect(parentElement.getElementsByTagName("AmtlichesKennzeichen").length).to.eq(1)
-      let licensePlateElement = parentElement.getElementsByTagName("AmtlichesKennzeichen")[0]
-      console.log(`licensePlate: ${licensePlateElement.textContent}`);
-
-      expect(parentElement.getElementsByTagName("SchadenNummer").length).to.eq(1)
-      let claimNumberElement = parentElement.getElementsByTagName("SchadenNummer")[0]
-      console.log(`claimNumber: ${claimNumberElement.textContent}`);
-
-      Array.from(parentElement.getElementsByTagName("Bezeichnung")).forEach((element, index) => {
-        console.log(`email ${index}: ${element.childNodes[0].nodeValue}`);
-        element.childNodes[0].nodeValue = newEmail
-      })
-
-      Array.from(parentElement.getElementsByTagName("Telefon1")).forEach((element, index) => {
-        console.log(`Telefon1 ${index}: ${element.childNodes[0].nodeValue}`);
-        element.childNodes[0].nodeValue = newPhoneNumber
-      })
-      Array.from(parentElement.getElementsByTagName("Telefon2")).forEach((element, index) => {
-        console.log(`Telefon2 ${index}: ${element.childNodes[0].nodeValue}`);
-        element.childNodes[0].nodeValue = newPhoneNumber
-      })
-
-      let newDxNumber = `KF3C0910KR${getRandomInt(1000000000000,9999999999999)}+${getRandomInt(100000,999999)}%` //<DxNumber>KF3C0910KR0735504630004+001002%</DxNumber>
-      //newDxNumber = 'KF3C0910KR7990820637743+632584%' //test for preventing duplicate DxNumbers
-      /* If want to check <DxNumber> exists , execute
-      POST {{baseUrl}}/damage/notifications/search-by-extra-information
-      {
-        "dekra_number": "KF3C0910KR7990820637743+642584"
-      }
-      Return Status 200 if exist
-      404 if not exist */
-
-      Array.from(xmlDocument.getElementsByTagName("DxNumber")).forEach((element, index) => {
-        console.log(`DxNumber ${index}: ${element.childNodes[0].nodeValue}`);
-        element.childNodes[0].nodeValue = newDxNumber
-      })
-
-      expect(parentElement.getElementsByTagName("Bezeichnung").length).to.eq(2)
-
-      let vin = $car[0]
-      let licensePlate = `ER GO${getRandomInt(100,999)}`
-      if (noLicensePlate){
-        licensePlate = ``;
-      }
-      let claimNumber = `KS${getRandomInt(10000000,99999999)}-${getRandomInt(1000,9999)}`
-
-      vinElement.textContent = vin
-      licensePlateElement.textContent = licensePlate
-      claimNumberElement.textContent = claimNumber
-
-      if (vehicle_identification_by_hsn_tsn){
-        vinElement.textContent = ''
-        expect(parentElement.getElementsByTagName("KbaNr2Hersteller").length).to.eq(1)
-        parentElement.getElementsByTagName("KbaNr2Hersteller")[0].textContent = vehicle_hsn_tsn_1
-        expect(parentElement.getElementsByTagName("KbaNr3Typ").length).to.eq(1)
-        parentElement.getElementsByTagName("KbaNr3Typ")[0].textContent = vehicle_hsn_tsn_2
-        console.log(`vehicle identification by hsn_tsn: ${parentElement.querySelector("KbaNr2Hersteller").textContent}/${parentElement.querySelector("KbaNr3Typ").textContent}`);
-      }
-
-      console.log(`new vin: ${parentElement.querySelector("Fin").textContent}`);
-      console.log(`new licensePlate: ${parentElement.querySelector("AmtlichesKennzeichen").textContent}`);
-      console.log(`new claimNumber: ${parentElement.querySelector("SchadenNummer").textContent}`);
-      Array.from(parentElement.getElementsByTagName("Bezeichnung")).forEach((element, index) => {
-        console.log(`new email ${index}: ${element.childNodes[0].nodeValue}`);
-      })
-      Array.from(parentElement.getElementsByTagName("Telefon1")).forEach((element, index) => {
-        console.log(`new Telefon1 ${index}: ${element.childNodes[0].nodeValue}`);
-      })
-      Array.from(parentElement.getElementsByTagName("Telefon2")).forEach((element, index) => {
-        console.log(`new Telefon2 ${index}: ${element.childNodes[0].nodeValue}`);
-      })
-      Array.from(xmlDocument.getElementsByTagName("DxNumber")).forEach((element, index) => {
-        console.log(`new DxNumber ${index}: ${element.childNodes[0].nodeValue}`);
-      })
-
-      if (changeRoleType){
-        //expect(parentElement.getElementsByTagName("RollenTyp").length).to.eq(1)
-        roleTypeElement.textContent = 'ZH'
-        //console.log(`new roleType: ${parentElement.querySelector("RollenTyp").textContent}`);
-        Array.from(parentElement.getElementsByTagName("RollenTyp")).forEach((element, index) => {
-          console.log(`new roleType ${index}: ${element.childNodes[0].nodeValue}`);
+        //let roleTypeElement = xmlDocument.getElementsByTagName("RollenTyp")[0]
+        Array.from(xmlDocument.getElementsByTagName("RollenTyp")).forEach(element => {
+          console.log(`element: ${element.textContent}`);
+          if (element.textContent == 'ZN'){
+          roleTypeElement = element
+          }
         })
-      }
+
+        if ( !roleTypeElement ) {
+          throw new Error(`test fails, cannot find roleType ZN`)
+        }
+
+        console.log(`roleType: ${roleTypeElement.textContent}`);
+
+        let parentElement = roleTypeElement.parentElement
+        const loop = [1,2,3,4,5,6]
+        loop.forEach((v, index, arr) => {
+          console.log(`parent ${v} of roleType: ${parentElement.nodeName }`);
+          if (parentElement.nodeName == 'body') {
+            arr.length = index + 1; // Behaves like `break`
+          }
+          parentElement = parentElement.parentElement
+        })
+
+        expect(parentElement.getElementsByTagName("Fin").length).to.eq(1)
+        let vinElement = parentElement.getElementsByTagName("Fin")[0]
+        console.log(`vin: ${vinElement.textContent}`);
+
+        expect(parentElement.getElementsByTagName("AmtlichesKennzeichen").length).to.eq(1)
+        let licensePlateElement = parentElement.getElementsByTagName("AmtlichesKennzeichen")[0]
+        console.log(`licensePlate: ${licensePlateElement.textContent}`);
+
+        expect(parentElement.getElementsByTagName("SchadenNummer").length).to.eq(1)
+        let claimNumberElement = parentElement.getElementsByTagName("SchadenNummer")[0]
+        console.log(`claimNumber: ${claimNumberElement.textContent}`);
+
+        Array.from(parentElement.getElementsByTagName("Bezeichnung")).forEach((element, index) => {
+          console.log(`email ${index}: ${element.childNodes[0].nodeValue}`);
+          element.childNodes[0].nodeValue = newEmail
+        })
+
+        Array.from(parentElement.getElementsByTagName("Telefon1")).forEach((element, index) => {
+          console.log(`Telefon1 ${index}: ${element.childNodes[0].nodeValue}`);
+          element.childNodes[0].nodeValue = newPhoneNumber
+        })
+        Array.from(parentElement.getElementsByTagName("Telefon2")).forEach((element, index) => {
+          console.log(`Telefon2 ${index}: ${element.childNodes[0].nodeValue}`);
+          element.childNodes[0].nodeValue = newPhoneNumber
+        })
+
+        let newDxNumber = `KF3C0910KR${getRandomInt(1000000000000,9999999999999)}+${getRandomInt(100000,999999)}%` //<DxNumber>KF3C0910KR0735504630004+001002%</DxNumber>
+        //newDxNumber = 'KF3C0910KR7990820637743+632584%' //test for preventing duplicate DxNumbers
+        /* If want to check <DxNumber> exists , execute
+        POST {{baseUrl}}/damage/notifications/search-by-extra-information
+        {
+          "dekra_number": "KF3C0910KR7990820637743+642584"
+        }
+        Return Status 200 if exist
+        404 if not exist */
+
+        Array.from(xmlDocument.getElementsByTagName("DxNumber")).forEach((element, index) => {
+          console.log(`DxNumber ${index}: ${element.childNodes[0].nodeValue}`);
+          element.childNodes[0].nodeValue = newDxNumber
+        })
+
+        expect(parentElement.getElementsByTagName("Bezeichnung").length).to.eq(2)
+
+        let vin = $car[0]
+        let licensePlate = `ER GO${getRandomInt(100,999)}`
+        if (noLicensePlate){
+          licensePlate = ``;
+        }
+        let claimNumber = `KS${getRandomInt(10000000,99999999)}-${getRandomInt(1000,9999)}`
+
+        vinElement.textContent = vin
+        licensePlateElement.textContent = licensePlate
+        claimNumberElement.textContent = claimNumber
+
+        if (vehicle_identification_by_hsn_tsn){
+          vinElement.textContent = ''
+          expect(parentElement.getElementsByTagName("KbaNr2Hersteller").length).to.eq(1)
+          parentElement.getElementsByTagName("KbaNr2Hersteller")[0].textContent = vehicle_hsn_tsn_1
+          expect(parentElement.getElementsByTagName("KbaNr3Typ").length).to.eq(1)
+          parentElement.getElementsByTagName("KbaNr3Typ")[0].textContent = vehicle_hsn_tsn_2
+          console.log(`vehicle identification by hsn_tsn: ${parentElement.querySelector("KbaNr2Hersteller").textContent}/${parentElement.querySelector("KbaNr3Typ").textContent}`);
+        }
+
+        console.log(`new vin: ${parentElement.querySelector("Fin").textContent}`);
+        console.log(`new licensePlate: ${parentElement.querySelector("AmtlichesKennzeichen").textContent}`);
+        console.log(`new claimNumber: ${parentElement.querySelector("SchadenNummer").textContent}`);
+        Array.from(parentElement.getElementsByTagName("Bezeichnung")).forEach((element, index) => {
+          console.log(`new email ${index}: ${element.childNodes[0].nodeValue}`);
+        })
+        Array.from(parentElement.getElementsByTagName("Telefon1")).forEach((element, index) => {
+          console.log(`new Telefon1 ${index}: ${element.childNodes[0].nodeValue}`);
+        })
+        Array.from(parentElement.getElementsByTagName("Telefon2")).forEach((element, index) => {
+          console.log(`new Telefon2 ${index}: ${element.childNodes[0].nodeValue}`);
+        })
+        Array.from(xmlDocument.getElementsByTagName("DxNumber")).forEach((element, index) => {
+          console.log(`new DxNumber ${index}: ${element.childNodes[0].nodeValue}`);
+        })
+
+        if (changeRoleType){
+          //expect(parentElement.getElementsByTagName("RollenTyp").length).to.eq(1)
+          roleTypeElement.textContent = 'ZH'
+          //console.log(`new roleType: ${parentElement.querySelector("RollenTyp").textContent}`);
+          Array.from(parentElement.getElementsByTagName("RollenTyp")).forEach((element, index) => {
+            console.log(`new roleType ${index}: ${element.childNodes[0].nodeValue}`);
+          })
+        }
 
         const xmlString = new XMLSerializer().serializeToString(xmlDocument);
 
@@ -218,6 +202,8 @@ describe('Ergo Self Service init', () =>{
           })
 
           Cypress._.merge(header, {'authorization' : authorization});
+          Cypress._.merge(header, {'HeaderName' : newDxNumber});
+
 
           const options = {
             method: 'POST',

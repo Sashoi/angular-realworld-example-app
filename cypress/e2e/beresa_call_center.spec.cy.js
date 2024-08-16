@@ -57,7 +57,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
 
   const file1 = [
 
-    ["W1V44760313930767", "Van", "01.01.2020", "Mercedes Vito 09/2021 "]
+    ["W1V44760313930767", "Van", "01.01.2020", "Mercedes Vito  09/2021 "]
 
   ]
   file1.forEach($car => {

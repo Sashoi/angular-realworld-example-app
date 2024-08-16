@@ -145,13 +145,16 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
         //windshield
         cy.selectSVG('windshield')
 
-        //load-doors and rear-windows  MiniBusMidPanel VanMidPanel  $equipment_2_loading_doors = true
         cy.get('@bodyType').then(function (bodyType) {
-          if ($equipment_2_loading_doors && (bodyType == 'MiniBusMidPanel' || bodyType == 'VanMidPanel')){
-            cy.selectSVG('right-load-door')
-            cy.selectSVG('left-load-door')
-            //cy.selectSVG('left-rear-door-window')
-            //cy.selectSVG('right-rear-door-window')
+          if (bodyType == 'MiniBusMidPanel' || bodyType == 'VanMidPanel' || bodyType == 'Van' || bodyType == 'MiniBus'){
+            if ($equipment_2_loading_doors){
+              cy.selectSVG('right-load-door')
+              cy.selectSVG('left-load-door')
+              //cy.selectSVG('left-rear-door-window')
+              //cy.selectSVG('right-rear-door-window')
+            } else {
+              cy.selectSVG('tailgate')
+            }
           }
         })
 
@@ -384,15 +387,20 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
         cy.uploadImage('damage-photo-upload-detail-windshield',PathToImages,'broken front window_1.jpg')
 
         cy.get('@bodyType').then(function (bodyType) {
-          if ($equipment_2_loading_doors && (bodyType == 'MiniBusMidPanel' || bodyType == 'VanMidPanel')){
-            //cy.uploadImage('damage-photo-upload-overview-left-rear-door-window',PathToImages,'airbag.jpg')
-            //cy.uploadImage('damage-photo-upload-detail-left-rear-door-window',PathToImages,'airbag.jpg')
-            //cy.uploadImage('damage-photo-upload-overview-right-rear-door-window',PathToImages,'airbag.jpg')
-            //cy.uploadImage('damage-photo-upload-detail-right-rear-door-window',PathToImages,'airbag.jpg')
-            cy.uploadImage('damage-photo-upload-overview-left-load-door',PathToImages,'airbag.jpg')
-            cy.uploadImage('damage-photo-upload-detail-left-load-door',PathToImages,'airbag.jpg')
-            cy.uploadImage('damage-photo-upload-overview-right-load-door',PathToImages,'airbag.jpg')
-            cy.uploadImage('damage-photo-upload-detail-right-load-door',PathToImages,'airbag.jpg')
+          if (bodyType == 'MiniBusMidPanel' || bodyType == 'VanMidPanel' || bodyType == 'Van' || bodyType == 'MiniBus'){
+            if ($equipment_2_loading_doors){
+              //cy.uploadImage('damage-photo-upload-overview-left-rear-door-window',PathToImages,'airbag.jpg')
+              //cy.uploadImage('damage-photo-upload-detail-left-rear-door-window',PathToImages,'airbag.jpg')
+              //cy.uploadImage('damage-photo-upload-overview-right-rear-door-window',PathToImages,'airbag.jpg')
+              //cy.uploadImage('damage-photo-upload-detail-right-rear-door-window',PathToImages,'airbag.jpg')
+              cy.uploadImage('damage-photo-upload-overview-left-load-door',PathToImages,'airbag.jpg')
+              cy.uploadImage('damage-photo-upload-detail-left-load-door',PathToImages,'airbag.jpg')
+              cy.uploadImage('damage-photo-upload-overview-right-load-door',PathToImages,'airbag.jpg')
+              cy.uploadImage('damage-photo-upload-detail-right-load-door',PathToImages,'airbag.jpg')
+            } else {
+              cy.uploadImage('damage-photo-upload-overview-tailgate',PathToImages,'airbag.jpg')
+              cy.uploadImage('damage-photo-upload-detail-tailgate',PathToImages,'airbag.jpg')
+            }
           }
         })
         nextBtn()
@@ -410,7 +418,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
         cy.selectSingleList('windshield-damage-size-scratch-bigger-5cm',0)
         cy.selectSVG('zone-a')
         cy.get('@bodyType').then(function (bodyType) {
-          if (bodyType == 'MiniBusMidPanel' || bodyType == 'VanMidPanel') {
+          if (bodyType == 'MiniBusMidPanel' || bodyType == 'VanMidPanel' || bodyType == 'Van' || bodyType == 'MiniBus') {
             cy.selectSingleList('loading-floor-area-bend', 0)
             if ($equipment_2_loading_doors ){
               cy.selectMultipleList('left-load-door-damage-type', 0)
@@ -420,6 +428,10 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
               cy.selectMultipleList('right-load-door-damage-type', 0)
               cy.selectMultipleList('right-load-door-damage-type', 1)
               cy.selectSingleList('right-load-door-damage-size', 2)
+            } else {
+              cy.selectSingleList('tailgate-still-open-close-easily', 0)
+              cy.selectMultipleList('tailgate-damage-type', 1)
+              cy.selectSingleList('tailgate-damage-size', 0)
             }
           }
         })
@@ -474,8 +486,8 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   }
 
   const file1 = [
+    ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"],
     ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
-
   ]
 
   file1.forEach($car => {

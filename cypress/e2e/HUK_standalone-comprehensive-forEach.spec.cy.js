@@ -71,7 +71,7 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
     "WVWZZZ6RZGY304402",
     "Hatch5",
     "01.01.2017",
-    "Volkswagen  Polo Limousine  5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
+    "Volkswagen  Polo Limousine  5 Doors 201404 – 209912,  driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
   ]
 ]
   file1.forEach($car => {

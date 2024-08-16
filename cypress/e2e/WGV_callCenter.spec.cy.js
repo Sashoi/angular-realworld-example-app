@@ -77,12 +77,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   ]
 
   const file1 = [
-    [
-      "6FPPXXMJ2PCD55635",
-      "PickUpDoubleCabine",
-      "01.01.2012",
-      "Ford Ranger double cabine, Pick-up"
-    ]
+    ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"]
   ]
 
   damageCauseArr1.forEach($damageCause => {
@@ -110,7 +105,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
             // see "fixtures/damage_cause_mapping.json"
 
             b2bBody.claimNumber = claimNumber
-            b2bBody.claimType = "01"  //01, 02, 03, 53IV
+            b2bBody.claimType = "03"  //01, 02, 03, 53IV
             b2bBody.damageCause =  "storm"//"glass" // see "fixtures/damage_cause_mapping.json"
             b2bBody.vin =  $vin
             b2bBody.licensePlate = `WGV${claim2}BT` //"EH1234BT"
@@ -194,6 +189,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
                     cy.wait(2000)
                   }
                 })
+                //cy.get('div#vehicle-mileage').find('input#vehicle-mileage-input2').type(mileage) // stop here
                 nextBtn()
                 cy.wait(1000)
               }

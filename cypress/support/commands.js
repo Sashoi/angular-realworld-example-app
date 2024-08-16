@@ -41,7 +41,7 @@ import { getPageTitle } from "../support/utils/common.js";
 import { getQuestionnaireIdFromLinks } from "../support/utils/common.js";
 
 
-const c_requestTimeout = 60000;
+const c_requestTimeout = 999999//60000;
 
 Cypress.Commands.add('elementExists', (selector) =>{
   cy.get('body').then(($body) => {
@@ -198,7 +198,7 @@ Cypress.Commands.add('uploadAllImagesOnPage', (PathToImages) =>{
       } else if (id.includes('door')){
         cy.uploadImage(id,PathToImages,'door-2.jpg')
       }  else if (id.includes('grill')){
-        cy.uploadImage(id,PathToImages,'grill-2.jpg')
+        cy.uploadImage(id,PathToImages,'grill-2.jpg')  //15mbmb.jpg grill-2.jpg
       } else {
         cy.uploadImage(id,PathToImages,'airbag.jpg')
       }
