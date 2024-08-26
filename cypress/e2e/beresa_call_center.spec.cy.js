@@ -57,7 +57,12 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
 
   const file1 = [
 
-    ["W1V44760313930767", "Van", "01.01.2020", "Mercedes Vito  09/2021 "]
+    [
+      "TMBJB7NS4K8027658",
+      "SUV",
+      "01.09.2018",
+      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
+    ]
 
   ]
   file1.forEach($car => {
@@ -265,7 +270,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-05'){
-          cy.selectSingleList('vehicle-body-type',10) //0..10
+          cy.selectSingleList('vehicle-body-type',8) //0..10
           nextBtn()
         }
       })

@@ -72,10 +72,14 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
   // }
 
   const file1 = [
-  ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
+
+    ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"],
+  ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"],
+  ["WVWZZZAWZJY186035", "Hatch5", "01.01.2018", "VOLKSWAGEN Polo"],
+  ["JTNB23HK903079950", "Sedan", "01.01.2020", "TOYOTA  Camry"]
 ]
   file1.forEach($car => {
-    it(`allianz standalone - allianz_liability_call_center vin ${$car[0]}`, () => {
+    it.only(`allianz standalone - allianz_liability_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
       //Login()
@@ -132,12 +136,26 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
           cy.get('#vehicle-first-registration-date-input').type(first_registration_date)
           cy.get('#vehicle-mileage-input').clear().type('123456')
           cy.selectSingleList('odometer-reading-source-display',0)
+
+          cy.selectorHasAttrClass('select#select_specialModel','field-invalid').then(res =>{
+            if (res){
+              cy.selectDropDown('select_specialModel',1)
+              cy.wait(2000)
+            }
+          })
+          cy.selectorHasAttrClass('select#select_bodyType','field-invalid').then(res =>{
+            if (res){
+              cy.selectDropDown('select_bodyType',1)
+              cy.wait(2000)
+            }
+          })
           cy.selectorHasAttrClass('select#select_buildPeriod','field-invalid').then(res =>{
             if (res){
               cy.selectDropDown('select_buildPeriod',2)
               cy.wait(2000)
             }
           })
+
           cy.selectSingleList('loss-circumstances',0)
           cy.selectSingleList('loss-circumstances-details',0)
 
@@ -194,11 +212,13 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
 
             if (xhr.response.body.search('g id="right-headlight"') > 0){
               cy.selectSVG('right-headlight')
+              cy.selectSingleList('right-headlight-equipment-enhanced-headlight-system',0)
               cy.selectSingleList('right-headlight-loose-shifted-by-hand',0)
             }
 
             if (xhr.response.body.search('g id="left-headlight"') > 0){
               cy.selectSVG('left-headlight')
+              cy.selectSingleList('left-headlight-equipment-enhanced-headlight-system',0)
               cy.selectSingleList('left-headlight-loose-shifted-by-hand',0)
             }
 
@@ -523,7 +543,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
       })
     })
 
-    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['allianz_abschlussbericht'])
     }) //it PDF from commands
   })

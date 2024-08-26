@@ -28,9 +28,9 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = true
-  const executePostR = true
-  const executePost2 = false
+  const executePost = false
+  const executePostR = true  // reopen
+  const executePostSS = false // self_service
 
   function printUiBlocks(uiBlocks){
     uiBlocks.forEach((uiBlock, index1) => {
@@ -71,20 +71,9 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
   // }
 
   const file1 = [
-    [
-      "6FPPXXMJ2PCD55635",
-      "PickUpDoubleCabine",
-      "01.01.2012",
-      "Ford Ranger double cabine, Pick-up"
-    ],
-    [
-      "6FPGXXMJ2GEL59891",
-      "PickUpSingleCabine",
-      "01.01.2012",
-      "Ford Ranger single cabine, Pick-up"
-    ],
-    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"],
-    ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"]
+    ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"],
+  ["WVWZZZAWZJY186035", "Hatch5", "01.01.2014", "VOLKSWAGEN Polo"],
+  ["JTNB23HK903079950", "Sedan", "01.01.2020", "TOYOTA  Camry"]
 ]
   file1.forEach($car => {
     it.only(`allianz standalone - allianz_comprehensive_call_center vin ${$car[0]}`, () => {
@@ -143,12 +132,26 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
           cy.get('#vehicle-first-registration-date-input').type(first_registration_date)
           cy.get('#vehicle-mileage-input').clear().type('123456')
           cy.selectSingleList('odometer-reading-source-display',0)
+
+          cy.selectorHasAttrClass('select#select_specialModel','field-invalid').then(res =>{
+            if (res){
+              cy.selectDropDown('select_specialModel',1)
+              cy.wait(2000)
+            }
+          })
+          cy.selectorHasAttrClass('select#select_bodyType','field-invalid').then(res =>{
+            if (res){
+              cy.selectDropDown('select_bodyType',1)
+              cy.wait(2000)
+            }
+          })
           cy.selectorHasAttrClass('select#select_buildPeriod','field-invalid').then(res =>{
             if (res){
               cy.selectDropDown('select_buildPeriod',2)
               cy.wait(2000)
             }
           })
+
           cy.selectSingleList('loss-cause',0)
           cy.selectSingleList('loss-circumstances-details',0)
 
@@ -205,11 +208,13 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
 
             if (xhr.response.body.search('g id="right-headlight"') > 0){
               cy.selectSVG('right-headlight')
+              cy.selectSingleList('right-headlight-equipment-enhanced-headlight-system',0)
               cy.selectSingleList('right-headlight-loose-shifted-by-hand',0)
             }
 
             if (xhr.response.body.search('g id="left-headlight"') > 0){
               cy.selectSVG('left-headlight')
+              cy.selectSingleList('left-headlight-equipment-enhanced-headlight-system',0)
               cy.selectSingleList('left-headlight-loose-shifted-by-hand',0)
             }
 
@@ -517,7 +522,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'summary-page'){
           cy.get('textarea#summary-message-from-client-textarea').type('Hier können Sie eine persönliche Mitteilung für das Muster Versicherungs AG Schadenteam eintragen.')
-          if (executePost2) {
+          if (executePostSS) {
             //pageId: "summary-page"
             cy.selectMultipleList('summary-confirmation-acknowledgement',0)
             cy.get('button[type="submit"]').contains('Senden').click()

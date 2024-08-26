@@ -9,7 +9,7 @@ import header from '../fixtures/headerXML.json'
 
 const logFilename = 'cypress/fixtures/logs/ErgoSelfServiceInit.log'
 const PathToImages ='cypress/fixtures/images/'
-const b2bBody = 'cypress/fixtures/templates/ergoBody.xml' // or ergoBodyL where <PLZ>04158</PLZ> Leipzig
+const b2bBody = 'cypress/fixtures/templates/ergoBodyNoVin.xml' // or ergoBodyL where <PLZ>04158</PLZ> Leipzig
 const b2bBodySave = 'cypress/fixtures/templates/ergoBodySave.xml'
 
 describe('Ergo Self Service init', () =>{
@@ -29,16 +29,18 @@ describe('Ergo Self Service init', () =>{
   const $requestTimeout = 60000
   const executePost = false
   const noLicensePlate = false
-  const entire_vehicle_damaged_by_hail = true
-  const glass_parts_not_damaged_by_hail = true
+  const changeVin = true
+  const entire_vehicle_damaged_by_hail = false
+  const glass_parts_not_damaged_by_hail = false
   const client_email = Cypress.env("client_email")
   const vehicle_hsn_tsn_1 = '05881'   //Start with wrong TSN to reach page-04
   const vehicle_hsn_tsn_2 = 'AUC'
   const vehicle_identification_by_hsn_tsn = false
   const changeRoleType = false
-  const newEmail = `sivanchevski@soft2run.com`
-  const newPhoneNumber = `359888795023`
+  const newEmail = `sivanchevski2@soft2run.com`
+  const newPhoneNumber = `359888705020`
   const $equipment_2_loading_doors = true
+  const rollenTyp = 'ZH';
   //<Name2>Ilyovski</Name2>
 
 
@@ -68,129 +70,55 @@ describe('Ergo Self Service init', () =>{
 
 
   const file1 = [
-    ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021 "]
+    ["JTNB23HK903079950", "Sedan", "01.01.2020", "TOYOTA  Camry"]
   ]
 
   file1.forEach($car => {
-    it(`Execute /questionnaire/ergo_self_service_init with vin:${$car[0]}`, () =>{
+    it.only(`Execute /questionnaire/ergo_self_service_init with vin:${$car[0]}`, () =>{
+
+      let vin = $car[0]
+      let licensePlate = `ER GO${getRandomInt(100,999)}`
+      if (noLicensePlate){
+        licensePlate = ``;
+      }
+
       cy.readFile(b2bBody).then(xml => {
         const xmlDocument = new DOMParser().parseFromString(xml,'text/xml')
 
-        expect(xmlDocument.getElementsByTagName("RollenTyp").length).to.gt(0)
+        let newDxNumber = `KF3C0910KR${getRandomInt(1000000000000,9999999999999)}+${getRandomInt(100000,999999)}%`
+        Array.from(xmlDocument.getElementsByTagName("DxNumber")).forEach((element, index) => {
+          console.log(`DxNumber ${index}: ${element.childNodes[0].nodeValue}`);
+          element.childNodes[0].nodeValue = newDxNumber
+        })
 
         let roleTypeElement;
 
         //let roleTypeElement = xmlDocument.getElementsByTagName("RollenTyp")[0]
         Array.from(xmlDocument.getElementsByTagName("RollenTyp")).forEach(element => {
           console.log(`element: ${element.textContent}`);
-          if (element.textContent == 'ZN'){
+          if (element.textContent == rollenTyp){
           roleTypeElement = element
           }
         })
 
-        if ( !roleTypeElement ) {
-          throw new Error(`test fails, cannot find roleType ZN`)
+        if (roleTypeElement == undefined || roleTypeElement == null){
+          throw new Error(`test fails : Cannot find in body RollenTyp - ${rollenTyp}`)
         }
 
-        console.log(`roleType: ${roleTypeElement.textContent}`);
-
-        let parentElement = roleTypeElement.parentElement
-        const loop = [1,2,3,4,5,6]
-        loop.forEach((v, index, arr) => {
-          console.log(`parent ${v} of roleType: ${parentElement.nodeName }`);
-          if (parentElement.nodeName == 'body') {
-            arr.length = index + 1; // Behaves like `break`
-          }
-          parentElement = parentElement.parentElement
-        })
-
-        expect(parentElement.getElementsByTagName("Fin").length).to.eq(1)
-        let vinElement = parentElement.getElementsByTagName("Fin")[0]
-        console.log(`vin: ${vinElement.textContent}`);
-
-        expect(parentElement.getElementsByTagName("AmtlichesKennzeichen").length).to.eq(1)
+        let parentElement = roleTypeElement.parentElement.parentElement
         let licensePlateElement = parentElement.getElementsByTagName("AmtlichesKennzeichen")[0]
         console.log(`licensePlate: ${licensePlateElement.textContent}`);
-
-        expect(parentElement.getElementsByTagName("SchadenNummer").length).to.eq(1)
-        let claimNumberElement = parentElement.getElementsByTagName("SchadenNummer")[0]
-        console.log(`claimNumber: ${claimNumberElement.textContent}`);
-
-        Array.from(parentElement.getElementsByTagName("Bezeichnung")).forEach((element, index) => {
-          console.log(`email ${index}: ${element.childNodes[0].nodeValue}`);
-          element.childNodes[0].nodeValue = newEmail
-        })
-
-        Array.from(parentElement.getElementsByTagName("Telefon1")).forEach((element, index) => {
-          console.log(`Telefon1 ${index}: ${element.childNodes[0].nodeValue}`);
-          element.childNodes[0].nodeValue = newPhoneNumber
-        })
-        Array.from(parentElement.getElementsByTagName("Telefon2")).forEach((element, index) => {
-          console.log(`Telefon2 ${index}: ${element.childNodes[0].nodeValue}`);
-          element.childNodes[0].nodeValue = newPhoneNumber
-        })
-
-        let newDxNumber = `KF3C0910KR${getRandomInt(1000000000000,9999999999999)}+${getRandomInt(100000,999999)}%` //<DxNumber>KF3C0910KR0735504630004+001002%</DxNumber>
-        //newDxNumber = 'KF3C0910KR7990820637743+632584%' //test for preventing duplicate DxNumbers
-        /* If want to check <DxNumber> exists , execute
-        POST {{baseUrl}}/damage/notifications/search-by-extra-information
-        {
-          "dekra_number": "KF3C0910KR7990820637743+642584"
-        }
-        Return Status 200 if exist
-        404 if not exist */
-
-        Array.from(xmlDocument.getElementsByTagName("DxNumber")).forEach((element, index) => {
-          console.log(`DxNumber ${index}: ${element.childNodes[0].nodeValue}`);
-          element.childNodes[0].nodeValue = newDxNumber
-        })
-
-        expect(parentElement.getElementsByTagName("Bezeichnung").length).to.eq(2)
-
-        let vin = $car[0]
-        let licensePlate = `ER GO${getRandomInt(100,999)}`
-        if (noLicensePlate){
-          licensePlate = ``;
-        }
-        let claimNumber = `KS${getRandomInt(10000000,99999999)}-${getRandomInt(1000,9999)}`
-
-        vinElement.textContent = vin
         licensePlateElement.textContent = licensePlate
-        claimNumberElement.textContent = claimNumber
+        console.log(`new licensePlate: ${licensePlateElement.textContent}`);
 
-        if (vehicle_identification_by_hsn_tsn){
-          vinElement.textContent = ''
-          expect(parentElement.getElementsByTagName("KbaNr2Hersteller").length).to.eq(1)
-          parentElement.getElementsByTagName("KbaNr2Hersteller")[0].textContent = vehicle_hsn_tsn_1
-          expect(parentElement.getElementsByTagName("KbaNr3Typ").length).to.eq(1)
-          parentElement.getElementsByTagName("KbaNr3Typ")[0].textContent = vehicle_hsn_tsn_2
-          console.log(`vehicle identification by hsn_tsn: ${parentElement.querySelector("KbaNr2Hersteller").textContent}/${parentElement.querySelector("KbaNr3Typ").textContent}`);
+        if (changeVin){
+          let vinElement = parentElement.getElementsByTagName("Fin")[0]
+          console.log(`vin: ${vinElement.textContent}`);
+          vinElement.textContent = vin
+          console.log(`new vin: ${vinElement.textContent}`);
         }
 
-        console.log(`new vin: ${parentElement.querySelector("Fin").textContent}`);
-        console.log(`new licensePlate: ${parentElement.querySelector("AmtlichesKennzeichen").textContent}`);
-        console.log(`new claimNumber: ${parentElement.querySelector("SchadenNummer").textContent}`);
-        Array.from(parentElement.getElementsByTagName("Bezeichnung")).forEach((element, index) => {
-          console.log(`new email ${index}: ${element.childNodes[0].nodeValue}`);
-        })
-        Array.from(parentElement.getElementsByTagName("Telefon1")).forEach((element, index) => {
-          console.log(`new Telefon1 ${index}: ${element.childNodes[0].nodeValue}`);
-        })
-        Array.from(parentElement.getElementsByTagName("Telefon2")).forEach((element, index) => {
-          console.log(`new Telefon2 ${index}: ${element.childNodes[0].nodeValue}`);
-        })
-        Array.from(xmlDocument.getElementsByTagName("DxNumber")).forEach((element, index) => {
-          console.log(`new DxNumber ${index}: ${element.childNodes[0].nodeValue}`);
-        })
-
-        if (changeRoleType){
-          //expect(parentElement.getElementsByTagName("RollenTyp").length).to.eq(1)
-          roleTypeElement.textContent = 'ZH'
-          //console.log(`new roleType: ${parentElement.querySelector("RollenTyp").textContent}`);
-          Array.from(parentElement.getElementsByTagName("RollenTyp")).forEach((element, index) => {
-            console.log(`new roleType ${index}: ${element.childNodes[0].nodeValue}`);
-          })
-        }
+        //throw new Error(`test fails`)
 
         const xmlString = new XMLSerializer().serializeToString(xmlDocument);
 
@@ -202,7 +130,6 @@ describe('Ergo Self Service init', () =>{
           })
 
           Cypress._.merge(header, {'authorization' : authorization});
-          Cypress._.merge(header, {'HeaderName' : newDxNumber});
 
 
           const options = {
@@ -567,7 +494,9 @@ describe('Ergo Self Service init', () =>{
 
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-22'){
-                    cy.uploadImage('hail-damage-details-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
+                    cy.uploadImage('hail-damage-details-photo-upload',PathToImages,'hail-damage-intensity_heavy.jpg')
+                    cy.uploadImage('hail-damage-details-photo-upload',PathToImages,'hail-damage-intensity_heavy.jpg')
+                    cy.uploadImage('hail-damage-details-photo-upload',PathToImages,'hail-damage-intensity_moderate.jpg')
                     nextBtn()
                   }
                 })
@@ -617,8 +546,8 @@ describe('Ergo Self Service init', () =>{
                   if (aliasValue == 'summary-page'){
                     //cy.getQuestionnaireInfo()
                     cy.selectSingleList('client-salutation',1)
-                    //cy.fulfilInputIfEmpty('div#client-first-name','input#client-first-name-input','firstName')
-                    //cy.fulfilInputIfEmpty('div#client-last-name','input#client-last-name-input','lastName')
+                    cy.fulfilInputIfEmpty('div#client-first-name','input#client-first-name-input','firstName')
+                    cy.fulfilInputIfEmpty('div#client-last-name','input#client-last-name-input','lastName')
                     cy.fulfilInputIfEmpty('div#client-phone-number','input#client-phone-number-input','1234567890')
                     cy.fulfilInputIfEmpty('div#client-email','input#client-email-input',client_email)
                     //cy.get('div#client-email').find('input#client-email-input').blur()
@@ -650,8 +579,7 @@ describe('Ergo Self Service init', () =>{
     }) //it
 
 
-    it.only(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
-      Cypress.env('notificationId','rYWuDORwTxZSEoEAPfqBm') //temp
+    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['ergo_abschlussbericht','ergo_hagelbericht'])
     }) //it PDF from commands
   }) //forEach

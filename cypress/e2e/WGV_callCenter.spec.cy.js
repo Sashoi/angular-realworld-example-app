@@ -30,7 +30,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   const executePost = true
   const executePost2 = false
   const createNewQuestionnaires = executePost && true
-  const newQuestionnaire = 2 //1 - wgv_comprehensive_self_service_app, 2 - wgv_liability_self_service_app
+  const newQuestionnaire = 1 //1 - wgv_comprehensive_self_service_app, 2 - wgv_liability_self_service_app
   const interceptWGV = false
   const $equipment_2_loading_doors = true
 
@@ -77,7 +77,12 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   ]
 
   const file1 = [
-    ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"]
+    [
+      "TMBJB7NS4K8027658",
+      "SUV",
+      "01.09.2018",
+      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
+    ]
   ]
 
   damageCauseArr1.forEach($damageCause => {

@@ -1,4 +1,3 @@
-vin: 6FPPXXMJ2PCD55635 expected: PickUpDoubleCabine real: PickUpDoubleCabine desc: Ford Ranger double cabine, Pick-up 
-vin: 6FPGXXMJ2GEL59891 expected: PickUpSingleCabine real: PickUpSingleCabine desc: Ford Ranger single cabine, Pick-up 
-vin: WDB1704351F077666 expected:             Cabrio real:             Cabrio desc: MER SLK Cabrio 
-vin: WBAUB310X0VN69014 expected:             Hatch3 real:             Hatch3 desc: BMW 1 Series Hatch3 
+vin: ZFA25000002K44267 expected:    MiniBusMidPanel real:    MiniBusMidPanel desc: Fiat Ducato 
+vin: WVWZZZAWZJY186035 expected:             Hatch5 real:             Hatch5 desc: VOLKSWAGEN Polo 
+vin: JTNB23HK903079950 expected:              Sedan real:              Sedan desc: TOYOTA  Camry 

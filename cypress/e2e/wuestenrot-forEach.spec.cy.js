@@ -25,7 +25,7 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
   const executePost = true
-  const executePost2 = true
+  const executePost2 = false
 
   const sectionError = true
   const photos_available = true
@@ -47,10 +47,10 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
 
   const file1 = [
 
-    ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
+    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"]
   ]
   file1.forEach($car => {
-    it(`wuestenrot-comprehensive-call-center for vin: ${$car[0]}`, () => {
+    it.only(`wuestenrot-comprehensive-call-center for vin: ${$car[0]}`, () => {
 
       const $vin = $car[0]
 
@@ -115,7 +115,21 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
           cy.get('#accident-date-input').type('01.11.2023')
           cy.get('#vehicle-mileage-input').clear().type('123456')
           //cy.selectSingleList('loss-cause',0) // already selected
+
           cy.selectSingleList('loss-circumstances-details',8)
+
+          cy.selectorHasAttrClass('select#select_specialModel','field-invalid').then(res =>{
+            if (res){
+              cy.selectDropDown('select_specialModel',1)
+              cy.wait(2000)
+            }
+          })
+          cy.selectorHasAttrClass('select#select_bodyType','field-invalid').then(res =>{
+            if (res){
+              cy.selectDropDown('select_bodyType',1)
+              cy.wait(2000)
+            }
+          })
           cy.selectorHasAttrClass('select#select_buildPeriod','field-invalid').then(res =>{
             if (res){
               cy.selectDropDown('select_buildPeriod',1)

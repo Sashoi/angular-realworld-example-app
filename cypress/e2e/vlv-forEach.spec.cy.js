@@ -38,7 +38,9 @@ describe('Start and complete vlv standalone questionnaire', () => {
   const loss_causeArray1 = ["Unfall"]
 
   const file1 = [
-    ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"]
+    ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"],
+  ["WVWZZZAWZJY186035", "Hatch5", "01.01.2014", "VOLKSWAGEN Polo"],
+  ["JTNB23HK903079950", "Sedan", "01.01.2020", "TOYOTA  Camry"]
   ]
 
   loss_causeArray1.forEach(loss_cause => {
@@ -135,6 +137,19 @@ describe('Start and complete vlv standalone questionnaire', () => {
               cy.selectSingleList('police-ranger-informed',0)
             }
             cy.get('#vehicle-mileage-input').clear().type('123456')
+
+            cy.selectorHasAttrClass('select#select_specialModel','field-invalid').then(res =>{
+              if (res){
+                cy.selectDropDown('select_specialModel',1)
+                cy.wait(2000)
+              }
+            })
+            cy.selectorHasAttrClass('select#select_bodyType','field-invalid').then(res =>{
+              if (res){
+                cy.selectDropDown('select_bodyType',1)
+                cy.wait(2000)
+              }
+            })
             cy.selectorHasAttrClass('select#select_buildPeriod','field-invalid').then(res =>{
               if (res){
                 cy.selectDropDown('select_buildPeriod',2)

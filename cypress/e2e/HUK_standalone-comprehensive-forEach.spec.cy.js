@@ -67,15 +67,10 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
   // }
 
   const file1 = [
-  [
-    "WVWZZZ6RZGY304402",
-    "Hatch5",
-    "01.01.2017",
-    "Volkswagen  Polo Limousine  5 Doors 201404 – 209912,  driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
-  ]
+    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"]
 ]
   file1.forEach($car => {
-    it.only(`huk standalone - huk_comprehensive_call_center vin ${$car[0]}`, () => {
+    it(`huk standalone - huk_comprehensive_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
       ///Login()
