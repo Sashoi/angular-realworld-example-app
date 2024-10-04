@@ -83,6 +83,22 @@
     {
       "questionId": "part-selection-type",
       "answer": ["vehicle-zones"]
+    },
+    {
+      "questionId": "vehicle-zone",
+      "answer": null
+    },
+    {
+      "questionId": "client-salutation",
+      "answer": "girl"
+    },
+    {
+      "questionId": "client-first-name",
+      "answer": [" org clientFirstName"]
+    },
+    {
+      "questionId": "client-last-name",
+      "answer": ["org clientLastName"]
     }
   ],
   "supportInformation": null,

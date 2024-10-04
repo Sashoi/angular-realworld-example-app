@@ -1,2 +1,3 @@
-vin: TMBJB7NS4K8027658 expected:                SUV real:                    desc: SKODA Kodiaq 1.5 TSI ACT DSG Style 
-vin: TMBJB7NS4K8027658 expected:                SUV real:            MiniBus desc: SKODA Kodiaq 1.5 TSI ACT DSG Style 
+vin: JTNB23HK903079950 expected:              Sedan real:                    desc: TOYOTA  Camry 
+vin: JTNB23HK903079950 expected:              Sedan real:             Cabrio desc: TOYOTA  Camry 
+vin: JTNB23HK903079950 expected:              Sedan real:            MiniBus desc: TOYOTA  Camry 

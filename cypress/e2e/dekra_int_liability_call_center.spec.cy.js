@@ -120,7 +120,7 @@ describe('Start and complete dekra_int_liability_call_center standalone question
         f_first_registration_date = '01.01.2015'
       }
       cy.get('input[formcontrolname="firstRegistrationDate"]').type(f_first_registration_date)
-      cy.get('input#zipCode[data-test="standalone_zipCode"]').type('22222')
+      //cy.get('input#zipCode[data-test="standalone_zipCode"]').type('22222')
 
       if (interceptDekraStandalone){
        // with this intercept I'm replacing the body of standalone
@@ -378,7 +378,7 @@ describe('Start and complete dekra_int_liability_call_center standalone question
 
 
     it(`dekra_int_liability_self_service_app create vin ${$car[0]}`, () => {
-      const notificationId = 'LO3ECHNEEBAoUNYDWyLuI'//Cypress.env('notificationId') //`kltjnKARCYpXoovcyDPMh`
+      const notificationId = 'rNdCdjCjoFU0j4N8o42vM'//Cypress.env('notificationId') //`kltjnKARCYpXoovcyDPMh`
       cy.authenticate().then(function (authorization) {
         cy.then(function () {
           questionnaire.authorization = authorization

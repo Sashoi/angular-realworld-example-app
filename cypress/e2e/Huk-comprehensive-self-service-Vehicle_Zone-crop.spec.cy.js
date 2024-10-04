@@ -28,7 +28,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
   const $requestTimeout = 60000;
-  const executePost = false
+  const executePost = true
 
   function selectCropImage(selectorId,cropSelectorId,fileName){
     cy.intercept('GET', `/questionnaire/*/attachment/answer/${selectorId}/index-*`,{ log: false }).as(`cropOrigin-${selectorId}`)
@@ -72,7 +72,11 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   const file1 = [
- ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"]
+    ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"],
+  ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"],
+  ["WVWZZZAWZJY186035", "Hatch5", "01.01.2014", "VOLKSWAGEN Polo"],
+  ["JTNB23HK903079950", "Sedan", "01.01.2020", "TOYOTA  Camry"],
+  ["VF7RDRFJF9L510253", "Station", "01.01.2010", "Citroen C5 Limousine 4 türig"]
 ]
   file1.forEach($car => {
     it.only(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
@@ -312,6 +316,14 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-17'){
                   cy.selectSingleList('vehicle-location-equals-home-address',0)
+                  nextBtn()
+                }
+              })
+
+              //"page-18"
+              cy.get('@goingPageId').then(function (aliasValue) {
+                if (aliasValue == 'page-18'){
+                  cy.get('textarea#additional-remarks-textarea').type('Weitere Anmerkungen  - 1.<br>Weitere Anmerkungen  - 2.<br>Weitere Anmerkungen  - 3.')
                   nextBtn()
                 }
               })

@@ -62,22 +62,10 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
       "SUV",
       "01.09.2018",
       "SKODA Kodiaq 1.5 TSI ACT DSG Style"
-    ],
-    [
-      "WVWZZZ3CZME020680",
-      "Station",
-      "01.09.2020",
-      "Passat Variant 1.4 TSI Plug-In-Hybrid DSG GTE"
-    ],
-    [
-      "VF3VEAHXKLZ080921",
-      "MiniBusMidPanel",
-      "01.01.2017",
-      "Peugeot Expert 09/2020"
     ]
   ]
   file1.forEach($car => {
-    it.only(`dekra_int_comprehensive_call_center standalone questionnaire, vin ${$car[0]}`, () => {
+    it.skip(`dekra_int_comprehensive_call_center standalone questionnaire, vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
 
@@ -132,7 +120,7 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
         cy.get('input[data-test="standalone_vin"]').focus() //this is a bug
       }
       cy.get('input[formcontrolname="firstRegistrationDate"]').type(f_first_registration_date)
-      cy.get('input#zipCode[data-test="standalone_zipCode"]').type('22222')
+      //cy.get('input#zipCode[data-test="standalone_zipCode"]').type('22222')
 
       if (interceptDekraStandalone){
        // with this intercept I'm replacing the body of standalone
@@ -392,8 +380,8 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
       })
     }) //it
 
-    it.skip(`dekra_int_comprehensive_self_service_app create vin ${$car[0]}`, () => {
-      const notificationId = 'X0E6VlLyPESJIx28b3y38'//Cypress.env('notificationId') //`kltjnKARCYpXoovcyDPMh`
+    it(`dekra_int_comprehensive_self_service_app create vin ${$car[0]}`, () => {
+      const notificationId = 'RI932FC0PrgjHuYe68J0g'//Cypress.env('notificationId') //`kltjnKARCYpXoovcyDPMh`
       cy.authenticate().then(function (authorization) {
         cy.then(function () {
           questionnaire.authorization = authorization
@@ -421,7 +409,7 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
       })
     })
 
-    it.skip(`dekra_int_comprehensive_self_service_app execute vin ${$car[0]}`, () => {
+    it(`dekra_int_comprehensive_self_service_app execute vin ${$car[0]}`, () => {
       cy.viewport('samsung-note9')
       const requestUrl = Cypress.env('requestUrl')
       console.log(`Start ${Cypress.env('templateId')} from url: ${requestUrl}.`)

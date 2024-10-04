@@ -37,6 +37,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
   const sendSMS = false
   const interceptBeresaStandalone = false
   const $equipment_2_loading_doors = true
+  const replaceVin = false
 
   function printUiBlocks(uiBlocks){
     uiBlocks.forEach((uiBlock, index1) => {
@@ -57,12 +58,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
 
   const file1 = [
 
-    [
-      "TMBJB7NS4K8027658",
-      "SUV",
-      "01.09.2018",
-      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
-    ]
+    ["JTNB23HK903079950", "Sedan", "01.01.2020", "TOYOTA  Camry"]
 
   ]
   file1.forEach($car => {
@@ -215,6 +211,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
               console.log(`notificationId : ${notificationId}`);
               console.log(`SMS templateId : ${templateId}`);
               console.log(`SMS requestUrl : ${requestUrl}`);
+              //expect(response.status).to.eq(400) // stop
               //Cypress.env('requestUrl', requestUrl)
               //Cypress.env('templateId', response.body.requestedInformation[arrLength - 1].templateId)
               //cy.printRequestedInformation(response.body.requestedInformation);
@@ -225,6 +222,9 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
     })
 
     it(`beresa_self_service_app_employee execute vin ${$car[0]}`, () => {
+
+      const $vin = $car[0]
+
       cy.viewport('samsung-note9')
       const requestUrl = Cypress.env('requestUrl')
       console.log(`Start ${Cypress.env('templateId')} from url: ${requestUrl}.`)
@@ -250,33 +250,72 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-02'){
-          cy.uploadImage('order-form-upload-beresa-ahl',PathToImages,'airbag.jpg')
+          cy.uploadImage('order-form-upload-beresa-ahl',PathToImages,'Dekra_flags.jpg')
           nextBtn()
         }
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-03'){
-          cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,'registration-part-1.jpg')
+          cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,'zulassungsbescheinigung-teil-1-fahrzeugidentifizierungsnummer.png')
+          //cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,'vehicle-registration-part-1.png')
+          //cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,'registration-part-1.jpg')
           nextBtn()
         }
       })
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-04'){
-          //vehicle-vin-photo-upload
+          // "vehicle-registration-part-1-data-check-instruction",
+          // "vehicle-registration-part-1-vehicle-label",
+          if (replaceVin) {
+            cy.get('input#vehicle-registration-part-1-hsn-tsn-input[data-test="text-question-type-vehicle-registration-part-1-hsn-tsn"]').clear()
+            cy.wait(2000)
+            const vinInput = 'input#vehicle-registration-part-1-vin-input[data-test="text-question-type-vehicle-registration-part-1-vin"]'
+            cy.get(vinInput).clear().type($vin,{delay : 200})
+            cy.wait(2000)
+            cy.get(vinInput).invoke('val').then(aVin => {
+              console.log(`check vin typing : ${aVin}-${$vin}`)
+              expect(aVin).to.eq($vin)
+            });
+            cy.get(vinInput).should('have.value', $vin)
+          }
+
+          // "vehicle-registration-part-1-first-registration-date",
+          // "vehicle-registration-part-1-vehicle-owner-label",
+          // "vehicle-registration-part-1-last-name-company-name",
+          // "vehicle-registration-part-1-first-name",
+          // "vehicle-registration-part-1-street",
+          // "vehicle-registration-part-1-street-number",
+          // "vehicle-registration-part-1-city",
+          // "vehicle-registration-part-1-zip-code"
+
           nextBtn()
         }
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-05'){
-          cy.selectSingleList('vehicle-body-type',8) //0..10
+          cy.wait(3000)
+          cy.getBodyType($car,logFilename).then(function (bodyType) {
+            cy.then(function () {
+              questionnaire.bodyType = bodyType
+            })
+          })
+          //"vehicle-vin-photo-upload-instruction",
+          //"vehicle-vin-photo-upload"
           nextBtn()
         }
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-06'){
+          cy.selectSingleList('vehicle-body-type',8) //0..10
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-07'){
           cy.getBodyType($car,logFilename).then(function (bodyType) {
             cy.then(function () {
               questionnaire.bodyType = bodyType
@@ -304,7 +343,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-07'){
+        if (aliasValue == 'page-08'){
           cy.wait('@clickableCar',{requestTimeout : $requestTimeout, log : false}).then(xhr => {
             expect(xhr.response.statusCode).to.equal(200)
             console.log(`Comming SVG with clickableCar`)
@@ -330,14 +369,14 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-08'){
+        if (aliasValue == 'page-09'){
           cy.uploadImage('vehicle-interior-front-photo-upload',PathToImages,'interior-front.jpg')
           nextBtn()
         }
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-09'){
+        if (aliasValue == 'page-10'){
           cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathToImages,'image dashboard-odometer.jpg')
           cy.get('input#vehicle-mileage-input').type('321334')
           nextBtn()
@@ -345,7 +384,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-10'){
+        if (aliasValue == 'page-11'){
           cy.uploadImage('vehicle-right-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
           cy.uploadImage('vehicle-left-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
           cy.uploadImage('vehicle-left-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
@@ -355,7 +394,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-11'){
+        if (aliasValue == 'page-12'){
           cy.uploadAllImagesOnPage(PathToImages)
           cy.get('input#damage-photo-upload-remarks-hood-input').type('damage-photo-upload-remarks-hood')
           nextBtn()
@@ -363,7 +402,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-12'){
+        if (aliasValue == 'page-13'){
           cy.get('form').each(($form, index, $list) => {
             cy.wrap($form)
             .invoke('attr', 'id')
@@ -381,7 +420,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-13'){
+        if (aliasValue == 'page-14'){
           cy.get('@bodyType').then(function (bodyType) {
             const remarks = `additional-remarks for bodyType : ${bodyType}.`
             cy.get('textarea#additional-remarks-textarea').type(remarks)
@@ -396,7 +435,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
           if (executePost2) {
             //pageId: "summary-page"
             //cy.selectMultipleList('`summary-confirmation-acknowledgement`',0)
-            cy.get('button[type="submit"]').contains('Senden').click()
+            cy.get('button[type="submit"]').contains('Schadenmeldung senden').click()
             cy.wait('@postPost',{ log: false }).then(xhr => {
               cy.postPost(xhr,false).then(function (notificationId) {
                 console.log(`notificationId: ${notificationId}`);

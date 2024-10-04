@@ -28,9 +28,9 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = false
+  const executePost = true
   const executePostR = true  // reopen
-  const executePostSS = false // self_service
+  const executePostSS = true // self_service
 
   function printUiBlocks(uiBlocks){
     uiBlocks.forEach((uiBlock, index1) => {
@@ -71,12 +71,10 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
   // }
 
   const file1 = [
-    ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"],
-  ["WVWZZZAWZJY186035", "Hatch5", "01.01.2014", "VOLKSWAGEN Polo"],
-  ["JTNB23HK903079950", "Sedan", "01.01.2020", "TOYOTA  Camry"]
+    ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato "]
 ]
   file1.forEach($car => {
-    it.only(`allianz standalone - allianz_comprehensive_call_center vin ${$car[0]}`, () => {
+    it(`allianz standalone - allianz_comprehensive_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
       //Login()
@@ -403,7 +401,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
       })
     })
 
-    it.skip(`allianz_comprehensive_self_service create vin ${$car[0]}`, () => {
+    it(`allianz_comprehensive_self_service create vin ${$car[0]}`, () => {
       const notificationId = Cypress.env('notificationId') //`wlA4icU77W6LjzUFyrGzy`
       cy.authenticate().then(function (authorization) {
         cy.then(function () {
@@ -431,7 +429,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
       })
     })
 
-    it.skip(`allianz_comprehensive_self_service execute vin ${$car[0]}`, () => {
+    it(`allianz_comprehensive_self_service execute vin ${$car[0]}`, () => {
       cy.viewport('samsung-note9')
       console.log(`Start ${Cypress.env('templateId')} from url: ${Cypress.env('requestUrl')}.`)
 

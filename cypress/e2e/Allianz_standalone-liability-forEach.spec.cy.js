@@ -73,13 +73,10 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
 
   const file1 = [
 
-    ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"],
-  ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"],
-  ["WVWZZZAWZJY186035", "Hatch5", "01.01.2018", "VOLKSWAGEN Polo"],
-  ["JTNB23HK903079950", "Sedan", "01.01.2020", "TOYOTA  Camry"]
+    ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV "]
 ]
   file1.forEach($car => {
-    it.only(`allianz standalone - allianz_liability_call_center vin ${$car[0]}`, () => {
+    it(`allianz standalone - allianz_liability_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
       //Login()
@@ -405,7 +402,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
       })
     })
 
-    it.skip(`allianz_liability_self_service vin ${$car[0]}`, () => {
+    it(`allianz_liability_self_service vin ${$car[0]}`, () => {
       cy.viewport('samsung-note9')
       const notificationId = Cypress.env('notificationId') //`wlA4icU77W6LjzUFyrGzy`
       cy.authenticate().then(function (authorization) {

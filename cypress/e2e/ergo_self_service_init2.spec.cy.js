@@ -27,10 +27,10 @@ describe('Ergo Self Service init', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
-  const executePost = false
+  const executePost = true
   const noLicensePlate = false
   const changeVin = true
-  const entire_vehicle_damaged_by_hail = false
+  const entire_vehicle_damaged_by_hail = true
   const glass_parts_not_damaged_by_hail = false
   const client_email = Cypress.env("client_email")
   const vehicle_hsn_tsn_1 = '05881'   //Start with wrong TSN to reach page-04
@@ -70,7 +70,7 @@ describe('Ergo Self Service init', () =>{
 
 
   const file1 = [
-    ["JTNB23HK903079950", "Sedan", "01.01.2020", "TOYOTA  Camry"]
+    ["W0L0XCR975E026845", "Cabrio", "01.01.2009", "OPE Tigra Cabrio"]
   ]
 
   file1.forEach($car => {
@@ -392,16 +392,8 @@ describe('Ergo Self Service init', () =>{
                     cy.selectMultipleList('windshield-hail-damage-type',0)
                     cy.selectMultipleList('windshield-hail-damage-type',1)
                     //"visibleExpression": "answer('glass-parts-damaged-by-hail') == 'yes' && answer('selected-parts-glass-parts-only')['roof'] == 'yes'",
-                    // this does not work
-                    // cy.getQuestionAnswer('selected-parts-glass-parts-only').then(function (answer) {
-                    //   let roof = answer.map(x => x.roof)
-                    //   console.log(`roof: ${JSON.stringify(roof)}`);
-                    //   console.log(`roof bool: ${!roof && roof.length > 0 && roof[0] == 'yes'}`);
-                    //   if (!glass_parts_damaged_by_hail && (!roof && roof.length > 0 && roof[0] == 'yes')){
-                    //     cy.selectSingleList('roof-equipment-panorama-roof',1)
-                    //   }
-                    // })
-                    //cy.getQuestionnaireInfo()
+
+                    cy.getQuestionnaireInfo()
                     //getInternalInformation(`On ${aliasValue}:`)
                     nextBtn()
                   }

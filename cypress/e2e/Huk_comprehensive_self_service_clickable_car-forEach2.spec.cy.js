@@ -486,12 +486,16 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   }
 
   const file1 = [
-    ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"],
-    ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
+    [
+      "6FPPXXMJ2PCD55635",
+      "PickUpDoubleCabine",
+      "01.01.2012",
+      "Ford Ranger double cabine, Pick-up"
+    ]
   ]
 
   file1.forEach($car => {
-    it.only(`Huk-comprehensive-self-service-clickable-car vin :  ${$car[0]}`, function () {
+    it.skip(`Huk-comprehensive-self-service-clickable-car vin :  ${$car[0]}`, function () {
 
       const vin = $car[0]
 
@@ -514,7 +518,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
         b2bBody.qas.find(q => {return q.questionId === "client-insurance-claim-number"}).answer = claimNumber
         b2bBody.qas.find(q => {return q.questionId === "vehicle-vin"}).answer = vin
         b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licenseplate
-        b2bBody.qas.find(q => {return q.questionId === "part-selection-type"}).answer = 'clickable-car'
+        b2bBody.qas.find(q => {return q.questionId === "part-selection-type"}).answer = 'clickable-car' //'vehicle-zones'
         b2bBody.qas.find(q => {return q.questionId === "client-mobile-phone-number"}).answer = newPhoneNumber
         b2bBody.qas.find(q => {return q.questionId === "client-phone-number"}).answer = newPhoneNumber
 
@@ -613,7 +617,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
       cy.GeneratePDFs(['dekra_schadenbilder','dekra_abschlussbericht'])
     }) //it PDF from commands
 
-    it(`huk_comprehensive_self_service_clickable_car create vin ${$car[0]}`, () => {
+    it.skip(`huk_comprehensive_self_service_clickable_car create vin ${$car[0]}`, () => {
       const notificationId = Cypress.env('notificationId')
       cy.authenticate().then(function (authorization) {
         cy.then(function () {
@@ -653,6 +657,13 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
         })
       })
     })
+
+    it.skip(`Generate Emails for ${$car[0]}`, function () {
+      //huk_request_information, huk_request_information_reminder_16h, huk_request_information_reminder_32h, huk_request_information_reminder_cancellation,
+      //huk_request_information_reminder_completion
+      cy.GenerateEmails(['huk_request_information', 'huk_request_information_reminder_16h', 'huk_request_information_reminder_32h', 'huk_request_information_reminder_cancellation',
+        'huk_request_information_reminder_completion'],'huk_comprehensive_self_service_clickable_car')
+    }) //it PDF from commands
 
 
 

@@ -12,6 +12,7 @@ import header from '../fixtures/header.json'
 const logFilename = 'cypress/fixtures/logs/hukVehicleZone.log'
 const pdfPath = 'cypress/fixtures/Pdf/'
 const PathToImages ='cypress/fixtures/images/'
+const b2bBodySave = 'cypress/fixtures/templates/b2bBodyHuk_vehicle_zone_Save.json'
 
 describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
 
@@ -41,12 +42,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   const file1 = [
-    [
-      "6FPPXXMJ2PCD55635",
-      "PickUpDoubleCabine",
-      "01.01.2012",
-      "Ford Ranger double cabine, Pick-up"
-    ]
+    ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"]
   ]
   file1.forEach($car => {
     it.only(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
@@ -73,6 +69,10 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
         b2bBody.qas.find(q => {return q.questionId === "client-insurance-claim-number"}).answer = claimNumber
         b2bBody.qas.find(q => {return q.questionId === "vehicle-vin"}).answer = $vin
         b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licenseplate
+        //b2bBody.qas.find(q => {return q.questionId === "vehicle-zone"}).answer = null
+        //b2bBody.qas = b2bBody.qas.filter(obj => obj.questionId !== "vehicle-zone");
+        //b2bBody.qas.find(q => {return q.questionId === "client-salutation"}).answer = "ms"
+        //b2bBody.qas = b2bBody.qas.filter(obj => obj.questionId !== "client-salutation");
 
         Cypress._.merge(header, {'authorization' : authorization});
         const options = {
@@ -81,6 +81,8 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
           body: b2bBody,
           headers: header
         };
+
+        cy.writeFile(b2bBodySave, b2bBody)
 
         cy.request(options).then(
           (response) => {
@@ -179,6 +181,15 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                 if (aliasValue == 'page-05'){
                   cy.wait('@vehicleZones',{requestTimeout : $requestTimeout}).then(xhr => {
                     expect(xhr.response.statusCode).to.equal(200)
+                    cy.selectSVG_VZ('front-center')
+                    cy.selectSVG_VZ('front-left')
+                    cy.selectSVG_VZ('front-right')
+                    cy.selectSVG_VZ('side-left')
+                    cy.selectSVG_VZ('side-right')
+                    cy.selectSVG_VZ('rear-left')
+                    cy.selectSVG_VZ('rear-right')
+                    cy.selectSVG_VZ('rear-center')
+
                     cy.selectSVG_VZ('roof')
                     cy.selectSVG_VZ('windshield')
                     nextBtn()
@@ -198,7 +209,10 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-07"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-07'){
-                  cy.get('div.svg-selection-container[title="Dach"]').click('center');
+                  // cy.get('div.svg-selection-container[title="Windschutzscheibe"]').click('center');
+                  // cy.get('div.svg-selection-container[title="Dach"]').click('center');
+                  //select all
+                  cy.get('div.svg-selection-container').click('center',{ multiple: true });
                   cy.wait(1000);
                   nextBtn()
                 }
@@ -249,12 +263,13 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-12"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-12'){
-                  cy.uploadImage('damage-photo-upload-overview-vehicle-front-left-top-side',PathToImages,`airbag1.jpg`)
-                  cy.uploadImage('damage-photo-upload-overview-vehicle-front-right-top-side',PathToImages,`airbag2.jpg`)
-                  cy.uploadImage('damage-photo-upload-overview-roof-front-left-top-side',PathToImages,`airbag3.jpg`)
-                  cy.uploadImage('damage-photo-upload-overview-roof-front-right-top-side',PathToImages,`airbag4.jpg`)
-                  cy.uploadImage('damage-photo-upload-overview-roof-rear-right-top-side',PathToImages,`airbag5.jpg`)
-                  cy.uploadImage('damage-photo-upload-overview-roof-rear-left-top-side',PathToImages,`airbag6.jpg`)
+                  // cy.uploadImage('damage-photo-upload-overview-vehicle-front-left-top-side',PathToImages,`airbag1.jpg`)
+                  // cy.uploadImage('damage-photo-upload-overview-vehicle-front-right-top-side',PathToImages,`airbag2.jpg`)
+                  // cy.uploadImage('damage-photo-upload-overview-roof-front-left-top-side',PathToImages,`airbag3.jpg`)
+                  // cy.uploadImage('damage-photo-upload-overview-roof-front-right-top-side',PathToImages,`airbag4.jpg`)
+                  // cy.uploadImage('damage-photo-upload-overview-roof-rear-right-top-side',PathToImages,`airbag5.jpg`)
+                  // cy.uploadImage('damage-photo-upload-overview-roof-rear-left-top-side',PathToImages,`airbag6.jpg`)
+                  cy.uploadAllImagesOnPage(PathToImages)
                   nextBtn()
                 }
               })
@@ -262,12 +277,20 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-13"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-13'){
-                  cy.uploadImage('damage-photo-upload-overview-roof',PathToImages,`roof.jpg`)
+                  cy.typeIntoAllTextArea('Anmerkungen zu Nahaufnahme der Beschädigung - 1.<br>Anmerkungen zu Nahaufnahme der Beschädigung - 2.<br>Anmerkungen zu Nahaufnahme der Beschädigung - 3.')
+                  //cy.get('textarea#damage-photo-upload-remarks-*').type()
+                  //cy.uploadImage('damage-photo-upload-overview-windshield',PathToImages,`broken front window_2.jpg`)
+                  //cy.uploadImage('damage-photo-upload-detail-windshield',PathToImages,`broken front window_1.jpg`)
+                  //cy.uploadImage('damage-photo-upload-overview-roof',PathToImages,`roof.jpg`)
                   if(false){
                     cy.get('form#damage-photo-upload-overview-roof').find('button').contains(' Beschädigung markieren ').click({ force: true });
                     cy.get('q-image-analytics-popup').find('div.popup-damage-types').find('input[type="checkbox"]').contains('Kratzer ').click({ force: true });
                   }
-                  cy.uploadImage('damage-photo-upload-detail-roof',PathToImages,`roof-d.jpg`)
+                  //cy.uploadImage('damage-photo-upload-detail-roof',PathToImages,`roof-d.jpg`)
+                  cy.uploadAllImagesOnPage(PathToImages)
+                  //cy.get('textarea#damage-photo-upload-remarks-windshield-textarea').type('Anmerkungen zu Windschutzscheibe - 1.<br>Anmerkungen zu Windschutzscheibe - 2.<br>Anmerkungen zu Windschutzscheibe - 3.')
+                  //cy.get('textarea#damage-photo-upload-remarks-roof-textarea').type('Anmerkungen zu Nahaufnahme der Beschädigung - 1.<br>Anmerkungen zu Nahaufnahme der Beschädigung - 2.<br>Anmerkungen zu Nahaufnahme der Beschädigung - 3.')
+
                   nextBtn()
                 }
               })
@@ -304,6 +327,14 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-17'){
                   cy.selectSingleList('vehicle-location-equals-home-address',0)
+                  nextBtn()
+                }
+              })
+
+              //"page-18"
+              cy.get('@goingPageId').then(function (aliasValue) {
+                if (aliasValue == 'page-18'){
+                  cy.get('textarea#additional-remarks-textarea').type('Weitere Anmerkungen  - 1.<br>Weitere Anmerkungen  - 2.<br>Weitere Anmerkungen  - 3.')
                   nextBtn()
                 }
               })
@@ -362,8 +393,9 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
       })
     }) //it PDF
 
-    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
-      cy.GeneratePDFs(['dekra_schadenbilder','dekra_abschlussbericht'])
+    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+      //Cypress.env('notificationId','ElfrTimcD1lhz7wHFx6iM')
+      cy.GeneratePDFs(['dekra_schadenbilder','dekra_abschlussbericht','dekra_schadenbilder_kommentiert'])
     }) //it PDF from commands
 
   })  //forEach

@@ -37,11 +37,14 @@
 // }
 
 import header from '../fixtures/header.json'
+import emailBody from '../fixtures/templates/emailBody.json'
 import { getPageTitle } from "../support/utils/common.js";
 import { getQuestionnaireIdFromLinks } from "../support/utils/common.js";
 
 
 const c_requestTimeout = 999999//60000;
+
+
 
 Cypress.Commands.add('elementExists', (selector) =>{
   cy.get('body').then(($body) => {
@@ -104,8 +107,22 @@ Cypress.Commands.add('selectSingleList', (selectorId, option) =>{
   selectFromList(selectorId,option,'radio--checked');
 })
 
+
+// You can use jquery via Cypress.$ to check if any exist.
+
+// const listItemTitle = '[data-cy-component=list-item-title]';
+// if (Cypress.$(listItemTitle).length > 0) {
+//   cy.get(listItemTitle).each(($el, index, $list) => {
+//     cy.wrap($el).then(($span) => {
+//     const spanText = $span.text();
+//     cy.log(`index: ` + index + ' ' + spanText);
+//     });
+//   });
+// }
 function selectAllFromLists(containerClass,option){
-  cy.get(`div.${containerClass}`)
+  cy.get(`div.${containerClass}`).should("have.length.gte", 0).then($containerClass => {
+    if ($containerClass.length > 0){
+          cy.get(`div.${containerClass}`)
           .should('be.visible')
           .each(($container, index, $list) => {
             //const firstDit = $container
@@ -122,6 +139,9 @@ function selectAllFromLists(containerClass,option){
               })
             })
           })
+        }
+    }
+  )
 }
 
 Cypress.Commands.add('selectAllMultipleList', (option) =>{
@@ -129,7 +149,7 @@ Cypress.Commands.add('selectAllMultipleList', (option) =>{
 })
 
 Cypress.Commands.add('selectAllSingleLists', (option) =>{
-  selectAllFromLists('single-list-container',option)
+    selectAllFromLists('single-list-container',option)
 })
 
 
@@ -167,12 +187,49 @@ Cypress.Commands.add('uploadImage', (selectorId,toPath,fileName) =>{
   cy.get(`form#${selectorId}`).find(`img[alt="${fileName}"]`).should('exist')
 })
 
+
+
+//does not work
+Cypress.Commands.add('selectAllSVG_VZ', () =>{
+  cy.get('svg',{ log : false }).find('g').each(($g_element, index, $list) => {
+    cy.wrap($g_element).invoke('attr', 'id')
+    .then((id) => {
+      cy.log(id) //prints id
+      cy.selectSVG_VZ(id)
+    })
+  })
+
+})
+
+function pad_with_zeroes(number, length) {
+
+  var my_string = '' + number;
+  while (my_string.length < length) {
+      my_string = '0' + my_string;
+  }
+
+  return my_string;
+
+}
+
+Cypress.Commands.add('typeIntoAllTextArea', (text) =>{
+  cy.get('textarea').each(($textarea, index, $list) => {
+    cy.wrap($textarea)
+    .invoke('attr', 'id')
+    .then((id) => {
+      console.log(`$textarea[${index}] : ${id}.`) //prints id
+      cy.get(`#${id}`).clear().type(`${pad_with_zeroes(index+1,3)} ${id} - ${text}`)
+    })
+  })
+})
+
 Cypress.Commands.add('uploadAllImagesOnPage', (PathToImages) =>{
   cy.get('form').each(($form, index, $list) => {
     cy.wrap($form)
     .invoke('attr', 'id')
     .then((id) => {
       console.log(`$form[${index}] : ${id}.`) //prints id
+      cy.wait(2000)
       if (id.includes('hood')){
         cy.uploadImage(id,PathToImages,'hood.jpg')
       } else if (id.includes('roof')){
@@ -375,6 +432,28 @@ Cypress.Commands.add('generatePdf', function (baseUrl_lp, pdfPath, pdf_template)
   }) //get('@authorization'
 })
 
+Cypress.Commands.add('generateEmail', function (baseUrl_lp, email_template,q_template) {
+  cy.get('@authorization').then(function (authorization) {
+    const notificationId = Cypress.env('notificationId')
+    Cypress._.merge(header, {'authorization':authorization})
+
+    emailBody.emailTemplate = email_template
+
+    const options = {
+      method: 'POST',
+      url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/${q_template}?unknownReceiver=false`,
+      body: emailBody,
+      headers: header
+    }
+    cy.request(options).then(
+      (response) => {
+      expect(response.status).to.eq(200)
+      console.log(`notificationId : ${notificationId}`)
+      cy.printRequestedInformation(response.body.requestedInformation)
+    })
+  }) //get('@authorization'
+})
+
 Cypress.Commands.add(`GeneratePDFs`, function (pdf_templates) {
 
   const $dev = Cypress.env("dev");
@@ -399,6 +478,37 @@ Cypress.Commands.add(`GeneratePDFs`, function (pdf_templates) {
         pdf_templates.forEach(pdf_template => {
           cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
           console.log(`pdf template : ${pdf_template}`)
+        })
+      })
+    } else {
+      assert.isOk('OK', 'damageNotificationId not exist.')
+    }
+  })
+})
+
+Cypress.Commands.add(`GenerateEmails`, function (email_templates,q_template) {
+
+  const $dev = Cypress.env("dev");
+  const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
+
+  cy.authenticate().then(function (authorization) {
+
+    Cypress._.merge(header, {'authorization':authorization});
+    const damageNotificationId = Cypress.env('notificationId')
+    if (damageNotificationId != null && damageNotificationId.length > 0){
+      const options = {
+        method: 'GET',
+        url: `${baseUrl_lp}damage/notification/${damageNotificationId}`,
+        headers: header
+      }
+      cy.request(options).then(
+        (response) => {
+        expect(response.status).to.eq(200) // true
+        const vin = response.body.body.vehicleIdentification.vin;
+        console.log(`GenerateEmails for vin: ${vin}`)
+        email_templates.forEach(email_template => {
+          cy.generateEmail(baseUrl_lp, email_template,q_template)
+          console.log(`email template : ${email_template} q template : ${q_template}`)
         })
       })
     } else {

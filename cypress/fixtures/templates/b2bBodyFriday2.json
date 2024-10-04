@@ -1,0 +1,44 @@
+{
+  "qas": [
+    {
+      "questionId": "questionnaire-locale",
+      "answer": "de"
+    },
+    {
+      "questionId": "accident-date",
+      "answer": "2023-09-15"
+    },
+    {
+      "questionId": "license-plate",
+      "answer": "{{input-license-plate}}"
+    },
+    {
+      "questionId": "first-registration-date",
+      "answer": "2019-05-23"
+    },
+    {
+      "questionId": "odometer-reading",
+      "answer": "34567"
+    },
+    {
+      "questionId": "repair-location-zipcode",
+      "answer": "70180"
+    },
+    {
+      "questionId": "damage-cause-friday",
+      "answer": "explosion"
+    },
+    {
+      "questionId": "coverage-type",
+      "answer": "partially-comprehensive"
+    }
+  ],
+  "supportInformation": {
+    "vin": "W1V44760313930767",
+    "country": "DE",
+    "labourRate": 100,
+    "paintRate": 100,
+    "claimNumber": "{{claimNumber}}",
+    "countryVehicleIdentification": ""
+  }
+}

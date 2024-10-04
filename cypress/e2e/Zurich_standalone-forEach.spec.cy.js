@@ -29,7 +29,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = false
+  const executePost = true
   const interceptZurichStandalone = false
 
   function printUiBlocks(uiBlocks){
@@ -49,32 +49,13 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
     cy.waitingFor('@currentPage',goingPage,questionnaire)
   }
 
-  const file1 = [[
-    "TMBJB7NS4K8027658",
-    "SUV",
-    "01.09.2018",
-    "SKODA Kodiaq 1.5 TSI ACT DSG Style"
-  ]
+  const file1 = [
+    ["JTNB23HK903079950", "Sedan", "01.01.2020", "TOYOTA  Camry"]
   ]
   file1.forEach($car => {
     it.only(`zurich standalone questionnaire - zurich_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
-
-      // cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/zurich/#/login?theme=zurich`,{ log : false })
-      // // login
-      // cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
-      // cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
-      // cy.get('form').submit()
-
-
-      // cy.wait('@token',{requestTimeout : $requestTimeout}).then(xhr => {
-      //   expect(xhr.response.statusCode).to.equal(200)
-      //   const access_token = xhr.response.body.access_token
-      //   cy.then(function () {
-      //     questionnaire.authorization = `Bearer ${access_token}`
-      //   })
-      // })  //wait @token
 
       //Login()
       cy.standaloneLogin('zurich').then(function (authorization) {
@@ -106,7 +87,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
       console.log(`claimNumber: ${claimNumber}`)
 
       // Fulfill standalone form
-      cy.get('ng-select[data-test="standalone_company"]').find('input').type('D',{force: true})
+      cy.get('ng-select[data-test="standalone_company"]').find('input').type('D',{force: true}) //D or Z
       cy.get('input[name="claimNumber"]').type(claimNumber);
       cy.get('input[data-test="standalone_vin"]').type($vin)
       cy.get('input[formcontrolname="firstRegistrationDate"]').type(f_first_registration_date)

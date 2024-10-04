@@ -1,0 +1,44 @@
+{
+  "qas": [
+    {
+      "questionId": "questionnaire-locale",
+      "answer": "de"
+    },
+    {
+      "questionId": "accident-date",
+      "answer": "2023-09-15"
+    },
+    {
+      "questionId": "license-plate",
+      "answer": "FRI 8577"
+    },
+    {
+      "questionId": "first-registration-date",
+      "answer": "2009-01-01"
+    },
+    {
+      "questionId": "odometer-reading",
+      "answer": "34567"
+    },
+    {
+      "questionId": "repair-location-zipcode",
+      "answer": "70180"
+    },
+    {
+      "questionId": "damage-cause-friday",
+      "answer": "flood"
+    },
+    {
+      "questionId": "coverage-type",
+      "answer": "partially-comprehensive"
+    }
+  ],
+  "supportInformation": {
+    "vin": "WDB2083441T069719",
+    "country": "DE",
+    "labourRate": 100,
+    "paintRate": 100,
+    "claimNumber": "FR-692889-8577",
+    "countryVehicleIdentification": ""
+  }
+}

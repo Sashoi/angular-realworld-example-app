@@ -18,7 +18,7 @@
     },
     {
       "questionId": "client-insurance-claim-number",
-      "answer": "40-33-992/289820-S"
+      "answer": "89-13-738/703155-Z"
     },
     {
       "questionId": "animal-species",
@@ -50,7 +50,7 @@
     },
     {
       "questionId": "vehicle-vin",
-      "answer": "6FPPXXMJ2PCD55635"
+      "answer": "WAUZZZ4B73N015435"
     },
     {
       "questionId": "vehicle-first-registration-date",
@@ -58,7 +58,7 @@
     },
     {
       "questionId": "client-vehicle-license-plate",
-      "answer": "HSS 7-811"
+      "answer": "SOF 4840"
     },
     {
       "questionId": "client-email",
@@ -66,11 +66,11 @@
     },
     {
       "questionId": "client-mobile-phone-number",
-      "answer": "+3598887950"
+      "answer": ["123654789"]
     },
     {
       "questionId": "client-phone-number",
-      "answer": "+3598887950"
+      "answer": ["123654789"]
     },
     {
       "questionId": "vehicle-mileage",
@@ -82,7 +82,23 @@
     },
     {
       "questionId": "part-selection-type",
-      "answer": "clickable-car"
+      "answer": ["vehicle-zones"]
+    },
+    {
+      "questionId": "vehicle-zone",
+      "answer": null
+    },
+    {
+      "questionId": "client-salutation",
+      "answer": "girl"
+    },
+    {
+      "questionId": "client-first-name",
+      "answer": [" org clientFirstName"]
+    },
+    {
+      "questionId": "client-last-name",
+      "answer": ["org clientLastName"]
     }
   ],
   "supportInformation": null,

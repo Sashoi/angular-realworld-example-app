@@ -27,7 +27,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = true
+  const executePost = false
   const executePost2 = false
   const createNewQuestionnaires = executePost && true
   const newQuestionnaire = 1 //1 - wgv_comprehensive_self_service_app, 2 - wgv_liability_self_service_app
@@ -110,7 +110,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
             // see "fixtures/damage_cause_mapping.json"
 
             b2bBody.claimNumber = claimNumber
-            b2bBody.claimType = "03"  //01, 02, 03, 53IV
+            b2bBody.claimType = "01"  //01, 02, 03, 53IV
             b2bBody.damageCause =  "storm"//"glass" // see "fixtures/damage_cause_mapping.json"
             b2bBody.vin =  $vin
             b2bBody.licensePlate = `WGV${claim2}BT` //"EH1234BT"
@@ -149,6 +149,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
             cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
 
             currentPage()
+            console.log(cy.state('aliases'))
 
             cy.get('@goingPageId').then(function (aliasValue) {
               if (aliasValue == 'page-01'){
@@ -357,7 +358,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
         cy.GeneratePDFs(['wgv_default','wgv_pilot','wgv_pilot_2023'])
       }) //it PDF from commands
 
-      it(`Start new questionnaire.`, function () {
+      it.skip(`Start new questionnaire.`, function () {
         cy.viewport('samsung-note9')
         console.log(`Start ${Cypress.env('templateId')} from url: ${Cypress.env('requestUrl')}.`)
 
