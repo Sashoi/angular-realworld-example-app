@@ -72,11 +72,26 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   const file1 = [
-    ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"],
-  ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"],
-  ["WVWZZZAWZJY186035", "Hatch5", "01.01.2014", "VOLKSWAGEN Polo"],
-  ["JTNB23HK903079950", "Sedan", "01.01.2020", "TOYOTA  Camry"],
-  ["VF7RDRFJF9L510253", "Station", "01.01.2010", "Citroen C5 Limousine 4 türig"]
+    [
+      "TMBJB7NS4K8027658",
+      "SUV",
+      "01.09.2018",
+      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
+    ],
+    [
+      "WVWZZZ3CZME020680",
+      "Station",
+      "01.09.2020",
+      "Passat Variant 1.4 TSI Plug-In-Hybrid DSG GTE"
+    ],
+    [
+      "VF3VEAHXKLZ080921",
+      "MiniBusMidPanel",
+      "01.01.2017",
+      "Peugeot Expert 09/2020"
+    ],
+    ["W1V44760313930767", "Van", "01.01.2019", "Mercedes Vito 09/2021"]
+
 ]
   file1.forEach($car => {
     it.only(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
@@ -279,6 +294,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-13"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-13'){
+                  cy.typeIntoAllTextArea('Anmerkungen zu Nahaufnahme der Beschädigung - 1.<br>Anmerkungen zu Nahaufnahme der Beschädigung - 2.<br>Anmerkungen zu Nahaufnahme der Beschädigung - 3.')
                   cy.uploadImage('damage-photo-upload-overview-windshield',PathToImages,`broken front window_2.jpg`)
                   selectCropImage('damage-photo-upload-overview-windshield',
                                   'damage-photo-upload-detail-windshield',

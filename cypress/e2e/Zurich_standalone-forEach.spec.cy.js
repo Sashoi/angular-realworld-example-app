@@ -50,7 +50,12 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
   }
 
   const file1 = [
-    ["JTNB23HK903079950", "Sedan", "01.01.2020", "TOYOTA  Camry"]
+    [
+      "TMBJB7NS4K8027658",
+      "SUV",
+      "01.09.2018",
+      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
+    ]
   ]
   file1.forEach($car => {
     it.only(`zurich standalone questionnaire - zurich_call_center vin ${$car[0]}`, () => {
@@ -87,11 +92,11 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
       console.log(`claimNumber: ${claimNumber}`)
 
       // Fulfill standalone form
-      cy.get('ng-select[data-test="standalone_company"]').find('input').type('D',{force: true}) //D or Z
+      //cy.get('ng-select[data-test="standalone_company"]').find('input').type('D',{force: true}) //D or Z
       cy.get('input[name="claimNumber"]').type(claimNumber);
       cy.get('input[data-test="standalone_vin"]').type($vin)
       cy.get('input[formcontrolname="firstRegistrationDate"]').type(f_first_registration_date)
-      cy.get('input[formcontrolname="mileage"]').type('123.456')
+      //cy.get('input[formcontrolname="mileage"]').type('123.456')
       cy.get('[data-test="standalone_licensePlate"]').type(licensePlate)
       if (interceptZurichStandalone){
        // with this intercept I'm replacing the body of standalone
@@ -291,9 +296,13 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
       // Schadenbilder und Dokumente - page-03
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-03'){
-          cy.selectSingleList('send-report-per-email-to-client',1)
+          cy.selectSingleList('fictious-billing',0)
+          cy.get('input#client-email-input').clear().type('sivanchevski@soft2run.com');
+          cy.selectSingleList('company',0)
+
+          //cy.selectSingleList('send-report-per-email-to-client',1)
           cy.selectSingleList('send-report-per-email-to-agent',1)
-          cy.selectSingleList('assign-or-archive-claim',1)
+          cy.selectSingleList('assign-or-archive-claim',0)
           nextBtn()
         }
       })

@@ -42,10 +42,10 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   const file1 = [
-    ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"]
+    ["W1V44760313930767", "Van", "01.01.2019", "Mercedes Vito 09/2021"]
   ]
   file1.forEach($car => {
-    it.only(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
+    it.skip(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
 
       const $vin = $car[0]
 
@@ -394,7 +394,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
     }) //it PDF
 
     it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
-      //Cypress.env('notificationId','ElfrTimcD1lhz7wHFx6iM')
+      Cypress.env('notificationId','kSNARtMNsB7dEG29yFIMz')
       cy.GeneratePDFs(['dekra_schadenbilder','dekra_abschlussbericht','dekra_schadenbilder_kommentiert'])
     }) //it PDF from commands
 

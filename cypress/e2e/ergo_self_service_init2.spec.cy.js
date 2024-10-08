@@ -70,7 +70,20 @@ describe('Ergo Self Service init', () =>{
 
 
   const file1 = [
-    ["W0L0XCR975E026845", "Cabrio", "01.01.2009", "OPE Tigra Cabrio"]
+    [
+      "6FPPXXMJ2PCD55635",
+      "PickUpDoubleCabine",
+      "01.01.2012",
+      "Ford Ranger double cabine, Pick-up"
+    ],
+    [
+      "6FPGXXMJ2GEL59891",
+      "PickUpSingleCabine",
+      "01.01.2012",
+      "Ford Ranger single cabine, Pick-up"
+    ],
+    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"],
+    ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"]
   ]
 
   file1.forEach($car => {
@@ -209,7 +222,8 @@ describe('Ergo Self Service init', () =>{
                         questionnaire.bodyType = bodyType
                       })
                     })
-                    cy.selectMultipleList('terms-of-service-acknowledgement',0)
+                    //cy.selectMultipleList('terms-of-service-acknowledgement',0)
+                    cy.selectSingleList('terms-of-service-acknowledgement',0)
                     //cy.getQuestionnaireInfo()
                     cy.wait(1000)
                     nextBtn()
@@ -548,18 +562,10 @@ describe('Ergo Self Service init', () =>{
                     })
                     if (executePost) {
                       cy.get('button[type="submit"]').contains('Schadenmeldung senden').click() //Senden
-                      cy.wait('@postPost',{timeout : $requestTimeout}).then(xhr => {
-                        cy.postPost(xhr,false)
+                      cy.wait('@completePost',{timeout : $requestTimeout}).then(xhr => {
+                        cy.completePost(xhr,false)
                         console.log(`Cypress.env('notificationId') = ${Cypress.env('notificationId')}`)
                       }) //cy.wait
-                      // cy.wait('@updatePage').then(xhr => {
-                      //   if (xhr.response.statusCode != 200){
-                      //     console.log(`status: ${xhr.response.statusCode}`);
-                      //     console.log(`internalErrorCode: ${xhr.response.internalErrorCode}`);
-                      //     console.log(`message: ${xhr.response.message}`);
-                      //   }
-                      //   expect(xhr.response.statusCode).to.equal(200)
-                      // })
                     }
                   }
                 })

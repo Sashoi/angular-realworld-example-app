@@ -229,7 +229,7 @@ Cypress.Commands.add('uploadAllImagesOnPage', (PathToImages) =>{
     .invoke('attr', 'id')
     .then((id) => {
       console.log(`$form[${index}] : ${id}.`) //prints id
-      cy.wait(2000)
+      cy.wait(3000) // does not work for 80 images
       if (id.includes('hood')){
         cy.uploadImage(id,PathToImages,'hood.jpg')
       } else if (id.includes('roof')){
@@ -411,6 +411,27 @@ Cypress.Commands.add('postPost', (xhr, hasDialog = true) =>{
   })
 })
 
+Cypress.Commands.add('completePost', (xhr, hasDialog = true) =>{
+  if (xhr.response.statusCode != 200){
+    console.log(`status: ${xhr.response.statusCode}`);
+    console.log(`internalErrorCode: ${xhr.response.body.internalErrorCode}`);
+    console.log(`message: ${xhr.response.body.message}`);
+    throw new Error(`test fails : ${xhr.response.body.message}`)
+  }
+  expect(xhr.response.statusCode).to.equal(200)
+  const notificationId = xhr.response.body.relatesTo.notificationId;
+  Cypress.env('notificationId', notificationId)
+  console.log(`answers count: ${xhr.response.body.answers.length}`);
+  console.log(`notificationId: ${notificationId}`);
+  console.log(`status: ${xhr.response.body.status}`);
+  if (hasDialog){
+
+  }
+  cy.wrap(notificationId).then((notificationId) => {
+    return notificationId
+  })
+})
+
 
 Cypress.Commands.add('generatePdf', function (baseUrl_lp, pdfPath, pdf_template) {
   cy.get('@authorization').then(function (authorization) {
@@ -560,6 +581,7 @@ Cypress.Commands.add('commanBeforeEach',(goingPage,questionnaire) =>{
   console.clear()
   cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
   cy.intercept('POST', `/questionnaire/*/post?locale=de`,{ log: false }).as('postPost')
+  cy.intercept('POST', `/questionnaire/*/complete`,{ log: false }).as('completePost')
   cy.intercept('GET',  `/questionnaire/*/currentPage?offset=*&locale=de`).as('currentPage')
   cy.intercept('GET', `/questionnaire/*/picture/clickableCar*`,{ log: false }).as('clickableCar')
   cy.intercept('POST', '/questionnaire/*/page/page-*', (req) => {
