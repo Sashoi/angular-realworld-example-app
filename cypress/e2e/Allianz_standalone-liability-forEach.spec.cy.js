@@ -28,7 +28,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = true
+  const executePost = false
   const executePostR = true
   const executePost2 = false
 
@@ -73,10 +73,10 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
 
   const file1 = [
 
-    ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV "]
+    ["WVWZZZAWZJY186035", "Hatch5", "01.01.2018", "VOLKSWAGEN Polo"]
 ]
   file1.forEach($car => {
-    it(`allianz standalone - allianz_liability_call_center vin ${$car[0]}`, () => {
+    it.only(`allianz standalone - allianz_liability_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
       //Login()
@@ -402,7 +402,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
       })
     })
 
-    it(`allianz_liability_self_service vin ${$car[0]}`, () => {
+    it.skip(`allianz_liability_self_service vin ${$car[0]}`, () => {
       cy.viewport('samsung-note9')
       const notificationId = Cypress.env('notificationId') //`wlA4icU77W6LjzUFyrGzy`
       cy.authenticate().then(function (authorization) {

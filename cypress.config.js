@@ -7,7 +7,9 @@ module.exports = defineConfig({
   viewportWidth: 1920,
   viewportHeight: 1080,
   chromeWebSecurity: false,
-
+  experimentalMemoryManagement : true,
+  numTestsKeptInMemory: 20,
+  
   env: {
     username: "artem.bondar166@gmail.com - cypress.env.json is used",
     password: "CypressTest1",

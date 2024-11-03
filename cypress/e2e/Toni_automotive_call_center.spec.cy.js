@@ -94,7 +94,12 @@ const vehicle_body_type_value = 0;
 
 
   const file1 = [
-      ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"]
+    [
+      "WVWZZZ6RZGY304402",
+      "Hatch5",
+      "01.01.2017",
+      "Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
+    ]
 ]
   file1.forEach($car => {
     it(`Toni automotive - toni_automotive_call_center vin ${$car[0]}`, () => {
@@ -551,6 +556,9 @@ const vehicle_body_type_value = 0;
 
     it(`toni_automotive_claim_handler get requestUrl vin ${$car[0]}`, () => {
       const notificationId = Cypress.env('notificationId') //`wlA4icU77W6LjzUFyrGzy`
+      if(notificationId == undefined || notificationId == null || !notificationId.length > 0){
+        throw new Error(`test fails : notificationId = ${notificationId}`)
+      }
       cy.authenticate().then(function (authorization) {
         cy.then(function () {
           questionnaire.authorization = authorization
@@ -584,6 +592,9 @@ const vehicle_body_type_value = 0;
     it(`toni_automotive_claim_handler execute vin ${$car[0]}`, () => {
       cy.wait(2000)
       let requestUrl = Cypress.env('requestUrl')
+      if(requestUrl == undefined || requestUrl == null || !requestUrl.length > 0){
+        throw new Error(`test fails : requestUrl = ${requestUrl}`)
+      }
       //requestUrl = 'https://dev02.spearhead-ag.ch:443/p/r/T9AxhE834hVZc2fVzB3aY'
       console.log(`Start ${Cypress.env('templateId')} from url: ${requestUrl}.`)
 

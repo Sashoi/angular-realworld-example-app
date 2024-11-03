@@ -486,16 +486,11 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   }
 
   const file1 = [
-    [
-      "6FPPXXMJ2PCD55635",
-      "PickUpDoubleCabine",
-      "01.01.2012",
-      "Ford Ranger double cabine, Pick-up"
-    ]
+    ["W1V44760313930767", "Van", "01.01.2019", "Mercedes Vito 09/2021"]
   ]
 
   file1.forEach($car => {
-    it.skip(`Huk-comprehensive-self-service-clickable-car vin :  ${$car[0]}`, function () {
+    it(`Huk-comprehensive-self-service-clickable-car vin :  ${$car[0]}`, function () {
 
       const vin = $car[0]
 
@@ -613,7 +608,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
       })
     }) //it PDF
 
-    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['dekra_schadenbilder','dekra_abschlussbericht'])
     }) //it PDF from commands
 

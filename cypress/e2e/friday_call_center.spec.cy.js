@@ -220,42 +220,45 @@ describe('Start and complete friday_call_center standalone questionnaire', () =>
             //cy.printRequestedInformation(response.body.requestedInformation);
         })
         if (sendSMS){
-          const options = {
-            method: 'POST',
-            url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/friday_self_service`,
-            body : `{
-              "receiver": "+359888795023",
-              "contact": {
-                "firstName": "first name",
-                "lastName": "lastName",
-                "mobileNumber": "+359888795023",
-                "type": "PERSON"
-              },
-              "smsTemplate": "dekra_sms_self_service_2_customer"
-            }`,
-            headers: header
-          };
-          cy.request(options).then(
-            (response) => {
-              // response.body is automatically serialized into JSON
-              expect(response.status).to.eq(200) // true
-              const arrLength = response.body.requestedInformation.length
-              const requestUrl = response.body.requestedInformation[arrLength - 1].requestUrl
-              const templateId = response.body.requestedInformation[arrLength - 1].templateId
-              console.log(`notificationId : ${notificationId}`);
-              console.log(`SMS templateId : ${templateId}`);
-              console.log(`SMS requestUrl : ${requestUrl}`);
-              //Cypress.env('requestUrl', requestUrl)
-              //Cypress.env('templateId', response.body.requestedInformation[arrLength - 1].templateId)
-              //cy.printRequestedInformation(response.body.requestedInformation);
-          })
+          cy.generateSMS(`${baseUrl_lp}`, 'dekra_sms_self_service_2_customer','friday_self_service')
+            if (false){
+            const options = {
+              method: 'POST',
+              url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/friday_self_service`,
+              body : `{
+                "receiver": "+359888795023",
+                "contact": {
+                  "firstName": "first name",
+                  "lastName": "lastName",
+                  "mobileNumber": "+359888795023",
+                  "type": "PERSON"
+                },
+                "smsTemplate": "dekra_sms_self_service_2_customer"
+              }`,
+              headers: header
+            };
+            cy.request(options).then(
+              (response) => {
+                // response.body is automatically serialized into JSON
+                expect(response.status).to.eq(200) // true
+                const arrLength = response.body.requestedInformation.length
+                const requestUrl = response.body.requestedInformation[arrLength - 1].requestUrl
+                const templateId = response.body.requestedInformation[arrLength - 1].templateId
+                console.log(`notificationId : ${notificationId}`);
+                console.log(`SMS templateId : ${templateId}`);
+                console.log(`SMS requestUrl : ${requestUrl}`);
+                //Cypress.env('requestUrl', requestUrl)
+                //Cypress.env('templateId', response.body.requestedInformation[arrLength - 1].templateId)
+                //cy.printRequestedInformation(response.body.requestedInformation);
+            })
+          }
         }
       })
 
     })
 
 
-    it(`friday_self_service execute vin ${$car[0]}`, () => {
+    it.skip(`friday_self_service execute vin ${$car[0]}`, () => {
       cy.viewport('samsung-note9')
       cy.intercept('GET', `/questionnaire/extended_generic_elements/attachment/*`,{ log: false }).as('clickableCarFri')
       const requestUrl = Cypress.env('requestUrl')
@@ -368,9 +371,9 @@ describe('Start and complete friday_call_center standalone questionnaire', () =>
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-04-photos'){
-          //cy.uploadImage('vehicle-photo-upload-front-view',PathToImages,'vehicle-right-front-photo.jpg')
-          //cy.uploadImage('vehicle-photo-upload-rear-view',PathToImages,'vehicle-left-rear-photo1.jpg')
-          cy.uploadAllImagesOnPage(PathToImages)
+          cy.uploadImage('vehicle-photo-upload-front-view',PathToImages,'vehicle-right-front-photo.jpg')
+          cy.uploadImage('vehicle-photo-upload-rear-view',PathToImages,'vehicle-left-rear-photo1.jpg')
+          //cy.uploadAllImagesOnPage(PathToImages)
           nextBtn()
         }
       })

@@ -116,12 +116,8 @@ describe('Start and complete friday_self_service',  () =>{
 ]
 
   const file1 = [
-    [
-      "WDB2083441T069719",
-      "Coupe",
-      "01.01.2009",
-      "MER CLK Coupe (partial identification, build period to be defined manually)"
-    ]
+
+  ["JTNB23HK903079950", "Sedan", "01.01.2020", "TOYOTA  Camry"]
   ]
   file1.forEach($car => {
     it(`friday_self_service questionnaire, vin ${$car[0]}`, () => {
@@ -201,7 +197,7 @@ describe('Start and complete friday_self_service',  () =>{
         Cypress._.merge(header, {'authorization':authorization});
         const options = {
           method: 'POST',
-          url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/friday_self_service?unknownReceiver=true`,
+          url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/friday_self_service?unknownReceiver=false`,
           //url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/wgv_self_service_upload?unknownReceiver=true`,
           body: emailBody,
           headers: header
@@ -429,6 +425,9 @@ describe('Start and complete friday_self_service',  () =>{
             cy.wait('@postPost',{ log: false }).then(xhr => {
               cy.postPost(xhr,false).then(function (notificationId) {
                 console.log(`notificationId: ${notificationId}`);
+                if (sendSMS){
+                  cy.generateSMS(baseUrl_lp, 'dekra_sms_self_service_2_customer','friday_self_service')
+                }
               })
             })
           }
@@ -437,9 +436,9 @@ describe('Start and complete friday_self_service',  () =>{
 
     })
 
-    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
-      cy.GeneratePDFs(['friday_default'])
-    }) //it PDF from commands
+    // it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    //   cy.GeneratePDFs(['friday_default'])
+    // }) //it PDF from commands
 /*
     it.skip('log browser info', function () {
       console.log(Cypress.browser)

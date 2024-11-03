@@ -28,8 +28,7 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = false
-  const executePostR = true
+  const executePost = true
   const executePost2 = true
 
   function printUiBlocks(uiBlocks){
@@ -61,14 +60,14 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
 
   const file1 = [
     [
-      "VF3VEAHXKLZ080921",
-      "MiniBusMidPanel",
-      "01.01.2017",
-      "Peugeot Expert 09/2020"
+      "TMBJB7NS4K8027658",
+      "SUV",
+      "01.09.2018",
+      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
     ]
 ]
   file1.forEach($car => {
-    it.only(`Sph sales - sph_sales_comprehensive_call_center vin ${$car[0]}`, () => {
+    it(`Sph sales - sph_sales_comprehensive_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
 
@@ -145,11 +144,13 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
           cy.selectSingleList('loss-circumstances-details',0)
 
           //cy.get('textarea#loss-cause-client-remarks-textarea').clear().type('Versicherungsinterne Anmerkung zur Schadenursache und/oder Schadenhergang:')
-          cy.selectSingleList('vehicle-ready-to-drive',1)
-          cy.selectSingleList('vehicle-location',2)
-          //cy.selectSingleList('repair-cost-estimate-available',1)
-          //cy.selectSingleList('cash-on-hand-settlement-preferred',1)
+          //cy.selectSingleList('vehicle-ready-to-drive',1)
+          //cy.selectSingleList('vehicle-location',2)
+          cy.selectSingleList('repair-cost-estimate-available',1)
+          cy.selectSingleList('cash-on-hand-settlement-preferred',1)
           //cy.selectSingleList('photo-only-available',1)
+          cy.get('#repair-location-zip-code-input').clear().type('22222')
+          cy.selectSingleList('switch-to-self-service-workflow',0)
 
 
           cy.getBodyType($car,logFilename).then(function (bodyType) {
@@ -298,8 +299,8 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
       })
     })
 
-    it.skip(`sph_sales_comprehensive_self_service_app create vin ${$car[0]}`, () => {
-      const notificationId = Cypress.env('notificationId') //`wlA4icU77W6LjzUFyrGzy`
+    it(`sph_sales_comprehensive_self_service_app create vin ${$car[0]}`, () => {
+      const notificationId = Cypress.env('notificationId')
       cy.authenticate().then(function (authorization) {
         cy.then(function () {
           questionnaire.authorization = authorization
@@ -307,7 +308,7 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
         Cypress._.merge(header, {'authorization':authorization});
         const options = {
           method: 'POST',
-          url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/allianz_comprehensive_self_service`,
+          url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/sph_sales_comprehensive_self_service_app`,
           body: emailBody,
           headers: header
         };

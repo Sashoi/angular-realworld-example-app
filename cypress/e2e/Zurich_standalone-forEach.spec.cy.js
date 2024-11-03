@@ -50,12 +50,14 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
   }
 
   const file1 = [
+
     [
       "TMBJB7NS4K8027658",
       "SUV",
       "01.09.2018",
       "SKODA Kodiaq 1.5 TSI ACT DSG Style"
     ]
+
   ]
   file1.forEach($car => {
     it.only(`zurich standalone questionnaire - zurich_call_center vin ${$car[0]}`, () => {
@@ -71,14 +73,14 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
 
       cy.wait(500)
 
-      const intS1 = getRandomInt(10,99).toString()
-      const intS2 = getRandomInt(1000000,9999999).toString()
-      const intS3 = getRandomInt(1000,9999).toString()
-      const intS4 = getRandomInt(1,9).toString()
+      const intS2 = getRandomInt(10,99).toString()
+      const intS7 = getRandomInt(1000000,9999999).toString()
+      const intS4 = getRandomInt(1000,9999).toString()
+      const intS1 = getRandomInt(1,9).toString()
       const $equipment_2_loading_doors = true
       const claimTypeArray = ["VK","TK","KH"]
       const claimTypeRandom = getRandomInt(0,3)
-      const claimType = claimTypeArray[claimTypeRandom]
+      const claimType = claimTypeArray[claimTypeRandom].toLocaleLowerCase() // Check if app makes them upper case.
 
 
       const first_registration_date = "2024-02-01";
@@ -87,8 +89,8 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
       console.log(`first_registration_date: ${first_registration_date}`)
       const nextButtonLabel ='Weiter'
       const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
-      const claimNumber = `${intS1}-${intS2}-${claimType}${intS4}`
-      const licensePlate = `ZUR ${intS3}`
+      const claimNumber = `${intS2}-${intS7}-${claimType}${intS1}`
+      const licensePlate = `ZUR ${intS4}`
       console.log(`claimNumber: ${claimNumber}`)
 
       // Fulfill standalone form
@@ -114,6 +116,9 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
           req.body = b2bBody
         })
       }
+      cy.get(`input[name="claimNumber"]`).invoke('val').then($val => {
+        console.log(`claimNumber after: ${$val}`)
+      })
       cy.get('button[data-test="standalone_submit"]').click()
 
       cy.wait('@zurichStandalone',{requestTimeout : $requestTimeout}).then(xhr => {
@@ -154,27 +159,33 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
               cy.selectSingleList('equipment-loading-area-cover-type',1)
             }
           })
-          cy.selectorHasAttrClass('select#select_buildPeriod','field-invalid').then(res =>{
-            if (res){
-              //cy.selectDropDown('select_buildPeriod',1)
-              const selectorId = 'select_buildPeriod'
-              const option = [1]
-              cy.get(`select#${selectorId}`).invoke('attr', 'class').then($classNames => {
-                console.log(`class Names :  ${$classNames}.`)
-                if ($classNames.includes('field-invalid')) {
-                  cy.get(`select#${selectorId}`).select(option,{force: true})//.should('have.value', '200501')
-                  cy.wait(2000)
-                  cy.get(`select#${selectorId}`).invoke('val').then($val => {
-                    console.log(`selected for ${selectorId} :  ${$val}.`)
-                    cy.get(`select#${selectorId}`).should('have.value', $val)
-                  })
-                }
-              })
-              cy.wait(2000)
-              cy.get('input#vehicle-first-registration-date-input').focus()
-              cy.wait(2000)
-            }
-          })
+          cy.fillInvalidDropDown('select_specialModel')
+          cy.wait(2000)
+          cy.fillInvalidDropDown('select_buildPeriod')
+          cy.wait(2000)
+          cy.selectSingleList('mileage-from-zurich-table',1)
+          cy.get('#vehicle-mileage-input').clear().type('123456')
+          // cy.selectorHasAttrClass('select#select_buildPeriod','field-invalid').then(res =>{
+          //   if (res){
+          //     //cy.selectDropDown('select_buildPeriod',1)
+          //     const selectorId = 'select_buildPeriod'
+          //     const option = [1]
+          //     cy.get(`select#${selectorId}`).invoke('attr', 'class').then($classNames => {
+          //       console.log(`class Names :  ${$classNames}.`)
+          //       if ($classNames.includes('field-invalid')) {
+          //         cy.get(`select#${selectorId}`).select(option,{force: true})//.should('have.value', '200501')
+          //         cy.wait(2000)
+          //         cy.get(`select#${selectorId}`).invoke('val').then($val => {
+          //           console.log(`selected for ${selectorId} :  ${$val}.`)
+          //           cy.get(`select#${selectorId}`).should('have.value', $val)
+          //         })
+          //       }
+          //     })
+          //     cy.wait(2000)
+          //     cy.get('input#vehicle-first-registration-date-input').focus()
+          //     cy.wait(2000)
+          //   }
+          // })
           nextBtn()
         }
       })
@@ -287,6 +298,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
             cy.selectSingleList('windshield-damage-size-scratch-bigger-5cm',0)
             cy.selectSingleList('windshield-damage-size-stone-chips-bigger-2cm',0)
             cy.selectSingleList('windshield-damage-size-crack-bigger-2cm',0)
+            cy.selectSingleList('windshield-equipment-windshield-electric',0)
             nextBtn()
           }) //wait('@clickableCar'
         } //'page-02'

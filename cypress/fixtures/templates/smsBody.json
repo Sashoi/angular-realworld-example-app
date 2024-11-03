@@ -1,0 +1,10 @@
+{
+  "receiver": "+359888795023",
+  "contact": {
+    "firstName": "first name",
+    "lastName": "lastName",
+    "mobileNumber": "+359888795023",
+    "type": "PERSON"
+  },
+  "smsTemplate": "dekra_sms_self_service_2_customer"
+}

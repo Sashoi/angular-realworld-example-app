@@ -38,6 +38,8 @@
 
 import header from '../fixtures/header.json'
 import emailBody from '../fixtures/templates/emailBody.json'
+import smsBody from '../fixtures/templates/smsBody.json'
+
 import { getPageTitle } from "../support/utils/common.js";
 import { getQuestionnaireIdFromLinks } from "../support/utils/common.js";
 
@@ -212,24 +214,55 @@ function pad_with_zeroes(number, length) {
 
 }
 
-Cypress.Commands.add('typeIntoAllTextArea', (text) =>{
-  cy.get('textarea').each(($textarea, index, $list) => {
-    cy.wrap($textarea)
+function typeIntoAllTextAreaOrInput (elements, text, delay = 0) {
+  cy.get(elements).its('length').then((len) => {
+    console.log(`Number of ${elements}s to type :${len}.`)
+  })
+  cy.get(elements).each(($element, index, $list) => {
+    cy.wrap($element)
     .invoke('attr', 'id')
     .then((id) => {
-      console.log(`$textarea[${index}] : ${id}.`) //prints id
+      cy.wait(delay)
+      console.log(`[${index}] : ${id}.`) //prints id
       cy.get(`#${id}`).clear().type(`${pad_with_zeroes(index+1,3)} ${id} - ${text}`)
     })
   })
+}
+
+Cypress.Commands.add('typeIntoAllTextArea', (text, delay = 0) =>{
+  typeIntoAllTextAreaOrInput ('textarea', text, delay)
+  // cy.get('textarea').each(($textarea, index, $list) => {
+  //   cy.wrap($textarea)
+  //   .invoke('attr', 'id')
+  //   .then((id) => {
+  //     console.log(`$textarea[${index}] : ${id}.`) //prints id
+  //     cy.get(`#${id}`).clear().type(`${pad_with_zeroes(index+1,3)} ${id} - ${text}`)
+  //   })
+  // })
 })
 
-Cypress.Commands.add('uploadAllImagesOnPage', (PathToImages) =>{
+Cypress.Commands.add('typeIntoAllInput', (text, delay = 0) =>{
+  typeIntoAllTextAreaOrInput ('input[type="text"]', text, delay)
+  // cy.get('input[type="text"]').each(($input, index, $list) => {
+  //   cy.wrap($input)
+  //   .invoke('attr', 'id')
+  //   .then((id) => {
+  //     console.log(`$input[${index}] : ${id}.`) //prints id
+  //     cy.get(`#${id}`).clear().type(`${pad_with_zeroes(index+1,3)} ${id} - ${text}`)
+  //   })
+  // })
+})
+
+Cypress.Commands.add('uploadAllImagesOnPage', (PathToImages, delay = 2000) =>{
+  cy.get('form').its('length').then((len) => {
+    console.log(`Number of images to upload :${len}.`)
+  })
   cy.get('form').each(($form, index, $list) => {
     cy.wrap($form)
     .invoke('attr', 'id')
     .then((id) => {
       console.log(`$form[${index}] : ${id}.`) //prints id
-      cy.wait(3000) // does not work for 80 images
+      cy.wait(delay) // 3000 does not work for 80 images, 4000 -> only 68
       if (id.includes('hood')){
         cy.uploadImage(id,PathToImages,'hood.jpg')
       } else if (id.includes('roof')){
@@ -433,8 +466,8 @@ Cypress.Commands.add('completePost', (xhr, hasDialog = true) =>{
 })
 
 
-Cypress.Commands.add('generatePdf', function (baseUrl_lp, pdfPath, pdf_template) {
-  cy.get('@authorization').then(function (authorization) {
+Cypress.Commands.add('generatePdf', function (baseUrl_lp, pdfPath, pdf_template,authorization) {
+  //cy.get('@authorization').then(function (authorization) {
     const notificationId = Cypress.env('notificationId')
     Cypress._.merge(header, {'authorization':authorization})
 
@@ -450,12 +483,15 @@ Cypress.Commands.add('generatePdf', function (baseUrl_lp, pdfPath, pdf_template)
       const filePath = `${pdfPath}${pdf_template}_${notificationId}.pdf`;
       cy.writeFile(filePath, response.body, 'base64')
     })
-  }) //get('@authorization'
+  //}) //get('@authorization'
 })
 
 Cypress.Commands.add('generateEmail', function (baseUrl_lp, email_template,q_template) {
   cy.get('@authorization').then(function (authorization) {
     const notificationId = Cypress.env('notificationId')
+    if(notificationId == undefined || notificationId == null || !notificationId.length > 0){
+      throw new Error(`test fails : notificationId = ${notificationId}`)
+    }
     Cypress._.merge(header, {'authorization':authorization})
 
     emailBody.emailTemplate = email_template
@@ -475,6 +511,31 @@ Cypress.Commands.add('generateEmail', function (baseUrl_lp, email_template,q_tem
   }) //get('@authorization'
 })
 
+Cypress.Commands.add('generateSMS', function (baseUrl_lp, sms_template,q_template) {
+  cy.get('@authorization').then(function (authorization) {
+    const notificationId = Cypress.env('notificationId')
+    if(notificationId == undefined || notificationId == null || !notificationId.length > 0){
+      throw new Error(`test fails : notificationId = ${notificationId}`)
+    }
+    Cypress._.merge(header, {'authorization':authorization})
+
+    smsBody.smsTemplate = sms_template
+
+    const options = {
+      method: 'POST',
+      url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/${q_template}?unknownReceiver=false`,
+      body: smsBody,
+      headers: header
+    }
+    cy.request(options).then(
+      (response) => {
+      expect(response.status).to.eq(200)
+      console.log(`notificationId : ${notificationId}`)
+      cy.printRequestedInformation(response.body.requestedInformation)
+    })
+  }) //get('@authorization'
+})
+
 Cypress.Commands.add(`GeneratePDFs`, function (pdf_templates) {
 
   const $dev = Cypress.env("dev");
@@ -482,6 +543,8 @@ Cypress.Commands.add(`GeneratePDFs`, function (pdf_templates) {
   const pdfPath = 'cypress/fixtures/Pdf/'
 
   cy.authenticate().then(function (authorization) {
+
+    //console.log(`authorization: ${authorization}`)
 
     Cypress._.merge(header, {'authorization':authorization});
     const damageNotificationId = Cypress.env('notificationId')
@@ -491,13 +554,14 @@ Cypress.Commands.add(`GeneratePDFs`, function (pdf_templates) {
         url: `${baseUrl_lp}damage/notification/${damageNotificationId}`,
         headers: header
       }
+      //console.log(`header authorization: ${header.authorization}`)
       cy.request(options).then(
         (response) => {
         expect(response.status).to.eq(200) // true
         const vin = response.body.body.vehicleIdentification.vin;
         console.log(`GeneratePDFs for vin: ${vin}`)
         pdf_templates.forEach(pdf_template => {
-          cy.generatePdf(baseUrl_lp, pdfPath, pdf_template)
+          cy.generatePdf(baseUrl_lp, pdfPath, pdf_template,authorization)
           console.log(`pdf template : ${pdf_template}`)
         })
       })
@@ -704,6 +768,44 @@ Cypress.Commands.add('standaloneLogin', function (theme, bearer = true) {
         return authorization
       })
   })
+})
+
+// Cypress.Commands.overwrite('select', (originalFn, subject, value, options) => {
+//   if(typeof value == 'number'){
+//     return cy.wrap(subject).children('option').eq(value).then(e => {
+//       return originalFn(subject, e.text().trim(), options);
+//     });
+//   }
+//   else{
+//     return originalFn(subject, value, options);
+//   }
+// });
+
+Cypress.Commands.add('fillInvalidDropDown', (selectorId) =>{
+  console.log(`Try select ${selectorId} .`)
+  cy.selectorHasAttrClass(`select#${selectorId}`,'field-invalid').then(res =>{
+    if (res){
+      const op = 1
+      cy.get(`select#${selectorId}`).invoke('attr', 'class').then($classNames => {
+        console.log(`class Names :  ${$classNames}.`)
+        if ($classNames.includes('field-invalid') ) {
+          cy.get(`select#${selectorId}`).children('option',{timeout: 6000}).eq(op).then($text => {
+            //cy.get(`select#${selectorId}`).select($text.text().trim(),{force: true, timeout: 6000})
+            cy.get(`select#${selectorId}`).select($text.text().trim())
+          });
+          //cy.wait(6000)
+          cy.get(`select#${selectorId}`).invoke('val').then($val => {
+            console.log(`selected for ${selectorId} :  ${$val}.`)
+            cy.get(`select#${selectorId}`).should('have.value', $val)
+          })
+        }
+      })
+      //cy.wait(2000)
+      cy.get('input#vehicle-first-registration-date-input').focus()
+      cy.wait(2000)
+    }
+  })
+
 })
 
 

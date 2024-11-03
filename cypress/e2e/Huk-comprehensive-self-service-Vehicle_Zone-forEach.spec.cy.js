@@ -42,10 +42,15 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   const file1 = [
-    ["W1V44760313930767", "Van", "01.01.2019", "Mercedes Vito 09/2021"]
+    [
+      "TMBJB7NS4K8027658",
+      "SUV",
+      "01.09.2018",
+      "SKODA Kodiaq 1.5 TSI ACT DSG Style "
+    ]
   ]
   file1.forEach($car => {
-    it.skip(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
+    it.only(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
 
       const $vin = $car[0]
 
@@ -128,7 +133,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
 
               //"page-01"
-              cy.selectMultipleList('terms-of-service-acknowledgement-huk-coburg',0)
+              cy.selectSingleList('terms-of-service-acknowledgement-huk-coburg',0)
               nextBtn()
 
               //"page-02"
@@ -269,7 +274,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                   // cy.uploadImage('damage-photo-upload-overview-roof-front-right-top-side',PathToImages,`airbag4.jpg`)
                   // cy.uploadImage('damage-photo-upload-overview-roof-rear-right-top-side',PathToImages,`airbag5.jpg`)
                   // cy.uploadImage('damage-photo-upload-overview-roof-rear-left-top-side',PathToImages,`airbag6.jpg`)
-                  cy.uploadAllImagesOnPage(PathToImages)
+                  cy.uploadAllImagesOnPage(PathToImages,4000)
                   nextBtn()
                 }
               })
@@ -287,7 +292,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                     cy.get('q-image-analytics-popup').find('div.popup-damage-types').find('input[type="checkbox"]').contains('Kratzer ').click({ force: true });
                   }
                   //cy.uploadImage('damage-photo-upload-detail-roof',PathToImages,`roof-d.jpg`)
-                  cy.uploadAllImagesOnPage(PathToImages)
+                  cy.uploadAllImagesOnPage(PathToImages,6000)
                   //cy.get('textarea#damage-photo-upload-remarks-windshield-textarea').type('Anmerkungen zu Windschutzscheibe - 1.<br>Anmerkungen zu Windschutzscheibe - 2.<br>Anmerkungen zu Windschutzscheibe - 3.')
                   //cy.get('textarea#damage-photo-upload-remarks-roof-textarea').type('Anmerkungen zu Nahaufnahme der Beschädigung - 1.<br>Anmerkungen zu Nahaufnahme der Beschädigung - 2.<br>Anmerkungen zu Nahaufnahme der Beschädigung - 3.')
 
@@ -393,7 +398,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
       })
     }) //it PDF
 
-    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       Cypress.env('notificationId','kSNARtMNsB7dEG29yFIMz')
       cy.GeneratePDFs(['dekra_schadenbilder','dekra_abschlussbericht','dekra_schadenbilder_kommentiert'])
     }) //it PDF from commands

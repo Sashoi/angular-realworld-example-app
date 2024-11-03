@@ -30,7 +30,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = false
+  const executePost = true
   const role_type = 'claimant' //or claimant or client
   const selected_parts_count_gte4 = false
 
@@ -119,11 +119,11 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
   const eMail = Cypress.env("client_email")
 
   const file1 = [
-  ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato "]
+  ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
   ]
 
   file1.forEach($car => {
-    it.only(`Execute b2b/integration/toni-digital/hdiLiabilitySelfService for vin: ${$car[0]}`, () =>{
+    it(`Execute b2b/integration/toni-digital/hdiLiabilitySelfService for vin: ${$car[0]}`, () =>{
 
       const vin = $car[0]
 
@@ -417,6 +417,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                     cy.get('button[type="submit"]').contains('Senden').click()
                     cy.wait('@postPost').then(xhr => {
                       cy.postPost(xhr,false)
+                      cy.generateSMS(`${baseUrl_lp}`, 'dekra_sms_self_service_2_customer','toni_hdi_automotive_liability_self_service')
                     })
                   }
                 }
@@ -429,5 +430,11 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
     it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['toni_hdi_tele_check','toni_tele_check','toni_tele_expert'])
     }) //it PDF from commands
+
+    it.skip(`Generate SMS for ${$car[0]}`, function () {
+      cy.generateSMS(`${baseUrl_lp}`, 'dekra_sms_self_service_2_customer','toni_hdi_automotive_liability_self_service')
+    }) //it PDF from commands
+
+
   })  //forEach
 }) //describe

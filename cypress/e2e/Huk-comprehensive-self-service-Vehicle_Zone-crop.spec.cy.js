@@ -73,28 +73,16 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
 
   const file1 = [
     [
-      "TMBJB7NS4K8027658",
-      "SUV",
-      "01.09.2018",
-      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
+      "6FPGXXMJ2GEL59891",
+      "PickUpSingleCabine",
+      "01.01.2012",
+      "Ford Ranger single cabine, Pick-up"
     ],
-    [
-      "WVWZZZ3CZME020680",
-      "Station",
-      "01.09.2020",
-      "Passat Variant 1.4 TSI Plug-In-Hybrid DSG GTE"
-    ],
-    [
-      "VF3VEAHXKLZ080921",
-      "MiniBusMidPanel",
-      "01.01.2017",
-      "Peugeot Expert 09/2020"
-    ],
-    ["W1V44760313930767", "Van", "01.01.2019", "Mercedes Vito 09/2021"]
-
+    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"],
+    ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"]
 ]
   file1.forEach($car => {
-    it.only(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
+    it(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
 
       const $vin = $car[0]
 
@@ -170,7 +158,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
               cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
 
-              cy.selectMultipleList('terms-of-service-acknowledgement-huk-coburg',0)
+              cy.selectSingleList('terms-of-service-acknowledgement-huk-coburg',0)
               nextBtn()
 
               //"page-02"
@@ -233,7 +221,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-06'){
                   cy.selectSingleList('airbag-deployed',1)
-                  cy.selectSingleList('underbody-damage-type2',1)
+                  cy.selectSingleList('underbody-damage-type2',0)
                   nextBtn()
                 }
               })
@@ -364,7 +352,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
       })
     }) //it Huk
 
-    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['dekra_schadenbilder','dekra_abschlussbericht'])
     }) //it PDF from commands
   }) //forEach

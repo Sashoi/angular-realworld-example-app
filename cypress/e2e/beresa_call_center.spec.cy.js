@@ -33,11 +33,11 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
   const executePost = true
-  const executePost2 = false
+  const executePost2 = true
   const sendSMS = false
   const interceptBeresaStandalone = false
   const $equipment_2_loading_doors = true
-  const replaceVin = false
+  const replaceVin = true
 
   function printUiBlocks(uiBlocks){
     uiBlocks.forEach((uiBlock, index1) => {
@@ -58,7 +58,13 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
 
   const file1 = [
 
-    ["JTNB23HK903079950", "Sedan", "01.01.2020", "TOYOTA  Camry"]
+    [
+      "6FPPXXMJ2PCD55635",
+      "PickUpDoubleCabine",
+      "01.01.2012",
+      "Ford Ranger double cabine, Pick-up"
+    ]
+
 
   ]
   file1.forEach($car => {
@@ -186,42 +192,45 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
             //cy.printRequestedInformation(response.body.requestedInformation);
         })
         if (sendSMS){
-          const options = {
-            method: 'POST',
-            url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/beresa_self_service_app_employee`,
-            body : `{
-              "receiver": "+359888795023",
-              "contact": {
-                "firstName": "first name",
-                "lastName": "lastName",
-                "mobileNumber": "+359888795023",
-                "type": "PERSON"
-              },
-              "smsTemplate": "dekra_sms_self_service_2_customer"
-            }`,
-            headers: header
-          };
-          cy.request(options).then(
-            (response) => {
-              // response.body is automatically serialized into JSON
-              expect(response.status).to.eq(200) // true
-              const arrLength = response.body.requestedInformation.length
-              const requestUrl = response.body.requestedInformation[arrLength - 1].requestUrl
-              const templateId = response.body.requestedInformation[arrLength - 1].templateId
-              console.log(`notificationId : ${notificationId}`);
-              console.log(`SMS templateId : ${templateId}`);
-              console.log(`SMS requestUrl : ${requestUrl}`);
-              //expect(response.status).to.eq(400) // stop
-              //Cypress.env('requestUrl', requestUrl)
-              //Cypress.env('templateId', response.body.requestedInformation[arrLength - 1].templateId)
-              //cy.printRequestedInformation(response.body.requestedInformation);
-          })
+          cy.generateSMS(`${baseUrl_lp}`, 'dekra_sms_self_service_2_customer','beresa_self_service_app_employee')
+          if (false){
+            const options = {
+              method: 'POST',
+              url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/beresa_self_service_app_employee`,
+              body : `{
+                "receiver": "+359888795023",
+                "contact": {
+                  "firstName": "first name",
+                  "lastName": "lastName",
+                  "mobileNumber": "+359888795023",
+                  "type": "PERSON"
+                },
+                "smsTemplate": "dekra_sms_self_service_2_customer"
+              }`,
+              headers: header
+            };
+            cy.request(options).then(
+              (response) => {
+                // response.body is automatically serialized into JSON
+                expect(response.status).to.eq(200) // true
+                const arrLength = response.body.requestedInformation.length
+                const requestUrl = response.body.requestedInformation[arrLength - 1].requestUrl
+                const templateId = response.body.requestedInformation[arrLength - 1].templateId
+                console.log(`notificationId : ${notificationId}`);
+                console.log(`SMS templateId : ${templateId}`);
+                console.log(`SMS requestUrl : ${requestUrl}`);
+                //expect(response.status).to.eq(400) // stop
+                //Cypress.env('requestUrl', requestUrl)
+                //Cypress.env('templateId', response.body.requestedInformation[arrLength - 1].templateId)
+                //cy.printRequestedInformation(response.body.requestedInformation);
+            })
+          }
         }
       })
 
     })
 
-    it(`beresa_self_service_app_employee execute vin ${$car[0]}`, () => {
+    it.skip(`beresa_self_service_app_employee execute vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
 
@@ -395,8 +404,9 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-12'){
+          //cy.get('input#damage-photo-upload-remarks-hood-input').type('damage-photo-upload-remarks-hood')
+          cy.typeIntoAllInput('- add remarks')
           cy.uploadAllImagesOnPage(PathToImages)
-          cy.get('input#damage-photo-upload-remarks-hood-input').type('damage-photo-upload-remarks-hood')
           nextBtn()
         }
       })
@@ -423,7 +433,8 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
         if (aliasValue == 'page-14'){
           cy.get('@bodyType').then(function (bodyType) {
             const remarks = `additional-remarks for bodyType : ${bodyType}.`
-            cy.get('textarea#additional-remarks-textarea').type(remarks)
+            //cy.get('textarea#additional-remarks-textarea').type(remarks)
+            cy.typeIntoAllTextArea(remarks)
           })
           nextBtn()
         }

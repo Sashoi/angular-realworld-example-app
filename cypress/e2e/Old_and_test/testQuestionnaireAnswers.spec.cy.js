@@ -3,7 +3,11 @@
 import { getRandomInt } from "../../support/utils/common.js";
 import { makeid } from "../../support/utils/common.js";
 import { questionnaire } from "../../support/utils/common.js";
+import { goingPage } from "../../support/utils/common.js";
 import header from '../../fixtures/header.json'
+
+
+const PathToImages ='cypress/fixtures/images/'
 
 
 
@@ -11,10 +15,14 @@ describe('Execute test questionnaireAnswers', () =>{
 
   beforeEach('Login to the app', () =>{
     console.clear()
-    cy.wrap(questionnaire).its('Id').as('questionnaireId')
-    cy.wrap(questionnaire).its('authorization').as('authorization')
-    cy.wrap(questionnaire).its('bodyType').as('bodyType')
-    cy.wrap(questionnaire).its('notificationId').as('notificationId')
+    // cy.wrap(questionnaire).its('Id').as('questionnaireId')
+    // cy.wrap(questionnaire).its('authorization').as('authorization')
+    // cy.wrap(questionnaire).its('bodyType').as('bodyType')
+    // cy.wrap(questionnaire).its('notificationId').as('notificationId')
+
+    cy.viewport('samsung-note9')
+    cy.intercept('GET', `/questionnaire/*/picture/vehicleZones*`,{ log: false }).as('vehicleZones')
+    cy.commanBeforeEach(goingPage,questionnaire)
   })
 
   const c_requestTimeout = 60000;
@@ -72,7 +80,7 @@ describe('Execute test questionnaireAnswers', () =>{
     })
   })
 
-  it.only(`test questionnaire pages questions`, () =>{
+  it(`test questionnaire pages questions`, () =>{
     const showDetailLog = true
     cy.authenticate().then(function (authorization) {
       cy.then(function () {
@@ -139,6 +147,22 @@ describe('Execute test questionnaireAnswers', () =>{
 
 
 
+    })
+  })
+
+  it.only(`test uploadAllImagesOnPage`, () =>{
+    cy.authenticate().then(function (authorization) {
+      cy.then(function () {
+        questionnaire.authorization = authorization
+      })
+      cy.then(function () {
+        questionnaire.Id = 'K2U5kBGEwZlwyhRfRF12e'//'K2U5kBGEwZlwyhRfRF12e'//'GlJ8rBWB7rLLWIAmhXIP1' //questionnaireId2
+      })
+
+      const requestUrl = 'https://dev02.spearhead-ag.ch:443/p/r/W9TtyGUcYm71LfjlSHrry'
+      cy.visit(requestUrl,{ log : false });
+      cy.typeIntoAllTextArea('Anmerkungen zu Nahaufnahme der Beschädigung - 1.<br>Anmerkungen zu Nahaufnahme der Beschädigung - 2.<br>Anmerkungen zu Nahaufnahme der Beschädigung - 3.',1000)
+      cy.uploadAllImagesOnPage(PathToImages,5000)
     })
   })
 })

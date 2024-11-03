@@ -10,11 +10,11 @@
     },
     {
       "questionId": "license-plate",
-      "answer": "FRI 8577"
+      "answer": "FRI 6423"
     },
     {
       "questionId": "first-registration-date",
-      "answer": "2009-01-01"
+      "answer": "2020-01-01"
     },
     {
       "questionId": "odometer-reading",
@@ -34,11 +34,11 @@
     }
   ],
   "supportInformation": {
-    "vin": "WDB2083441T069719",
+    "vin": "JTNB23HK903079950",
     "country": "DE",
     "labourRate": 100,
     "paintRate": 100,
-    "claimNumber": "FR-692889-8577",
+    "claimNumber": "FR-615413-6423",
     "countryVehicleIdentification": ""
   }
 }

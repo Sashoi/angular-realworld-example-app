@@ -1,10 +1,10 @@
-import { getRandomInt } from "../support/utils/common.js";
-import { getPageTitle } from "../support/utils/common.js";
-import { getQuestionnaireIdFromLinks } from "../support/utils/common.js";
-import { questionnaire } from "../support/utils/common.js";
-import { goingPage } from "../support/utils/common.js";
-import file from '../fixtures/vinsArray.json'
-import header from '../fixtures/headerXML.json'
+import { getRandomInt } from "../../support/utils/common.js";
+import { getPageTitle } from "../../support/utils/common.js";
+import { getQuestionnaireIdFromLinks } from "../../support/utils/common.js";
+import { questionnaire } from "../../support/utils/common.js";
+import { goingPage } from "../../support/utils/common.js";
+import file from '../../fixtures/vinsArray.json'
+import header from '../../fixtures/headerXML.json'
 
 
 const logFilename = 'cypress/fixtures/logs/ErgoSelfServiceInit.log'

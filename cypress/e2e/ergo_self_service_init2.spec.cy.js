@@ -31,7 +31,7 @@ describe('Ergo Self Service init', () =>{
   const noLicensePlate = false
   const changeVin = true
   const entire_vehicle_damaged_by_hail = true
-  const glass_parts_not_damaged_by_hail = false
+  const glass_parts_not_damaged_by_hail = true
   const client_email = Cypress.env("client_email")
   const vehicle_hsn_tsn_1 = '05881'   //Start with wrong TSN to reach page-04
   const vehicle_hsn_tsn_2 = 'AUC'
@@ -70,22 +70,9 @@ describe('Ergo Self Service init', () =>{
 
 
   const file1 = [
-    [
-      "6FPPXXMJ2PCD55635",
-      "PickUpDoubleCabine",
-      "01.01.2012",
-      "Ford Ranger double cabine, Pick-up"
-    ],
-    [
-      "6FPGXXMJ2GEL59891",
-      "PickUpSingleCabine",
-      "01.01.2012",
-      "Ford Ranger single cabine, Pick-up"
-    ],
-    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"],
-    ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"]
-  ]
+    ["JTNB23HK903079950", "Sedan", "01.01.2020", "TOYOTA  Camry"]
 
+  ]
   file1.forEach($car => {
     it.only(`Execute /questionnaire/ergo_self_service_init with vin:${$car[0]}`, () =>{
 
@@ -577,7 +564,9 @@ describe('Ergo Self Service init', () =>{
     }) //it
 
 
-    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+      //Cypress.env('notificationId','V5z41mYa96xDCRVRcfyXh')
+      cy.wait(2000)
       cy.GeneratePDFs(['ergo_abschlussbericht','ergo_hagelbericht'])
     }) //it PDF from commands
   }) //forEach

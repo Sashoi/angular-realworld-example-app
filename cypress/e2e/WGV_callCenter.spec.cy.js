@@ -77,15 +77,24 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   ]
 
   const file1 = [
-    [
-      "TMBJB7NS4K8027658",
-      "SUV",
-      "01.09.2018",
-      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
-    ]
+    ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"],
+  [
+    "WVWZZZ6RZGY304402",
+    "Hatch5",
+    "01.01.2017",
+    "Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
+  ],
+  ["VF7SA5FS0BW550414", "Hatch3", "01.01.2014", "CIT DS3 Hatch3"],
+  ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"],
+  [
+    "WDB2083441T069719",
+    "Coupe",
+    "01.01.2009",
+    "MER CLK Coupe (partial identification, build period to be defined manually)"
+  ]
   ]
 
-  damageCauseArr1.forEach($damageCause => {
+  damageCauseArr.forEach($damageCause => {
     file1.forEach($car => {
       it(`wgv callCenter for vin: ${$car[0]} damage-cause: ${$damageCause[1]}`, () =>{
 

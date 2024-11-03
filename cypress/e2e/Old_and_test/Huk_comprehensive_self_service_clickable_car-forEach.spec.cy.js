@@ -594,12 +594,9 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
       })
     }) //it PDF
 
-    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
-      cy.GeneratePDFs(['dekra_schadenbilder','dekra_abschlussbericht'])
-    }) //it PDF from commands
 
     it(`huk_comprehensive_self_service_clickable_car create vin ${$car[0]}`, () => {
-      const notificationId = 'daJfVgPWDOGsNcqXjuRAZ'//Cypress.env('notificationId')
+      const notificationId = Cypress.env('notificationId')
       cy.authenticate().then(function (authorization) {
         cy.then(function () {
           questionnaire.authorization = authorization
@@ -636,6 +633,10 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
         })
       })
     })
+
+    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+      cy.GeneratePDFs(['dekra_schadenbilder','dekra_abschlussbericht'])
+    }) //it PDF from commands
 
 
 

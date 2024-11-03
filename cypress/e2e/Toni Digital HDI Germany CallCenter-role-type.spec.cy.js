@@ -31,7 +31,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60001;
-  const executePost = false
+  const executePost = true
   const role_type = 'claimant' //or claimant or client
   const selected_parts_count_gte4 = false
 
@@ -88,7 +88,12 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
   }
 
   const file1 = [
-    ["WVWZZZAWZJY186035", "Unknown", "01.01.2004", "Unknown Car"]
+    [
+      "6FPGXXMJ2GEL59891",
+      "PickUpSingleCabine",
+      "01.01.2012",
+      "Ford Ranger single cabine, Pick-up"
+    ]
   ]
 
   file1.forEach($car => {
