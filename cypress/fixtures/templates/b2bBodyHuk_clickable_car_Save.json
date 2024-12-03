@@ -10,7 +10,7 @@
     },
     {
       "questionId": "loss-cause",
-      "answer": ["animal"]
+      "answer": "animal"
     },
     {
       "questionId": "loss-circumstances",
@@ -18,7 +18,7 @@
     },
     {
       "questionId": "client-insurance-claim-number",
-      "answer": "21-33-598/132844-S"
+      "answer": "19-33-771/184540-S"
     },
     {
       "questionId": "animal-species",
@@ -50,7 +50,7 @@
     },
     {
       "questionId": "vehicle-vin",
-      "answer": "W1V44760313930767"
+      "answer": "6FPPXXMJ2PCD55635"
     },
     {
       "questionId": "vehicle-first-registration-date",
@@ -58,7 +58,7 @@
     },
     {
       "questionId": "client-vehicle-license-plate",
-      "answer": "HSS 4-380"
+      "answer": "HSS 4-271"
     },
     {
       "questionId": "client-email",

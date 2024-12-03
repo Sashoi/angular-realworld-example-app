@@ -9,7 +9,7 @@ module.exports = defineConfig({
   chromeWebSecurity: false,
   experimentalMemoryManagement : true,
   numTestsKeptInMemory: 20,
-  
+
   env: {
     username: "artem.bondar166@gmail.com - cypress.env.json is used",
     password: "CypressTest1",
@@ -31,6 +31,7 @@ module.exports = defineConfig({
 
   e2e: {
     baseUrl : 'http://localhost:4200',
+    watchForFileChanges	: false,
     setupNodeEvents(on, config) {
       on('task', {
         setHref: (val) => {

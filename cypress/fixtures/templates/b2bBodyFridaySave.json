@@ -22,15 +22,15 @@
     },
     {
       "questionId": "license-plate",
-      "answer": "FRI 5845"
+      "answer": "FRI 6235"
     },
     {
       "questionId": "client-vehicle-license-plate",
-      "answer": "FRI 5845"
+      "answer": "FRI 6235"
     },
     {
       "questionId": "claimant-vehicle-license-plate",
-      "answer": "FRI 5845"
+      "answer": "FRI 6235"
     },
     {
       "questionId": "repair-location-zipcode",
@@ -54,11 +54,11 @@
     },
     {
       "questionId": "claim-number",
-      "answer": "207-88-546284"
+      "answer": "805-15-574378"
     }
   ],
   "supportInformation": {
-    "claimNumber": "207-88-546284",
+    "claimNumber": "805-15-574378",
     "countryVehicleIdentification": "",
     "vin": "WVWZZZ3CZME020680"
   }

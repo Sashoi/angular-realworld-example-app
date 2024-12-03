@@ -1,4 +1,4 @@
-/// <reference types="cypress" />
+  /// <reference types="cypress" />
 
 import { getRandomInt } from "../support/utils/common.js";
 import { getPageTitle } from "../support/utils/common.js";
@@ -31,6 +31,9 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
   const executePost = false
   const executePostR = true
   const executePost2 = false
+  const sendSMS = true
+  const photos_available = true
+
 
 
   function printUiBlocks(uiBlocks){
@@ -73,7 +76,12 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
 
   const file1 = [
 
-    ["WVWZZZAWZJY186035", "Hatch5", "01.01.2018", "VOLKSWAGEN Polo"]
+    [
+      "6FPPXXMJ2PCD55635",
+      "PickUpDoubleCabine",
+      "01.01.2012",
+      "Ford Ranger double cabine, Pick-up"
+    ]
 ]
   file1.forEach($car => {
     it.only(`allianz standalone - allianz_liability_call_center vin ${$car[0]}`, () => {
@@ -267,6 +275,14 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
               cy.selectSingleList('left-front-wheel-equipment-rims-type',0)
               cy.selectMultipleList('left-front-wheel-damage-type',0)
             }
+            if (xhr.response.body.search('g id="airbag"') > 0){
+              cy.selectSVG('airbag')
+              cy.selectSingleList('airbag-deployed',0)
+            }
+            if (xhr.response.body.search('g id="underbody"') > 0){
+              cy.selectSVG('underbody')
+              cy.selectSingleList('underbody-damage-type2',0)
+            }
 
             cy.get('@bodyType').then(function (bodyType) {
               if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
@@ -293,8 +309,24 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
       // Schadenbilder und Dokumente - page-04
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-04'){
-          cy.selectSingleList('photos-available',1)
-          cy.selectSingleList('photos-not-available-because',2)
+          if (photos_available){
+            cy.selectSingleList('photos-available',0)
+            if (sendSMS){
+              cy.selectSingleList('receive-upload-link-by-2',1)
+              cy.get('q-country-selection-options').click()
+              cy.wait(1000)
+              cy.get('ul.dropdown-menu.show').contains('Bulgarien').click()
+              cy.get('input#client-mobile-phone-number-for-upload-link-2-input').clear().type('888795023')
+            } else {
+              cy.selectSingleList('receive-upload-link-by-2',0)
+              cy.get('input#client-email-for-upload-link-2-input').clear().type('sivanchevski@soft2run.com')
+
+            }
+          } else {
+            cy.selectSingleList('photos-available',1)
+            cy.selectSingleList('photos-not-available-because',2)
+          }
+
           nextBtn()
         }
       })

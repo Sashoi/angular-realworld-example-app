@@ -32,12 +32,14 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = true
+  const executePost = false
   const executePost2 = false
   const interceptDekraStandalone = false
   const vehicle_hsn_tsn = '0588AUC'
   const vehicle_identification_by_hsn_tsn = false
   const $equipment_2_loading_doors = true
+  const sendSMS = true
+  const photos_available = true
 
   function printUiBlocks(uiBlocks){
     uiBlocks.forEach((uiBlock, index1) => {
@@ -65,7 +67,7 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
     ]
   ]
   file1.forEach($car => {
-    it.skip(`dekra_int_comprehensive_call_center standalone questionnaire, vin ${$car[0]}`, () => {
+    it.only(`dekra_int_comprehensive_call_center standalone questionnaire, vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
 
@@ -347,8 +349,22 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
       // Schadenbilder und Dokumente - page-03
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-03'){
-          cy.selectSingleList('photos-available',1)
-          cy.selectSingleList('photos-not-available-because',2)
+          if (photos_available){
+            cy.selectSingleList('photos-available',0)
+            if (sendSMS) {
+              cy.selectSingleList('receive-upload-link-by-2',1)
+              cy.get('q-country-selection-options').click()
+              cy.wait(1000)
+              cy.get('ul.dropdown-menu.show').contains('Bulgarien').click()
+              cy.get('input#client-mobile-phone-number-for-upload-link-2-input').clear().type('888795023')
+            }else {
+              cy.selectSingleList('receive-upload-link-by-2',0)
+              cy.get('input#client-email-for-upload-link-2-input').clear().type('sivanchevski@soft2run.com')
+            }
+          } else {
+            cy.selectSingleList('photos-available',1)
+            cy.selectSingleList('photos-not-available-because',2)
+          }
           nextBtn()
         }
       })
@@ -381,7 +397,7 @@ describe('Start and complete dekra_int_comprehensive_call_center standalone ques
     }) //it
 
     it(`dekra_int_comprehensive_self_service_app create vin ${$car[0]}`, () => {
-      const notificationId = 'RI932FC0PrgjHuYe68J0g'//Cypress.env('notificationId') //`kltjnKARCYpXoovcyDPMh`
+      const notificationId = Cypress.env('notificationId')
       cy.authenticate().then(function (authorization) {
         cy.then(function () {
           questionnaire.authorization = authorization

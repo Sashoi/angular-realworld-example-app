@@ -2,7 +2,7 @@
   "qas": [
     {
       "questionId": "vehicle-first-registration-date",
-      "answer": "2018-09-01"
+      "answer": "2010-01-01"
     },
     {
       "questionId": "accident-date",

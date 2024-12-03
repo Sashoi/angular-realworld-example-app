@@ -30,6 +30,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
   const $requestTimeout = 60000;
   const executePost = false
+  const typeTextAreasPage13 = false
   //const generatePdfCondition = true
 
   function nextBtn() {
@@ -46,7 +47,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
       "TMBJB7NS4K8027658",
       "SUV",
       "01.09.2018",
-      "SKODA Kodiaq 1.5 TSI ACT DSG Style "
+      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
     ]
   ]
   file1.forEach($car => {
@@ -282,7 +283,9 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-13"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-13'){
-                  cy.typeIntoAllTextArea('Anmerkungen zu Nahaufnahme der Beschädigung - 1.<br>Anmerkungen zu Nahaufnahme der Beschädigung - 2.<br>Anmerkungen zu Nahaufnahme der Beschädigung - 3.')
+                  if (typeTextAreasPage13){
+                    cy.typeIntoAllTextArea('Anmerkungen zu Nahaufnahme der Beschädigung - 1.<br>Anmerkungen zu Nahaufnahme der Beschädigung - 2.<br>Anmerkungen zu Nahaufnahme der Beschädigung - 3.')
+                  }
                   //cy.get('textarea#damage-photo-upload-remarks-*').type()
                   //cy.uploadImage('damage-photo-upload-overview-windshield',PathToImages,`broken front window_2.jpg`)
                   //cy.uploadImage('damage-photo-upload-detail-windshield',PathToImages,`broken front window_1.jpg`)

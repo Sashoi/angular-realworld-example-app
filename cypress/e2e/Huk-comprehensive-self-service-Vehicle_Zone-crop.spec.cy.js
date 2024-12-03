@@ -28,7 +28,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
   const $requestTimeout = 60000;
-  const executePost = true
+  const executePost = false
 
   function selectCropImage(selectorId,cropSelectorId,fileName){
     cy.intercept('GET', `/questionnaire/*/attachment/answer/${selectorId}/index-*`,{ log: false }).as(`cropOrigin-${selectorId}`)
@@ -57,8 +57,8 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
         expect(xhr.response.statusCode).to.equal(200)
       })
 
-      cy.get(`form#${cropSelectorId}`).find(`img[alt="${fileName}"]`).invoke('attr', 'alt').should('eq', fileName)
       cy.get(`form#${cropSelectorId}`).find(`img[alt="${fileName}"]`).should('exist')
+      cy.get(`form#${cropSelectorId}`).find(`img[alt="${fileName}"]`).invoke('attr', 'alt').should('eq', fileName)
     })
   }
 
@@ -71,18 +71,20 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
     cy.waitingFor('@currentPage',goingPage,questionnaire)
   }
 
+  const loss_causes = ["collision", "vandalism", "storm", "glass", "animal"]
+  const loss_cause = loss_causes[0]
+
   const file1 = [
     [
-      "6FPGXXMJ2GEL59891",
-      "PickUpSingleCabine",
-      "01.01.2012",
-      "Ford Ranger single cabine, Pick-up"
-    ],
-    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"],
-    ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"]
+      "TMBJB7NS4K8027658",
+      "SUV",
+      "01.09.2018",
+      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
+    ]
+
 ]
   file1.forEach($car => {
-    it(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
+    it.only(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
 
       const $vin = $car[0]
 
@@ -101,11 +103,14 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
         cy.then(function () {
           questionnaire.authorization =authorization
         })
-        const claimNumber = ran1 + "-13-"+ ran2 + "/" + ran3 + "-Z";
+        const claimNumber = ran1 + "-11-"+ ran2 + "/" + ran3 + "-Z"; //13
+
         console.log(`claimNumber: ${claimNumber}`);
+        console.log(`loss_cause: ${loss_cause}`);
         b2bBody.qas.find(q => {return q.questionId === "client-insurance-claim-number"}).answer = claimNumber
         b2bBody.qas.find(q => {return q.questionId === "vehicle-vin"}).answer = $vin
         b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licenseplate
+        b2bBody.qas.find(q => {return q.questionId === "loss-cause"}).answer = loss_cause
 
         Cypress._.merge(header, {'authorization' : authorization});
 
@@ -212,6 +217,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                   cy.wait('@vehicleZones',{timeout : $requestTimeout}).then(xhr => {
                     expect(xhr.response.statusCode).to.equal(200)
                     cy.selectSVG_VZ('windshield')
+                    cy.selectSVG_VZ('front-center')
                     nextBtn()
                   })
                 }
@@ -230,6 +236,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-07'){
                   cy.get('div.svg-selection-container[title="Windschutzscheibe"]').click('center');
+                  cy.get('div.svg-selection-container[title="Grill"]').click('center');
                   cy.wait(1000);
                   nextBtn()
                 }
@@ -273,8 +280,9 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-12"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-12'){
-                  cy.uploadImage('damage-photo-upload-overview-vehicle-front-left-top-side',PathToImages,`airbag1.jpg`)
-                  cy.uploadImage('damage-photo-upload-overview-vehicle-front-right-top-side',PathToImages,`airbag2.jpg`)
+                  cy.uploadAllImagesOnPage(PathToImages)
+                  //cy.uploadImage('damage-photo-upload-overview-vehicle-front-left-top-side',PathToImages,`airbag1.jpg`)
+                  //cy.uploadImage('damage-photo-upload-overview-vehicle-front-right-top-side',PathToImages,`airbag2.jpg`)
                   nextBtn()
                 }
               })
@@ -287,6 +295,11 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                   selectCropImage('damage-photo-upload-overview-windshield',
                                   'damage-photo-upload-detail-windshield',
                                   `“Windschutzscheibe” - Nahaufnahme der Beschädigung`)
+
+                  cy.uploadImage('damage-photo-upload-overview-grill',PathToImages,`broken front window_2.jpg`)
+                  selectCropImage('damage-photo-upload-overview-grill',
+                                  'damage-photo-upload-detail-grill',
+                                  `“Kühlergrill” - Nahaufnahme der Beschädigung`)
                   nextBtn()
                 }
               })
@@ -294,6 +307,15 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-14" "pageShowCriteria" 'loss-cause': 'glass'
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-14'){
+                  cy.selectAllSingleLists(0)
+                  cy.selectAllMultipleList(0)
+                  cy.elementExists('div#windshield-damage-location').then((res) => {
+                    console.log(res)
+                    if (res){
+                      cy.selectSVG('zone-d')
+                    }
+                  })
+                  cy.selectAllSingleLists(0)
                   nextBtn()
                 }
               })
@@ -319,7 +341,20 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-17"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-17'){
-                  cy.selectSingleList('vehicle-location-equals-home-address',0)
+                  cy.getQuestionAnswer('loss-cause').then(function (loss_cause) {
+                    console.log(`loss-cause : ${loss_cause}`);
+                    if(loss_cause == 'animal' || loss_cause == 'collision'){
+                      if(loss_cause == 'animal'){
+                        cy.selectSingleList('collision-with-animal',0)
+                        cy.get('textarea#collision-with-animal-description-textarea').type('collision-with-animal-description - 1.<br>collision-with-animal-description - 2.')
+                      }
+                      if(loss_cause == 'collision'){
+                        cy.selectSingleList('loss-circumstances',0)
+                        cy.get('textarea#loss-circumstances-description-other-textarea').type('loss-circumstances-description-other - 1.<br>loss-circumstances-description-other - 2.')
+                      }
+                    }
+                  })
+
                   nextBtn()
                 }
               })
@@ -327,6 +362,14 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-18"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-18'){
+                  cy.selectSingleList('vehicle-location-equals-home-address',0)
+                  nextBtn()
+                }
+              })
+
+              //"page-19"
+              cy.get('@goingPageId').then(function (aliasValue) {
+                if (aliasValue == 'page-19'){
                   cy.get('textarea#additional-remarks-textarea').type('Weitere Anmerkungen  - 1.<br>Weitere Anmerkungen  - 2.<br>Weitere Anmerkungen  - 3.')
                   nextBtn()
                 }

@@ -30,13 +30,9 @@ describe('Ergo Self Service init', () =>{
   const executePost = true
   const noLicensePlate = false
   const changeVin = true
-  const entire_vehicle_damaged_by_hail = true
-  const glass_parts_not_damaged_by_hail = true
+  //const entire_vehicle_damaged_by_hail = true
+  const glass_parts_not_damaged_by_hail = false
   const client_email = Cypress.env("client_email")
-  const vehicle_hsn_tsn_1 = '05881'   //Start with wrong TSN to reach page-04
-  const vehicle_hsn_tsn_2 = 'AUC'
-  const vehicle_identification_by_hsn_tsn = false
-  const changeRoleType = false
   const newEmail = `sivanchevski2@soft2run.com`
   const newPhoneNumber = `359888705020`
   const $equipment_2_loading_doors = true
@@ -70,7 +66,9 @@ describe('Ergo Self Service init', () =>{
 
 
   const file1 = [
-    ["JTNB23HK903079950", "Sedan", "01.01.2020", "TOYOTA  Camry"]
+    ["W1V44760313930767", "Van", "01.01.2019", "Mercedes Vito 09/2021"],
+  ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"],
+  ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
 
   ]
   file1.forEach($car => {
@@ -285,7 +283,7 @@ describe('Ergo Self Service init', () =>{
                   if (aliasValue == 'page-07'){
                     cy.get('div#vehicle-mileage').find('input#vehicle-mileage-input').type('123321')
                     cy.selectSingleList('hail-damage-size',2)
-                    cy.selectSingleList('entire-vehicle-damaged-by-hail',Number(entire_vehicle_damaged_by_hail))
+                    //cy.selectSingleList('entire-vehicle-damaged-by-hail',Number(entire_vehicle_damaged_by_hail))
                     //cy.getQuestionnaireInfo()
                     nextBtn()
                   }
@@ -315,7 +313,7 @@ describe('Ergo Self Service init', () =>{
                   }
                 })
 
-                //pageId: "page-09" SVG pageShowCriteria 'entire-vehicle-damaged-by-hail' = 1
+                //pageId: "page-09" SVG
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-09'){
                     cy.selectSVG('hood')
@@ -327,7 +325,7 @@ describe('Ergo Self Service init', () =>{
                   }
                 })
 
-                //pageId: "page-10" pageShowCriteria 'entire-vehicle-damaged-by-hail' = 1
+                //pageId: "page-10"
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-10'){
                     cy.selectSingleList('hail-damage-intensity',2)
@@ -337,8 +335,7 @@ describe('Ergo Self Service init', () =>{
                 })
 
 
-
-                //pageId: "page-11" pageShowCriteria 'entire-vehicle-damaged-by-hail' = 0
+                //pageId: "page-11"
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-11'){
                     cy.selectSingleList('damaged-vehicle-area-left-hail-damage-intensity',2)
@@ -357,7 +354,7 @@ describe('Ergo Self Service init', () =>{
                   }
                 })
 
-                cy.get('@goingPageId').then(function (aliasValue) {
+                cy.get('@goingPageId').then(function (aliasValue) {  //pageShowCriteria 'glass-parts-damaged-by-hail' = 'yes'
                   if (aliasValue == 'page-13'){
                     cy.selectSVG('roof')
                     cy.selectSVG('windshield')
@@ -431,6 +428,7 @@ describe('Ergo Self Service init', () =>{
                     //   }
                     // })
                     //cy.selectSingleList('water-entered-vehicle',0)
+                    cy.wait(4000)
                     nextBtn()
                   }
                 })
@@ -517,7 +515,7 @@ describe('Ergo Self Service init', () =>{
                   }
                 })
 
-                cy.get('@goingPageId').then(function (aliasValue) {
+                cy.get('@goingPageId').then(function (aliasValue) { // pageShowCriteria 'unrepaired-pre-damages' = 'yes'
                   if (aliasValue == 'page-24'){
                     cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu1.jpg')
                     cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu2.jpg')
@@ -527,7 +525,7 @@ describe('Ergo Self Service init', () =>{
                   }
                 })
 
-                //pageId: "page-24" pageShowCriteria = true
+                //pageId: "page-25" pageShowCriteria = vehicle-road-safety-potentially-at-risk == true
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-25'){
                     cy.getQuestionnaireInfo($car[0], logFilename)

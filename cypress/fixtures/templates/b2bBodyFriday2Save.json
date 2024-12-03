@@ -10,11 +10,11 @@
     },
     {
       "questionId": "license-plate",
-      "answer": "FRI 6423"
+      "answer": "FRI 4155"
     },
     {
       "questionId": "first-registration-date",
-      "answer": "2020-01-01"
+      "answer": "2012-01-01"
     },
     {
       "questionId": "odometer-reading",
@@ -34,11 +34,11 @@
     }
   ],
   "supportInformation": {
-    "vin": "JTNB23HK903079950",
+    "vin": "6FPPXXMJ2PCD55635",
     "country": "DE",
     "labourRate": 100,
     "paintRate": 100,
-    "claimNumber": "FR-615413-6423",
+    "claimNumber": "FR-106313-4155",
     "countryVehicleIdentification": ""
   }
 }

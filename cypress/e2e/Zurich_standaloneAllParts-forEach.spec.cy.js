@@ -50,7 +50,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
   }
 
   const file1 = [
-    ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
+    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"]
   ]
   file1.forEach($car => {
     it.only(`zurich standalone questionnaire - zurich_call_center vin ${$car[0]}`, () => {
@@ -191,111 +191,37 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
             const SVGbody = xhr.response.body;
             cy.get('@bodyType').then(function (bodyType) {
               if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
-                cy.selectSingleList('loading-floor-area-bend', 0)
-                //load-doors and rear-windows
                 if ($equipment_2_loading_doors){
                   if (SVGbody.search('g id="right-load-door"') > 0 ){
-                    cy.selectSVG(`right-load-door`)
-                    cy.selectMultipleList('right-load-door-damage-type', 1)
-                    cy.selectSingleList('right-load-door-damage-size', 2)
-                    cy.selectSVG(`left-load-door`)
-                    cy.selectMultipleList('left-load-door-damage-type', 1)
-                    cy.selectSingleList('left-load-door-damage-size', 2)
-                    //cy.selectSVG(`left-rear-door-window`)
-                    //cy.selectSVG(`right-rear-door-window`)
                   }
                 }
-                //load-doors and rear-windows
                 if (!$equipment_2_loading_doors){
                   if (SVGbody.search('g id="tailgate"') > 0 ){
-                    cy.selectSVG(`tailgate`)
-                    cy.selectSingleList('tailgate-still-open-close-easily', 1)
-                    cy.selectMultipleList('tailgate-damage-type', 1)
-                    cy.selectSingleList('tailgate-damage-size', 2)
-                    cy.selectSVG(`rear-window`)
                   }
                 }
               }
               if (bodyType == 'MPV' || bodyType == 'Hatch3' || bodyType == 'Hatch5' || bodyType == 'Sedan' ||
                   bodyType == 'Coupe' || bodyType == 'Cabrio' || bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine' ||
-                  bodyType == 'SUV'){
+                  bodyType == 'SUV')
+              {
                 const regex = /g .*id="tailgate"/;
                 if (SVGbody.search(regex) > 0 ){
-                  cy.selectSVG(`tailgate`)
-                  cy.selectMultipleList('tailgate-damage-type', 0)
-                  cy.selectMultipleList('tailgate-damage-type', 1)
-                  cy.selectSingleList('tailgate-damage-size', 2)
-                  cy.selectSVG(`rear-window`) // rear-window-damage-type_0 preselected
                 }
               }
             }) //get('@bodyType'
 
-            if (xhr.response.body.search('g id="hood"') > 0){
-              cy.selectSVG('hood')
-              cy.selectMultipleList('hood-damage-type',0)
-            }
+
 
             cy.get('#repair-location-zip-code-input').clear().type('22222')
-            cy.selectSingleList('damage-description-completed',1)
-            cy.selectMultipleList('hood-damage-type',0)
-            cy.selectMultipleList('hood-damage-type',1)
-            cy.selectSingleList('hood-damage-size',2)
-            cy.selectSingleList('hidden-damage-front-zone-damage-level',3)
-            if (true){
-              if (xhr.response.body.search('g id="right-front-wheel"') > 0){
-                cy.selectSVG('right-front-wheel')
-                cy.wait(2000)
-                cy.selectSingleList('right-front-wheel-equipment-rims-type',0)
-                cy.selectMultipleList('right-front-wheel-damage-type',1)
-              }
-
-              if (xhr.response.body.search('g id="right-rear-wheel"') > 0){
-                cy.selectSVG('right-rear-wheel')
-                cy.selectSingleList('right-rear-wheel-equipment-rims-type',0)
-                cy.selectMultipleList('right-rear-wheel-damage-type',0)
-                cy.selectMultipleList('right-rear-wheel-damage-type',1)
-              }
-              if (xhr.response.body.search('g id="right-front-wheel-tire"') > 0){
-                cy.selectSVG('right-front-wheel-tire')
-              }
-              if (xhr.response.body.search('g id="right-rear-wheel-tire"') > 0){
-                cy.selectSVG('right-rear-wheel-tire')
-              }
-              if (xhr.response.body.search('g id="left-front-wheel"') > 0){
-                cy.selectSVG('left-front-wheel')
-                cy.selectSingleList('left-front-wheel-equipment-rims-type',0)
-                cy.selectMultipleList('left-front-wheel-damage-type',1)
-              }
-              if (xhr.response.body.search('g id="left-rear-wheel"') > 0){
-                cy.selectSVG('left-rear-wheel')
-                cy.selectSingleList('left-rear-wheel-equipment-rims-type',0)
-                cy.selectMultipleList('left-rear-wheel-damage-type',0)
-                cy.selectMultipleList('left-rear-wheel-damage-type',1)
-              }
-              if (xhr.response.body.search('g id="left-front-wheel-tire"') > 0){
-                cy.selectSVG('left-front-wheel-tire')
-              }
-              if (xhr.response.body.search('g id="left-rear-wheel-tire"') > 0){
-                cy.selectSVG('left-rear-wheel-tire')
-              }
-            }
-            cy.selectSVG('windshield')
-            cy.selectMultipleList('windshield-damage-type',0)
-            cy.selectMultipleList('windshield-damage-type',1)
-            cy.selectMultipleList('windshield-damage-type',2)
-            cy.selectSVG('zone-d')
-            cy.selectSVG('zone-a')
-            cy.selectSVG('zone-c')
-            cy.selectSVG('zone-b')
-            cy.selectSingleList('windshield-damage-quantity',3)
+            cy.get('@goingPageElements').then(function (elements) {
+              const areas = elements.find(x => x.id === 'selected-parts').areas
+              cy.selectAllSVGs(areas,SVGbody,['underbody'])
+            })
+            cy.selectAllSingleLists(0)
+            cy.selectAllMultipleList(0)
             cy.selectSingleList('windshield-damage-size-scratch-bigger-5cm',0)
-            cy.selectSingleList('windshield-damage-size-stone-chips-bigger-2cm',0)
-            cy.selectSingleList('windshield-damage-size-crack-bigger-2cm',0)
-            cy.selectSingleList('windshield-equipment-windshield-electric',0)
-
-            cy.selectSVG('underbody')
-            cy.selectSVG('airbag')
-
+            //cy.selectAllSingleLists(0)
+            //cy.selectAllMultipleList(0)
             nextBtn()
           }) //wait('@clickableCar'
         } //'page-02'

@@ -31,8 +31,8 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
   const executePost = true
-  const role_type = 'claimant' //or claimant or client
-  const selected_parts_count_gte4 = false
+  const sendSMS = executePost && false
+  const role_types = ['claimant','client']
 
   const printQuestionnaireIds = (obj) => {
     if(!obj) return;  // Added a null check for  Uncaught TypeError: Cannot convert undefined or null to object
@@ -119,11 +119,20 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
   const eMail = Cypress.env("client_email")
 
   const file1 = [
-  ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
+    [
+      "WDB2083441T069719",
+      "Coupe",
+      "01.01.2009",
+      "MER CLK Coupe (partial identification, build period to be defined manually)"
+    ],
+    ["W0L0XCR975E026845", "Cabrio", "01.01.2009", "OPE Tigra Cabrio"],
+    ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5"],
+    ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
+    ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
   ]
 
   file1.forEach($car => {
-    it(`Execute b2b/integration/toni-digital/hdiLiabilitySelfService for vin: ${$car[0]}`, () =>{
+    it.only(`Execute b2b/integration/toni-digital/hdiLiabilitySelfService for vin: ${$car[0]}`, () =>{
 
       const vin = $car[0]
 
@@ -148,7 +157,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
           b2bBody.qas.find(q => {return q.questionId === "incident-reporter-email"}).answer = eMail
           b2bBody.qas.find(q => {return q.questionId === "number-of-vehicles"}).answer = 'more-than-two'
           b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licensePlate
-          b2bBody.qas.find(q => {return q.questionId === "role-type"}).answer = role_type
+          b2bBody.qas.find(q => {return q.questionId === "role-type"}).answer = role_types[1]
 
           Cypress._.merge(header, {'authorization' : authorization});
           const options = {
@@ -417,7 +426,9 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
                     cy.get('button[type="submit"]').contains('Senden').click()
                     cy.wait('@postPost').then(xhr => {
                       cy.postPost(xhr,false)
-                      cy.generateSMS(`${baseUrl_lp}`, 'dekra_sms_self_service_2_customer','toni_hdi_automotive_liability_self_service')
+                      if (sendSMS){
+                        cy.generateSMS(`${baseUrl_lp}`, 'dekra_sms_self_service_2_customer','toni_hdi_automotive_liability_self_service')
+                      }
                     })
                   }
                 }

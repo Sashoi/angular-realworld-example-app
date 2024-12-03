@@ -20,8 +20,7 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
   })
 
   beforeEach('Setting up integrations and common variables', () => {
-    cy.intercept('POST', `questionnaire/sph_sales_comprehensive_call_center/start`).as('sphSalesCC')
-    cy.intercept('GET',  `/questionnaire/*/page/page-*?locale=de`).as('currentPageR')
+    cy.intercept('GET', `/questionnaire/*/picture/vehicleZones*`,{ log: false }).as('vehicleZones')
     cy.commanBeforeEach(goingPage,questionnaire)
   })
 
@@ -30,6 +29,7 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
   const $requestTimeout = 60000;
   const executePost = true
   const executePost2 = true
+  const $equipment_2_loading_doors = true
 
   function printUiBlocks(uiBlocks){
     uiBlocks.forEach((uiBlock, index1) => {
@@ -48,9 +48,6 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
     cy.waitingFor('@currentPage',goingPage,questionnaire)
   }
 
-  function currentPageR() {
-    cy.waitingFor('@currentPageR',goingPage,questionnaire)
-  }
 
   function convertDate(dateString){
     var p = dateString.split(/\D/g)
@@ -59,12 +56,8 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
 
 
   const file1 = [
-    [
-      "TMBJB7NS4K8027658",
-      "SUV",
-      "01.09.2018",
-      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
-    ]
+    ["JTNB23HK903079950", "Sedan", "01.01.2020", "TOYOTA  Camry"],
+  ["VF7RDRFJF9L510253", "Station", "01.01.2010", "Citroen C5 Limousine 4 türig"]
 ]
   file1.forEach($car => {
     it(`Sph sales - sph_sales_comprehensive_call_center vin ${$car[0]}`, () => {
@@ -72,7 +65,6 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
       const $vin = $car[0]
 
       const intS3 = getRandomInt(100,999).toString()
-      const $equipment_2_loading_doors = true
 
       let  first_registration_date = $car[2]
       //const f_first_registration_date = '2017-06-14'
@@ -81,7 +73,7 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
 
       console.log(`vin: ${$vin}`)
       console.log(`first registration date: ${first_registration_date}`)
-      const licensePlate = `SP ${intS3}9`
+      const licensePlate = `SPH ${intS3}9`
       //Cypress.env('licensePlate', licensePlate)
       console.log(`license plate: ${licensePlate}`)
 
@@ -92,6 +84,7 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
         })
         //b2bBody.supportInformation.vin  = $vin
         //b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licensePlate
+        //client-insurance-policy-number
         b2bBody.qas.find(q => {return q.questionId === "vehicle-first-registration-date"}).answer = first_registration_date
 
 
@@ -160,22 +153,24 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
           })
 
           cy.get('@bodyType').then(function (bodyType) {
-            if (false && (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel')){
+            if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
               //cy.selectSingleList('loading-floor-area-bend', 0)
               cy.wait(2000)
               cy.selectSingleList('equipment-slide-door',1)
-              cy.selectSingleList('equipment-2-loading-doors',Number($equipment_2_loading_doors))
+              //cy.selectSingleList('equipment-2-loading-doors',Number($equipment_2_loading_doors))
 
-              cy.selectSingleList('equipment-length',0)
-              cy.selectSingleList('equipment-height',0)
-              cy.selectSingleList('equipment-vehicle-rear-glassed',0)
-              cy.selectSingleList('vehicle-customized-interior',0)
+              //cy.selectSingleList('equipment-length',0)
+              //cy.selectSingleList('equipment-height',0)
+              //cy.selectSingleList('equipment-vehicle-rear-glassed',0)
+              //cy.selectSingleList('vehicle-customized-interior',0)
             }
-            if (false && (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine')){
+            if ( false && (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine')){
               cy.wait(2000)
               cy.selectSingleList('equipment-loading-area-cover-type',1)
             }
           })
+
+
           cy.wait(4000)
           nextBtn()
         }
@@ -327,7 +322,7 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
       })
     })
 
-    it.skip(`sph_sales_comprehensive_self_service_app.json execute vin ${$car[0]}`, () => {
+    it(`sph_sales_comprehensive_self_service_app.json execute vin ${$car[0]}`, () => {
       cy.viewport('samsung-note9')
       console.log(`Start ${Cypress.env('templateId')} from url: ${Cypress.env('requestUrl')}.`)
 
@@ -353,69 +348,193 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-02'){
+            // "client-insurance-claim-number",
+            // "accident-date",
+            // "client-vehicle-license-plate",
+            // "vehicle-description",
           nextBtn()
         }
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-03'){
+          // if "supportInformation('bodyType') == null"{
+          //   "vehicle-body-type" "multipleSvgListSelection"
+          // }
+          cy.get('@bodyType').then(function (bodyType) {
+            if(bodyType == 'undefine' || bodyType == null){
+              cy.selectSingleList('vehicle-body-type',0)
+            }
+          })
           nextBtn()
         }
       })
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-04'){
-          cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,'registration-part-1.jpg')
+          cy.get('@bodyType').then(function (bodyType) {
+            if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
+              cy.wait(2000)
+              cy.selectSingleList('equipment-slide-door',1)
+              cy.selectSingleList('equipment-2-loading-doors',Number($equipment_2_loading_doors))
+
+              cy.selectSingleList('equipment-length',0)
+              cy.selectSingleList('equipment-height',0)
+              cy.selectSingleList('equipment-vehicle-rear-glassed',0)
+              cy.selectSingleList('vehicle-customized-interior',0)
+            }
+            if (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine'){
+              cy.wait(2000)
+              cy.selectSingleList('equipment-loading-area-cover-type',1)
+            }
+          })
+
           nextBtn()
         }
       })
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-05'){
-          nextBtn()
+          //"clickable-zones-instructions",
+          //"selected-zones"
+          cy.wait('@vehicleZones',{requestTimeout : $requestTimeout}).then(xhr => {
+            expect(xhr.response.statusCode).to.equal(200)
+            cy.selectSVG_VZ('front-center')
+            // cy.selectSVG_VZ('front-left')
+            // cy.selectSVG_VZ('front-right')
+            // cy.selectSVG_VZ('side-left')
+            // cy.selectSVG_VZ('side-right')
+            // cy.selectSVG_VZ('rear-left')
+            // cy.selectSVG_VZ('rear-right')
+            // cy.selectSVG_VZ('rear-center')
+
+            cy.selectSVG_VZ('roof')
+            // cy.selectSVG_VZ('windshield')
+            nextBtn()
+          })
         }
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-06'){
-          cy.uploadImage('vehicle-right-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
-          cy.uploadImage('vehicle-left-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
+          cy.wait(2000)
+          cy.selectSingleList('airbag-deployed-zones',0)
+          cy.selectSingleList('underbody-damage-type2-zones',0)
+          cy.get('@bodyType').then(function (bodyType) {
+            if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
+              cy.wait(2000)
+              cy.selectSingleList('loading-floor-area-bend',1)
+            }
+
+          })
           nextBtn()
         }
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-07'){
-          cy.uploadImage('vehicle-interior-front-photo-upload',PathToImages,'interior-front.jpg')
-          cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathToImages,'image dashboard-odometer.jpg')
+          //"selected-parts-zones"
+          cy.get('div.svg-selection-container[title="Motorhaube"]').click('center');
+          cy.get('div.svg-selection-container[title="Stoßfänger vorne"]').click('center');
+          cy.get('div.svg-selection-container[title="Dach"]').click('center');
           nextBtn()
         }
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-08'){
-          cy.uploadImage('damage-photo-upload-overview-hood',PathToImages,'hood.jpg')
+          //"photo-upload-info-label",
+          //"photo-upload-instruction-label"
           nextBtn()
         }
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-09'){
+          cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,'registration-part-1.jpg')
           nextBtn()
         }
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-10'){
-          cy.get('input#client-bank-name-input').type('FiBank');
-          cy.get('input#client-bank-iban-input').type('IBAN1234');
-          cy.get('input#client-bank-bic-input').type('BIC');
-          cy.get('input#client-bank-account-holder-input').type('Account Holder');
+          //"vehicle-dashboard-odometer-photo-upload-label",
+          //"vehicle-dashboard-odometer-photo-upload",
+          cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathToImages,'image dashboard-odometer.jpg')
+          //"vehicle-mileage"
+          //cy.get('input#vehicle-mileage-input').type('321334')
+          cy.wait(2000)
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-11'){
+          cy.uploadAllImagesOnPage(PathToImages)
+          cy.wait(5000)
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-12'){
+          cy.wait(5000)
+          cy.uploadAllImagesOnPage(PathToImages)
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-13'){
+          //cy.uploadAllImagesOnPage(PathToImages)
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-14'){
+          cy.wait(2000)
+          //cy.uploadAllImagesOnPage(PathToImages)
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-15'){
+          cy.selectSingleList('front-bumper-equipment-fog-lights',0)
+          cy.selectSingleList('front-bumper-equipment-parking-aid-front',2)
+          cy.selectMultipleList('front-bumper-damage-type',2)
+          cy.selectSingleList('front-bumper-damage-size',2)
+
+          cy.get('@bodyType').then(function (bodyType) {
+            if (bodyType == 'Coupe' || bodyType == 'Hatch3' || bodyType == 'Sedan' || bodyType == 'Hatch5' || bodyType == 'Station' || bodyType == 'SUV' || bodyType == 'MPV'){
+              cy.wait(2000)
+              cy.selectSingleList('roof-equipment-panorama-roof',0)
+            }
+			      if (bodyType == 'Cabrio'){
+              cy.wait(2000)
+              cy.selectSingleList('roof-equipment-convertible-roof-material',1)
+            }
+          })
+          cy.selectMultipleList('roof-damage-type',0)
+          cy.selectMultipleList('roof-damage-type',2)
+          // roof-damage-size visible when 'roof-damage-type' = 1 -  "value": "dents-bumps"
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-16'){
+          cy.get('@bodyType').then(function (bodyType) {
+            const remarks = `additional-remarks for bodyType : ${bodyType}.`
+            //cy.get('textarea#general-remarks').type(remarks)
+            cy.typeIntoAllTextArea(remarks)
+          })
+          cy.wait(2000)
           nextBtn()
         }
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'summary-page'){
-          cy.get('textarea#summary-message-from-client-textarea').type('Hier können Sie eine persönliche Mitteilung für das Muster Versicherungs AG Schadenteam eintragen.')
           if (executePost2) {
             //pageId: "summary-page"
             cy.selectMultipleList('summary-confirmation-acknowledgement',0)

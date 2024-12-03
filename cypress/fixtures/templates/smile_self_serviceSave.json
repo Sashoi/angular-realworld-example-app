@@ -1,0 +1,17 @@
+{
+  "qas": [
+    {
+      "answer": "SM 8139",
+      "questionId": "client-vehicle-license-plate"
+    },
+    {
+      "answer": "2011-01-01",
+      "questionId": "vehicle-first-registration-date"
+    }
+  ],
+  "supportInformation": {
+    "claimNumber": "4016-2003A",
+    "vin": "WVWZZZ7NZDV041367",
+    "additionalProp3": {}
+  }
+}

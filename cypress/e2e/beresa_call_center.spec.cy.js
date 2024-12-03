@@ -38,6 +38,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
   const interceptBeresaStandalone = false
   const $equipment_2_loading_doors = true
   const replaceVin = true
+  const carDocumentsExist = false
 
   function printUiBlocks(uiBlocks){
     uiBlocks.forEach((uiBlock, index1) => {
@@ -56,13 +57,40 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
     cy.waitingFor('@currentPage',goingPage,questionnaire)
   }
 
-  const file1 = [
+  const coverage_type_Array = ["liability","full-comprehensive","partial-comprehensive"]
+  const coverage_type = 2
+  // only for coverage-type": "values": ["full-comprehensive", "partial-comprehensive"]
+  const loss_cause_Array = [
+    ["full-comprehensive", "collision"], //1, 0
+    ["full-comprehensive", "vandalism"], //1, 1
+    ["partial-comprehensive", "theft-robbery-embezzlement"], //2, 0
+    ["partial-comprehensive", "fire"], //2, 1
+    ["partial-comprehensive", "short-circuit"], //2, 2
+    ["partial-comprehensive", "collision-animal"], //2, 3
+    ["partial-comprehensive", "broken-glass"], //2, 4
+    ["partial-comprehensive","marten-animal-bite"] //2, 5
+  ]
 
+  const loss_cause = 0
+
+  const file1 = [
     [
-      "6FPPXXMJ2PCD55635",
-      "PickUpDoubleCabine",
-      "01.01.2012",
-      "Ford Ranger double cabine, Pick-up"
+      "TMBJB7NS4K8027658",
+      "SUV",
+      "01.09.2018",
+      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
+    ],
+    [
+      "WVWZZZ3CZME020680",
+      "Station",
+      "01.09.2020",
+      "Passat Variant 1.4 TSI Plug-In-Hybrid DSG GTE"
+    ],
+    [
+      "VF3VEAHXKLZ080921",
+      "MiniBusMidPanel",
+      "01.01.2017",
+      "Peugeot Expert 09/2020"
     ]
 
 
@@ -138,8 +166,10 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
           })
 
           cy.get('input#accident-date-input').type('01.05.2024')
-          cy.selectSingleList('coverage-type', 2)
-          cy.selectSingleList('loss-cause', 0)
+          cy.selectSingleList('coverage-type', coverage_type)
+          if (coverage_type> 0){
+            cy.selectSingleList('loss-cause', loss_cause)
+          }
           cy.selectDropDown('dropdown-selection-company-branch',3)
           cy.wait(4000)
           cy.selectDropDown('dropdown-selection-beresa-ahl-employee',2)
@@ -157,6 +187,14 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
             cy.get('button[type="submit"]').contains('Vorgangsanlage abschließen und Self-Service Link versenden').click()
             cy.wait('@postPost').then(xhr => {
               cy.postPost(xhr)
+              if (xhr.response.body.notification.body.requestedInformation != null && xhr.response.body.notification.body.requestedInformation.length > 0){
+                const requestUrl = xhr.response.body.notification.body.requestedInformation[0].requestUrl
+                const templateId = xhr.response.body.notification.body.requestedInformation[0].templateId
+                console.log(`requestUrl : ${requestUrl}`);
+                console.log(`templateId : ${templateId}`);
+                Cypress.env('requestUrl', requestUrl)
+                Cypress.env('templateId', templateId)
+              }
             })
           }
         }
@@ -164,7 +202,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
     }) //it
 
 
-    it(`beresa_self_service_app_employee create vin ${$car[0]}`, () => {
+    it.skip(`beresa_self_service_app_employee create vin ${$car[0]}`, () => {
       const notificationId = Cypress.env('notificationId')
       cy.authenticate().then(function (authorization) {
         cy.then(function () {
@@ -230,7 +268,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
 
     })
 
-    it.skip(`beresa_self_service_app_employee execute vin ${$car[0]}`, () => {
+    it(`beresa_self_service_app_employee execute vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
 
@@ -266,9 +304,13 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-03'){
-          cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,'zulassungsbescheinigung-teil-1-fahrzeugidentifizierungsnummer.png')
-          //cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,'vehicle-registration-part-1.png')
-          //cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,'registration-part-1.jpg')
+          if (carDocumentsExist) {
+            cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,'zulassungsbescheinigung-teil-1-fahrzeugidentifizierungsnummer.png')
+            //cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,'vehicle-registration-part-1.png')
+            //cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,'registration-part-1.jpg')
+          } else {
+            cy.selectMultipleList('vehicle-registration-part-1-available',0)
+          }
           nextBtn()
         }
       })
@@ -297,34 +339,39 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
           // "vehicle-registration-part-1-street-number",
           // "vehicle-registration-part-1-city",
           // "vehicle-registration-part-1-zip-code"
-
-          nextBtn()
-        }
-      })
-
-      cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-05'){
           cy.wait(3000)
           cy.getBodyType($car,logFilename).then(function (bodyType) {
             cy.then(function () {
               questionnaire.bodyType = bodyType
             })
           })
-          //"vehicle-vin-photo-upload-instruction",
-          //"vehicle-vin-photo-upload"
+          nextBtn()
+        }
+      })
+
+      // cy.get('@goingPageId').then(function (aliasValue) {
+      //   if (aliasValue == 'page-05'){
+      //     cy.wait(3000)
+      //     cy.getBodyType($car,logFilename).then(function (bodyType) {
+      //       cy.then(function () {
+      //         questionnaire.bodyType = bodyType
+      //       })
+      //     })
+      //     //"vehicle-vin-photo-upload-instruction",
+      //     //"vehicle-vin-photo-upload"
+      //     nextBtn()
+      //   }
+      // })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-05'){
+          cy.selectSingleList('vehicle-body-type',0) //0..10["Sedan", "SUV", "Station", "Hatch5", "Hatch3", "Coupe", "Cabrio", "Van", "MiniBus", "PickUpDoubleCabine", "PickUpSingleCabine"]
           nextBtn()
         }
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-06'){
-          cy.selectSingleList('vehicle-body-type',8) //0..10
-          nextBtn()
-        }
-      })
-
-      cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-07'){
           cy.getBodyType($car,logFilename).then(function (bodyType) {
             cy.then(function () {
               questionnaire.bodyType = bodyType
@@ -352,7 +399,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-08'){
+        if (aliasValue == 'page-07'){
           cy.wait('@clickableCar',{requestTimeout : $requestTimeout, log : false}).then(xhr => {
             expect(xhr.response.statusCode).to.equal(200)
             console.log(`Comming SVG with clickableCar`)
@@ -378,29 +425,43 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-08'){
+          cy.uploadAllImagesOnPage(PathToImages)
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-09'){
-          cy.uploadImage('vehicle-interior-front-photo-upload',PathToImages,'interior-front.jpg')
+          //cy.uploadImage('vehicle-vin-photo-upload',PathToImages,'interior-front.jpg')
           nextBtn()
         }
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-10'){
-          cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathToImages,'image dashboard-odometer.jpg')
-          cy.get('input#vehicle-mileage-input').type('321334')
+          cy.uploadImage('vehicle-interior-front-photo-upload',PathToImages,'interior-front.jpg')
           nextBtn()
         }
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-11'){
-          cy.uploadImage('vehicle-right-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
-          cy.uploadImage('vehicle-left-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
-          cy.uploadImage('vehicle-left-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
-          cy.uploadImage('vehicle-right-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
+          cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathToImages,'image dashboard-odometer.jpg')
+          cy.get('input#vehicle-mileage-input').type('321334')
           nextBtn()
         }
       })
+
+      // cy.get('@goingPageId').then(function (aliasValue) {
+      //   if (aliasValue == 'page-11'){
+      //     cy.uploadImage('vehicle-right-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
+      //     cy.uploadImage('vehicle-left-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
+      //     cy.uploadImage('vehicle-left-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
+      //     cy.uploadImage('vehicle-right-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
+      //     nextBtn()
+      //   }
+      // })
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-12'){

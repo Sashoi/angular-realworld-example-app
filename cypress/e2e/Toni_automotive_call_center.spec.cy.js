@@ -95,11 +95,18 @@ const vehicle_body_type_value = 0;
 
   const file1 = [
     [
-      "WVWZZZ6RZGY304402",
-      "Hatch5",
+      "WVWZZZ3CZME020680",
+      "Station",
+      "01.09.2020",
+      "Passat Variant 1.4 TSI Plug-In-Hybrid DSG GTE"
+    ],
+    [
+      "VF3VEAHXKLZ080921",
+      "MiniBusMidPanel",
       "01.01.2017",
-      "Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
-    ]
+      "Peugeot Expert 09/2020"
+    ],
+    ["W1V44760313930767", "Van", "01.01.2019", "Mercedes Vito 09/2021"]
 ]
   file1.forEach($car => {
     it(`Toni automotive - toni_automotive_call_center vin ${$car[0]}`, () => {

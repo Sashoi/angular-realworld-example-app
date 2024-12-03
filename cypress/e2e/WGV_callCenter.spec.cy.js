@@ -27,10 +27,10 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = false
-  const executePost2 = false
+  const executePost = true
+  const executePost2 = true
   const createNewQuestionnaires = executePost && true
-  const newQuestionnaire = 1 //1 - wgv_comprehensive_self_service_app, 2 - wgv_liability_self_service_app
+  const newQuestionnaire = 2 //1 - wgv_comprehensive_self_service_app, 2 - wgv_liability_self_service_app
   const interceptWGV = false
   const $equipment_2_loading_doors = true
 
@@ -73,28 +73,16 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   ]
 
   const damageCauseArr1 =[
-    [0, "collisionsingle"]
+    [3, "parking"]
   ]
 
   const file1 = [
-    ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"],
-  [
-    "WVWZZZ6RZGY304402",
-    "Hatch5",
-    "01.01.2017",
-    "Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
-  ],
-  ["VF7SA5FS0BW550414", "Hatch3", "01.01.2014", "CIT DS3 Hatch3"],
-  ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"],
-  [
-    "WDB2083441T069719",
-    "Coupe",
-    "01.01.2009",
-    "MER CLK Coupe (partial identification, build period to be defined manually)"
-  ]
+
+        ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
+    ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
   ]
 
-  damageCauseArr.forEach($damageCause => {
+  damageCauseArr1.forEach($damageCause => {
     file1.forEach($car => {
       it(`wgv callCenter for vin: ${$car[0]} damage-cause: ${$damageCause[1]}`, () =>{
 
@@ -321,7 +309,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
 
                         const options2 = {
                           method: 'POST',
-                          url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/wgv_comprehensive_self_service_app`,
+                          url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/wgv_comprehensive_self_service_app?unknownReceiver=false`,
                           body: emailBody,
                           headers: header
                         };
@@ -337,7 +325,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
 
                         const options3 = {
                           method: 'POST',
-                          url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/wgv_liability_self_service_app`,
+                          url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/wgv_liability_self_service_app?unknownReceiver=false`,
                           body: emailBody,
                           headers: header
                         };
@@ -367,7 +355,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
         cy.GeneratePDFs(['wgv_default','wgv_pilot','wgv_pilot_2023'])
       }) //it PDF from commands
 
-      it.skip(`Start new questionnaire.`, function () {
+      it(`Start new questionnaire.`, function () {
         cy.viewport('samsung-note9')
         console.log(`Start ${Cypress.env('templateId')} from url: ${Cypress.env('requestUrl')}.`)
 

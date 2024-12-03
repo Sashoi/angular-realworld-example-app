@@ -38,9 +38,21 @@ describe('Start and complete vlv standalone questionnaire', () => {
   const loss_causeArray1 = ["Unfall"]
 
   const file1 = [
-    ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"],
-  ["WVWZZZAWZJY186035", "Hatch5", "01.01.2014", "VOLKSWAGEN Polo"],
-  ["JTNB23HK903079950", "Sedan", "01.01.2020", "TOYOTA  Camry"]
+    ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"],
+  ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"],
+  [
+    "6FPPXXMJ2PCD55635",
+    "PickUpDoubleCabine",
+    "01.01.2012",
+    "Ford Ranger double cabine, Pick-up"
+  ],
+  [
+    "6FPGXXMJ2GEL59891",
+    "PickUpSingleCabine",
+    "01.01.2012",
+    "Ford Ranger single cabine, Pick-up"
+  ],
+  ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"]
   ]
 
   loss_causeArray1.forEach(loss_cause => {

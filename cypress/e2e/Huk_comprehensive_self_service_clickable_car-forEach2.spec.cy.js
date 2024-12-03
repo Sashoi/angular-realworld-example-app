@@ -460,7 +460,12 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
     //"page-14"
     cy.get('@goingPageId').then(function (aliasValue) {
       if (aliasValue == 'page-14'){
-        cy.uploadImage('police-ranger-report-photo-upload',PathToImages,'police-ranger-report-photo-upload.png')
+        cy.getQuestionAnswer('loss-cause').then(function (loss_cause) {
+          console.log(`loss-cause : ${loss_cause}`);
+          if(loss_cause == 'animal'){
+            cy.uploadImage('police-ranger-report-photo-upload',PathToImages,'police-ranger-report-photo-upload.png')
+          }
+        })
 
         cy.uploadImage('incident-location-photo-upload',PathToImages,'incident-location-photo-upload-1.jpg')
         cy.uploadImage('incident-location-photo-upload',PathToImages,'incident-location-photo-upload-2.jpg')
@@ -485,12 +490,22 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
     })
   }
 
+  const loss_causes = ["collision", "vandalism", "storm", "glass", "animal"]
+
   const file1 = [
-    ["W1V44760313930767", "Van", "01.01.2019", "Mercedes Vito 09/2021"]
+
+    ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"],
+  ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"],
+  [
+    "6FPPXXMJ2PCD55635",
+    "PickUpDoubleCabine",
+    "01.01.2012",
+    "Ford Ranger double cabine, Pick-up"
+  ]
   ]
 
   file1.forEach($car => {
-    it(`Huk-comprehensive-self-service-clickable-car vin :  ${$car[0]}`, function () {
+    it.only(`Huk-comprehensive-self-service-clickable-car vin :  ${$car[0]}`, function () {
 
       const vin = $car[0]
 
@@ -516,6 +531,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
         b2bBody.qas.find(q => {return q.questionId === "part-selection-type"}).answer = 'clickable-car' //'vehicle-zones'
         b2bBody.qas.find(q => {return q.questionId === "client-mobile-phone-number"}).answer = newPhoneNumber
         b2bBody.qas.find(q => {return q.questionId === "client-phone-number"}).answer = newPhoneNumber
+        b2bBody.qas.find(q => {return q.questionId === "loss-cause"}).answer = loss_causes[4]
 
 
         Cypress._.merge(header, {'authorization' : authorization});
@@ -608,7 +624,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
       })
     }) //it PDF
 
-    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['dekra_schadenbilder','dekra_abschlussbericht'])
     }) //it PDF from commands
 

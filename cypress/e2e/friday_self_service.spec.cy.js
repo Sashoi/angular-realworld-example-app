@@ -35,7 +35,7 @@ describe('Start and complete friday_self_service',  () =>{
   const $requestTimeout = 60000;
   const executePost = true
   const executePost2 = true
-  const sendSMS = false
+  const sendSMS = true
   const $equipment_2_loading_doors = true
 
   function printUiBlocks(uiBlocks){
@@ -116,8 +116,12 @@ describe('Start and complete friday_self_service',  () =>{
 ]
 
   const file1 = [
-
-  ["JTNB23HK903079950", "Sedan", "01.01.2020", "TOYOTA  Camry"]
+    [
+      "6FPPXXMJ2PCD55635",
+      "PickUpDoubleCabine",
+      "01.01.2012",
+      "Ford Ranger double cabine, Pick-up"
+    ]
   ]
   file1.forEach($car => {
     it(`friday_self_service questionnaire, vin ${$car[0]}`, () => {
@@ -180,12 +184,6 @@ describe('Start and complete friday_self_service',  () =>{
           cy.wait(4000)
         })
       })
-
-      // const nextButtonLabel ='Weiter'
-      // const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
-      // cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
-
-      //currentPage()
     }) //it
 
     it.skip(`friday_self_service create vin ${$car[0]}`, () => {

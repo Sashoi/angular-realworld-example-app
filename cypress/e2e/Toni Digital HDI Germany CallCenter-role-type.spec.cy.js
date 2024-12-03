@@ -88,12 +88,20 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
   }
 
   const file1 = [
-    [
-      "6FPGXXMJ2GEL59891",
-      "PickUpSingleCabine",
-      "01.01.2012",
-      "Ford Ranger single cabine, Pick-up"
-    ]
+    ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"],
+  ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"],
+  [
+    "6FPPXXMJ2PCD55635",
+    "PickUpDoubleCabine",
+    "01.01.2012",
+    "Ford Ranger double cabine, Pick-up"
+  ],
+  [
+    "6FPGXXMJ2GEL59891",
+    "PickUpSingleCabine",
+    "01.01.2012",
+    "Ford Ranger single cabine, Pick-up"
+  ]
   ]
 
   file1.forEach($car => {

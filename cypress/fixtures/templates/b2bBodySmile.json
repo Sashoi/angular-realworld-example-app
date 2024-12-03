@@ -1,0 +1,17 @@
+{
+  "qas": [
+    {
+      "answer": ["THW 80832"],
+      "questionId": "client-vehicle-license-plate"
+    },
+    {
+      "answer": [""],
+      "questionId": "vehicle-first-registration-date"
+    }
+  ],
+  "supportInformation": {
+    "claimNumber": "1235-2356X",
+    "vin": "",
+    "additionalProp3": {}
+  }
+}

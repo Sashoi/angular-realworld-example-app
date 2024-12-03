@@ -51,20 +51,34 @@ const c_requestTimeout = 999999//60000;
 Cypress.Commands.add('elementExists', (selector) =>{
   cy.get('body').then(($body) => {
     if ($body.find(selector).length) {
-      return cy.get(selector)
+      //return cy.get(selector)
+      return true
     } else {
       // Throws no error when element not found
       assert.isOk('OK', 'Element does not exist.')
+      return false
     }
   })
 })
 
 Cypress.Commands.add('selectSVG', (selectorId) =>{
-  cy.get('svg',{ log : false }).find(`g#${selectorId}`,{ log : false }).invoke('attr', 'data-selection-state').then(($state) => {
+  const attrName = 'data-selection-state'
+  cy.get('svg',{ log : false }).find(`g#${selectorId}`,{ log : false }).invoke('attr', attrName).then(($state) => {
     if ($state == undefined || $state == "no"){
       cy.get('svg',{ log : false }).find(`g#${selectorId}`,{ log : false }).click({ force: true, log : false })
     }
-    cy.get(`svg`,{ log : false }).find(`g#${selectorId}`,{ log : false }).invoke('attr', 'data-selection-state').should('eq', 'yes')
+    cy.get(`svg`,{ log : false }).find(`g#${selectorId}`,{ log : false }).invoke('attr', attrName).should('eq', 'yes')
+  })
+})
+
+
+Cypress.Commands.add('selectAllSVGs', (areas,SVGbody,excludeAreas) =>{
+  areas.forEach(area =>{
+    const regex = `g id="${area.id}"`;
+    if (area.visible && area.enabled && !excludeAreas.includes(area.id) && SVGbody.search(regex) > 0){
+      console.log(area.id)
+      cy.selectSVG(area.id)
+    }
   })
 })
 
@@ -281,9 +295,9 @@ Cypress.Commands.add('uploadAllImagesOnPage', (PathToImages, delay = 2000) =>{
         cy.uploadImage(id,PathToImages,'right-taillight-o.jpg')
       } else if (id.includes('registration-part')){
         cy.uploadImage(id,PathToImages,'registration-part-1.jpg')
-      } else if (id.includes('vehicle-left-rear') || id.includes('rear-view')){
+      } else if (id.includes('vehicle-left-rear') || id.includes('vehicle-right-rear') || id.includes('rear-view')){
         cy.uploadImage(id,PathToImages,'vehicle-left-rear-photo.jpg')
-      } else if (id.includes('vehicle-right-front') || id.includes('front-view')){
+      } else if (id.includes('vehicle-left-front') || id.includes('vehicle-right-front') || id.includes('front-view')){
         cy.uploadImage(id,PathToImages,'vehicle-right-front-photo.jpg')
       } else if (id.includes('door')){
         cy.uploadImage(id,PathToImages,'door-2.jpg')

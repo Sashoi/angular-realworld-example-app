@@ -24,7 +24,9 @@ export const getPageTitle = (body) => {
     if ((title.length <= 2)){
       const elements = body.uiBlocks[0].elements
       if (elements.sections != null && elements.sections.length > 0){
-        title = elements.sections[0].label.content
+        if(elements.sections[0].label){ // checks for null and undefined
+          title = elements.sections[0].label.content
+        }
       } else {
         if (elements.rootQuestions != null && elements.rootQuestions.length > 0){
           title = elements.rootQuestions[0]
@@ -48,7 +50,7 @@ export const getQuestionnaireIdFromLinks = (nextUrl) => {
   return questionnaireId
 }
 
-export const goingPage = { pageId: '', elements: []} 
+export const goingPage = { pageId: '', elements: []}
 export const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: ''}
 
 

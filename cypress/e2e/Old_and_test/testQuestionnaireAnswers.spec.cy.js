@@ -20,7 +20,7 @@ describe('Execute test questionnaireAnswers', () =>{
     // cy.wrap(questionnaire).its('bodyType').as('bodyType')
     // cy.wrap(questionnaire).its('notificationId').as('notificationId')
 
-    cy.viewport('samsung-note9')
+    //cy.viewport('samsung-note9')
     cy.intercept('GET', `/questionnaire/*/picture/vehicleZones*`,{ log: false }).as('vehicleZones')
     cy.commanBeforeEach(goingPage,questionnaire)
   })
@@ -150,7 +150,7 @@ describe('Execute test questionnaireAnswers', () =>{
     })
   })
 
-  it.only(`test uploadAllImagesOnPage`, () =>{
+  it(`test uploadAllImagesOnPage`, () =>{
     cy.authenticate().then(function (authorization) {
       cy.then(function () {
         questionnaire.authorization = authorization
@@ -163,6 +163,31 @@ describe('Execute test questionnaireAnswers', () =>{
       cy.visit(requestUrl,{ log : false });
       cy.typeIntoAllTextArea('Anmerkungen zu Nahaufnahme der Beschädigung - 1.<br>Anmerkungen zu Nahaufnahme der Beschädigung - 2.<br>Anmerkungen zu Nahaufnahme der Beschädigung - 3.',1000)
       cy.uploadAllImagesOnPage(PathToImages,5000)
+    })
+  })
+
+  it.only(`test setvalue`, () =>{
+    cy.authenticate().then(function (authorization) {
+      cy.then(function () {
+        questionnaire.authorization = authorization
+      })
+      cy.then(function () {
+        questionnaire.Id = 'K2U5kBGEwZlwyhRfRF12e'//'K2U5kBGEwZlwyhRfRF12e'//'GlJ8rBWB7rLLWIAmhXIP1' //questionnaireId2
+      })
+
+      const requestUrl = 'https://dev02.spearhead-ag.ch:443/p/r/x0AqcMxKBIlRvDc5y26Wb'
+      cy.visit(requestUrl,{ log : false });
+      cy.get('q-country-selection-options').click()
+      cy.wait(1000)
+      cy.get('ul.dropdown-menu.show').contains('Bulgarien').click()
+      cy.get('input#client-mobile-phone-number-for-upload-link-2-input').clear().type('888795023')
+
+      //cy.get('input#client-mobile-phone-number-for-upload-link-2-input').invoke('prop', 'value', '+359')
+      //cy.selectSingleList('receive-upload-link-by-2',0)
+      //cy.wait(1000)
+      //cy.selectSingleList('receive-upload-link-by-2',1)
+      //cy.get('input#client-mobile-phone-number-for-upload-link-2-input').invoke('prop', 'value', '+359888795023')
+
     })
   })
 })

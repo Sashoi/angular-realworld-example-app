@@ -31,6 +31,8 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
   const executePost = false
   const executePostR = true  // reopen
   const executePostSS = true // self_service
+  const sendSMS = true
+  const photos_available = true
 
   function printUiBlocks(uiBlocks){
     uiBlocks.forEach((uiBlock, index1) => {
@@ -53,25 +55,13 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
     cy.waitingFor('@currentPageR',goingPage,questionnaire)
   }
 
-  // function Login(){
-  //   cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/zurich/#/login?theme=allianz`,{ log : false })
-  //     // login
-  //     cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
-  //     cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
-  //     cy.get('form').submit()
-
-  //     cy.wait('@token',{requestTimeout : $requestTimeout}).then(xhr => {
-  //       expect(xhr.response.statusCode).to.equal(200)
-  //       const access_token = xhr.response.body.access_token
-  //       cy.then(function () {
-  //         questionnaire.authorization = `Bearer ${access_token}`
-  //       })
-  //     })
-  //     cy.wait(500)
-  // }
-
   const file1 = [
-    ["ZFA25000002K44267", "MiniBusMidPanel", "01.01.2019", "Fiat Ducato"]
+    [
+      "6FPPXXMJ2PCD55635",
+      "PickUpDoubleCabine",
+      "01.01.2012",
+      "Ford Ranger double cabine, Pick-up"
+    ]
 ]
   file1.forEach($car => {
     it.only(`allianz standalone - allianz_comprehensive_call_center vin ${$car[0]}`, () => {
@@ -265,6 +255,15 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
               cy.selectMultipleList('left-front-wheel-damage-type',0)
             }
 
+            if (xhr.response.body.search('g id="airbag"') > 0){
+              cy.selectSVG('airbag')
+              cy.selectSingleList('airbag-deployed',0)
+            }
+            if (xhr.response.body.search('g id="underbody"') > 0){
+              cy.selectSVG('underbody')
+              cy.selectSingleList('underbody-damage-type2',0)
+            }
+
             cy.get('@bodyType').then(function (bodyType) {
               if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
                 cy.selectSingleList('loading-floor-area-bend', 0)
@@ -293,8 +292,22 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
       // Schadenbilder und Dokumente - page-04
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-04'){
-          cy.selectSingleList('photos-available',1)
-          cy.selectSingleList('photos-not-available-because',2)
+          if (photos_available){
+            cy.selectSingleList('photos-available',0)
+            if (sendSMS){
+              cy.selectSingleList('receive-upload-link-by-2',1)
+              cy.get('q-country-selection-options').click()
+              cy.wait(1000)
+              cy.get('ul.dropdown-menu.show').contains('Bulgarien').click()
+              cy.get('input#client-mobile-phone-number-for-upload-link-2-input').clear().type('888795023')
+            } else {
+              cy.selectSingleList('receive-upload-link-by-2',0)
+              cy.get('input#client-email-for-upload-link-2-input').clear().type('sivanchevski@soft2run.com')
+            }
+          } else {
+            cy.selectSingleList('photos-available',1)
+            cy.selectSingleList('photos-not-available-because',2)
+          }
           nextBtn()
         }
       })
@@ -317,7 +330,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
       })
     })
 
-    it.skip(`allianz standalone - allianz_comprehensive_call_center - reoprn vin ${$car[0]}`, () => {
+    it(`allianz standalone - allianz_comprehensive_call_center - reoprn vin ${$car[0]}`, () => {
       const claimNumber  = Cypress.env('claimNumber')
       //const licensePlate = Cypress.env('licensePlate')
 
@@ -401,7 +414,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
       })
     })
 
-    it.skip(`allianz_comprehensive_self_service create vin ${$car[0]}`, () => {
+    it(`allianz_comprehensive_self_service create vin ${$car[0]}`, () => {
       const notificationId = Cypress.env('notificationId') //`wlA4icU77W6LjzUFyrGzy`
       cy.authenticate().then(function (authorization) {
         cy.then(function () {
@@ -429,7 +442,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
       })
     })
 
-    it.skip(`allianz_comprehensive_self_service execute vin ${$car[0]}`, () => {
+    it(`allianz_comprehensive_self_service execute vin ${$car[0]}`, () => {
       cy.viewport('samsung-note9')
       console.log(`Start ${Cypress.env('templateId')} from url: ${Cypress.env('requestUrl')}.`)
 
