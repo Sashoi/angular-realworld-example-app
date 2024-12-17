@@ -8,7 +8,7 @@ module.exports = defineConfig({
   viewportHeight: 1080,
   chromeWebSecurity: false,
   experimentalMemoryManagement : true,
-  numTestsKeptInMemory: 20,
+  numTestsKeptInMemory: 10,
 
   env: {
     username: "artem.bondar166@gmail.com - cypress.env.json is used",
@@ -17,7 +17,6 @@ module.exports = defineConfig({
     questionnaireId :"33",
     requestUrl: "test"
   },
-
   retries: {
     runMode: 2,
     openMode: 0,
@@ -30,8 +29,7 @@ module.exports = defineConfig({
   },
 
   e2e: {
-    baseUrl : 'http://localhost:4200',
-    watchForFileChanges	: false,
+    watchForFileChanges: false,
     setupNodeEvents(on, config) {
       on('task', {
         setHref: (val) => {
