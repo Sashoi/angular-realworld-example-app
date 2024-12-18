@@ -1,0 +1,32 @@
+{
+  "qas": [
+    {
+      "questionId": "odometer-unit",
+      "answer": ["km"]
+    },
+    {
+      "questionId": "standalone",
+      "answer": ["yes"]
+    },
+    {
+      "questionId": "loss-cause",
+      "answer": "other"
+    },
+    {
+      "questionId": "first-registration-date",
+      "answer": "2024-12-01"
+    },
+    {
+      "questionId": "process-type",
+      "answer": "sphLiabilityCallCenter"
+    },
+    {
+      "questionId": "claim-number",
+      "answer": "254234234234234234"
+    }
+  ],
+  "supportInformation": {
+    "claimNumber": "254234234234234234",
+    "vin": "U5YPH816HML010002"
+  }
+}

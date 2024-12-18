@@ -21,8 +21,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
 
   beforeEach('Setting up integrations and common variables', () =>{
     cy.viewport('samsung-note9')
-    cy.intercept('GET', `/questionnaire/generic_elements/attachment/*-example?size=original&locale=de`).as('generic_elements')
-                      // /questionnaire/generic_elements/attachment/sedan-selection-example?size=original&locale=de
+    cy.intercept('GET', `/questionnaire/generic_elements/attachment/*-example*`).as('generic_elements')
     cy.commanBeforeEach(goingPage,questionnaire)
   })
 
@@ -55,7 +54,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
 
     cy.get('@goingPageId').then(function (aliasValue) {
       if (aliasValue == 'page-01'){
-        cy.selectSingleList('terms-of-service-acknowledgement-huk-coburg',0)
+        cy.selectMultipleList('terms-of-service-acknowledgement-huk-coburg',0)
         cy.getBodyType($car,logFilename).then(function (bodyType) {
           cy.then(function () {
             questionnaire.bodyType = bodyType
@@ -75,7 +74,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
     //pageId: "page-03"
     cy.get('@goingPageId').then(function (aliasValue) {
       if (aliasValue == 'page-03'){
-        cy.wait(['@generic_elements','@generic_elements','@generic_elements','@generic_elements','@generic_elements',
+        cy.wait(['@','@generic_elements','@generic_elements','@generic_elements','@generic_elements',
         '@generic_elements','@generic_elements','@generic_elements','@generic_elements','@generic_elements','@generic_elements'],
         {requestTimeout : $requestTimeout}).then(xhr => {
           cy.get('div[title="VAN"]').find('g#Layer_4').click({ force: true, timeout: 3000 })
@@ -111,72 +110,18 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
     //pageId:"page-05" SVG
     cy.get('@goingPageId').then(function (aliasValue) {
       if (aliasValue == 'page-05'){
-        cy.get('@goingPageElements').then(function (elements) {
-          const threeSixtyOptions = elements.find(x => x.id === 'selected-parts').threeSixtyOptions
-          if (threeSixtyOptions != null && threeSixtyOptions.vehicleFolderPath != null && threeSixtyOptions.vehicleFolderPath.length > 0){
-            //clickableCar 3D
-            cy.then(function () {
-              questionnaire.is3Dcar = true
-            })
-            cy.get('div.clickMaskContainer').find('svg',{timeout: 10000}).find('path').then($path => {
-              console.log(`paths count: ${$path.length}`);
-              if ($path.length > 0) {
-                //const Id = $path.id
-                //cy.wrap($path).click({ force: true, multiple: true, timeout : 4000 }) select all
-                //cy.wrap($path).find('#hood').click({ force: true, timeout : 4000 }) does not work ??
-                cy.get('div.clickMaskContainer').find('svg',{timeout: 10000}).find('path#hood').click({ force: true, timeout : 4000 })
-              }
-            })
-          } else {
-              //clickableCar 2D
-              cy.wait('@clickableCar',{requestTimeout : $requestTimeout}).then(xhr => {
-                expect(xhr.response.statusCode).to.equal(200)
-                console.log(`Comming SVG with clickableCar`)
-                const SVGbody = xhr.response.body;
-                //exhaust
-                cy.selectSVG('exhaust')
-
-
-                //towing-hook if check does not calc iBox
-                if (false){
-                  cy.selectSVG('towing-hook')
-                }
-
-                //underbody  if check does not calc iBox
-                //cy.selectSVG('underbody`)
-
-                //airbag
-                cy.selectSVG('airbag')
-
-
-                //right-taillight
-                cy.selectSVG('right-taillight')
-
-                //hood
-                cy.selectSVG('hood')
-
-                //roof
-                cy.selectSVG('roof')
-
-                //windshield
-                cy.selectSVG('windshield')
-
-                cy.get('@bodyType').then(function (bodyType) {
-                  if (bodyType == 'MiniBusMidPanel' || bodyType == 'VanMidPanel' || bodyType == 'Van' || bodyType == 'MiniBus'){
-                    if ($equipment_2_loading_doors){
-                      cy.selectSVG('right-load-door')
-                      cy.selectSVG('left-load-door')
-                      //cy.selectSVG('left-rear-door-window')
-                      //cy.selectSVG('right-rear-door-window')
-                    } else {
-                      cy.selectSVG('tailgate')
-                    }
-                  }
-                })
-              })
-          }
-          nextBtn()
+        cy.wait('@clickableCar',{requestTimeout : $requestTimeout}).then(xhr => {
+          expect(xhr.response.statusCode).to.equal(200)
+          console.log(`Comming SVG with clickableCar`)
+          const SVGbody = xhr.response.body;
+          cy.get('@goingPageElements').then(function (elements) {
+            const areas = elements.find(x => x.id === 'selected-parts').areas
+            cy.selectAllSVGs(areas,SVGbody,[])
+          })
+          cy.selectAllSingleLists(0)
+          cy.selectAllMultipleList(0)
         })
+        nextBtn()
       }
     })
 
@@ -192,15 +137,6 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
     //"page-07"
     cy.get('@goingPageId').then(function (aliasValue) {
       if (aliasValue == 'page-07'){
-        cy.selectSingleList('unrepaired-pre-damages',0)
-        nextBtn()
-        cy.wait(1000)
-      }
-    })
-
-    //"page-08"
-    cy.get('@goingPageId').then(function (aliasValue) {
-      if (aliasValue == 'page-08'){
         cy.uploadImage('vehicle-interior-front-photo-upload',PathToImages,'interior-front.jpg')
         cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathToImages,'image dashboard-odometer.jpg')
         cy.get('div#vehicle-mileage').find('input#vehicle-mileage-input').type('123321')
@@ -208,9 +144,9 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
       }
     })
 
-    //"page-09"
+    //"page-08"
     cy.get('@goingPageId').then(function (aliasValue) {
-      if (aliasValue == 'page-09'){
+      if (aliasValue == 'page-08'){
         cy.uploadImage('vehicle-right-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
         cy.uploadImage('vehicle-left-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
         nextBtn()
@@ -218,59 +154,16 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
     })
 
     //"page-09"
-    // cy.get('@goingPageId').then(function (aliasValue) {
-    //   if (aliasValue == 'page-09'){
-    //     cy.selectSingleList('unrepaired-pre-damages',0)
-    //     nextBtn()
-    //   }
-    // })
+    cy.get('@goingPageId').then(function (aliasValue) {
+      if (aliasValue == 'page-09'){
+        cy.selectSingleList('unrepaired-pre-damages',0)
+        nextBtn()
+      }
+    })
 
     //"page-10"
     cy.get('@goingPageId').then(function (aliasValue) {
       if (aliasValue == 'page-10'){
-        if (false){
-          cy.uploadImage('damage-photo-upload-overview-hood',PathToImages,'hood.jpg')
-          if (hood3){
-            cy.uploadImage('damage-photo-upload-overview-hood',PathToImages,'hood.jpg')
-            cy.uploadImage('damage-photo-upload-overview-hood',PathToImages,'hood.jpg')
-          }
-          cy.uploadImage('damage-photo-upload-detail-hood',PathToImages,'hood-d.jpg')
-          if (hood3){
-            cy.uploadImage('damage-photo-upload-detail-hood',PathToImages,'hood-d.jpg')
-            cy.uploadImage('damage-photo-upload-detail-hood',PathToImages,'hood-d.jpg')
-          }
-
-          cy.uploadImage('damage-photo-upload-overview-exhaust',PathToImages,'broken exhaust_1.jpg')
-          cy.uploadImage('damage-photo-upload-detail-exhaust',PathToImages,'broken exhaust_2.jpg')
-          cy.uploadImage('damage-photo-upload-overview-right-taillight',PathToImages,'right-taillight-o.jpg')
-          cy.uploadImage('damage-photo-upload-detail-right-taillight',PathToImages,'right-taillight-d.jpg')
-
-
-
-          cy.uploadImage('damage-photo-upload-overview-roof',PathToImages,'roof.jpg')
-          cy.uploadImage('damage-photo-upload-detail-roof',PathToImages,'roof-d.jpg')
-
-          cy.uploadImage('damage-photo-upload-overview-windshield',PathToImages,'broken front window_2.jpg')
-          cy.uploadImage('damage-photo-upload-detail-windshield',PathToImages,'broken front window_1.jpg')
-
-          cy.get('@bodyType').then(function (bodyType) {
-            if (bodyType == 'MiniBusMidPanel' || bodyType == 'VanMidPanel' || bodyType == 'Van' || bodyType == 'MiniBus'){
-              if ($equipment_2_loading_doors){
-                //cy.uploadImage('damage-photo-upload-overview-left-rear-door-window',PathToImages,'airbag.jpg')
-                //cy.uploadImage('damage-photo-upload-detail-left-rear-door-window',PathToImages,'airbag.jpg')
-                //cy.uploadImage('damage-photo-upload-overview-right-rear-door-window',PathToImages,'airbag.jpg')
-                //cy.uploadImage('damage-photo-upload-detail-right-rear-door-window',PathToImages,'airbag.jpg')
-                cy.uploadImage('damage-photo-upload-overview-left-load-door',PathToImages,'airbag.jpg')
-                cy.uploadImage('damage-photo-upload-detail-left-load-door',PathToImages,'airbag.jpg')
-                cy.uploadImage('damage-photo-upload-overview-right-load-door',PathToImages,'airbag.jpg')
-                cy.uploadImage('damage-photo-upload-detail-right-load-door',PathToImages,'airbag.jpg')
-              } else {
-                cy.uploadImage('damage-photo-upload-overview-tailgate',PathToImages,'airbag.jpg')
-                cy.uploadImage('damage-photo-upload-detail-tailgate',PathToImages,'airbag.jpg')
-              }
-            }
-          })
-        }
         cy.uploadAllImagesOnPage(PathToImages,6000)
         nextBtn()
       }
@@ -279,39 +172,31 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
     //page-11
     cy.get('@goingPageId').then(function (aliasValue) {
       if (aliasValue == 'page-11'){
-        cy.get('@is3Dcar').then(function (is3Dcar) {
-          if (is3Dcar){
-            cy.selectAllSingleLists(0)
-            cy.selectAllMultipleList(0)
-          } else {
-            cy.selectSingleList('right-taillight-equipment-led-rear-lights',0)
-            cy.selectMultipleList('hood-damage-type',0)
-            cy.selectMultipleList('roof-damage-type',0)
-            cy.selectSingleList('windshield-equipment-windshield-electric',0)
-            cy.selectMultipleList('windshield-damage-type',0)
-            cy.selectSingleList('windshield-damage-size-scratch-bigger-5cm',0)
-            cy.selectSVG('zone-a')
-            cy.get('@bodyType').then(function (bodyType) {
-              if (bodyType == 'MiniBusMidPanel' || bodyType == 'VanMidPanel' || bodyType == 'Van' || bodyType == 'MiniBus') {
-                cy.selectSingleList('loading-floor-area-bend', 0)
-                if ($equipment_2_loading_doors ){
-                  cy.selectMultipleList('left-load-door-damage-type', 0)
-                  cy.selectMultipleList('left-load-door-damage-type', 1)
-                  cy.selectSingleList('left-load-door-damage-size', 2)
+        cy.selectSingleList('right-taillight-equipment-led-rear-lights',0)
+        cy.selectMultipleList('hood-damage-type',0)
+        cy.selectMultipleList('roof-damage-type',0)
+        cy.selectSingleList('windshield-equipment-windshield-electric',0)
+        cy.selectMultipleList('windshield-damage-type',0)
+        cy.selectSingleList('windshield-damage-size-scratch-bigger-5cm',0)
+        cy.selectSVG('zone-a')
+        cy.get('@bodyType').then(function (bodyType) {
+          if (bodyType == 'MiniBusMidPanel' || bodyType == 'VanMidPanel' || bodyType == 'Van' || bodyType == 'MiniBus') {
+            cy.selectSingleList('loading-floor-area-bend', 0)
+            if ($equipment_2_loading_doors ){
+              cy.selectMultipleList('left-load-door-damage-type', 0)
+              cy.selectMultipleList('left-load-door-damage-type', 1)
+              cy.selectSingleList('left-load-door-damage-size', 2)
 
-                  cy.selectMultipleList('right-load-door-damage-type', 0)
-                  cy.selectMultipleList('right-load-door-damage-type', 1)
-                  cy.selectSingleList('right-load-door-damage-size', 2)
-                } else {
-                  cy.selectSingleList('tailgate-still-open-close-easily', 0)
-                  cy.selectMultipleList('tailgate-damage-type', 1)
-                  cy.selectSingleList('tailgate-damage-size', 0)
-                }
-              }
-            })
+              cy.selectMultipleList('right-load-door-damage-type', 0)
+              cy.selectMultipleList('right-load-door-damage-type', 1)
+              cy.selectSingleList('right-load-door-damage-size', 2)
+            } else {
+              cy.selectSingleList('tailgate-still-open-close-easily', 0)
+              cy.selectMultipleList('tailgate-damage-type', 1)
+              cy.selectSingleList('tailgate-damage-size', 0)
+            }
           }
         })
-
         nextBtn()
       }
     })
@@ -319,9 +204,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
     //"page-12"
     cy.get('@goingPageId').then(function (aliasValue) {
       if (aliasValue == 'page-12'){
-        cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu1.jpg')
-        cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu2.jpg')
-        cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu3.jpg')
+        cy.selectSingleList('vehicle-location-equals-home-address',0)
         nextBtn()
       }
     })
@@ -329,6 +212,16 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
     //"page-13"
     cy.get('@goingPageId').then(function (aliasValue) {
       if (aliasValue == 'page-13'){
+        cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu1.jpg')
+        cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu2.jpg')
+        cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu3.jpg')
+        nextBtn()
+      }
+    })
+
+    //"page-14"
+    cy.get('@goingPageId').then(function (aliasValue) {
+      if (aliasValue == 'page-14'){
         cy.getQuestionAnswer('loss-cause').then(function (loss_cause_l) {
           console.log(`loss-cause : ${loss_cause_l}`);
           if(loss_cause_l == 'animal'){
@@ -342,35 +235,6 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
         nextBtn()
       }
     })
-
-    //"page-14"  "(hasAnswer('huk-coburg-triage-category', 'fictitious') && (hasAnswer('loss-cause','animal') || hasAnswer('loss-cause','collision')))"
-    cy.get('@goingPageId').then(function (aliasValue) {
-      if (aliasValue == 'page-14'){
-        // "collision-with-animal",
-        // "collision-with-animal-description",
-        // "loss-circumstances",
-        // "loss-circumstances-description-other",
-        // "loss-circumstances-description-other-mandatory"
-        nextBtn()
-      }
-    })
-
-    //"page-15"
-    cy.get('@goingPageId').then(function (aliasValue) {
-      if (aliasValue == 'page-15'){
-        cy.selectSingleList('vehicle-location-equals-home-address',0)
-        nextBtn()
-      }
-    })
-
-    //"page-16"
-    cy.get('@goingPageId').then(function (aliasValue) {
-      if (aliasValue == 'page-16'){
-        cy.get('textarea#additional-remarks-textarea').type('Weitere Anmerkungen  - 1.<br>Weitere Anmerkungen  - 2.<br>Weitere Anmerkungen  - 3.')
-        nextBtn()
-      }
-    })
-
 
     //"summary-page"
     cy.get('@goingPageId').then(function (aliasValue) {
@@ -389,16 +253,17 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   }
 
   const loss_causes = ["collision", "vandalism", "storm", "glass", "animal"]
+  const loss_cause = loss_causes[0]
 
   const file1 = [
-    ["W0L0XCR975E026845", "Cabrio", "01.01.2009", "OPE Tigra Cabrio"]
+    ["VF7RDRFJF9L510253", "Station", "01.01.2010", "Citroen C5 Limousine 4 türig "]
+
   ]
 
   file1.forEach($car => {
-    it(`Huk-comprehensive-self-service-clickable-car vin :  ${$car[0]}`, function () {
+    it.only(`Huk-comprehensive-self-service-clickable-car vin :  ${$car[0]}`, function () {
 
       const vin = $car[0]
-      const loss_cause = loss_causes[1]
 
       let ran1 =  getRandomInt(10,99)
       let ran2 =  getRandomInt(100,999)
@@ -515,7 +380,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
       })
     }) //it PDF
 
-    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['dekra_schadenbilder','dekra_abschlussbericht'])
     }) //it PDF from commands
 

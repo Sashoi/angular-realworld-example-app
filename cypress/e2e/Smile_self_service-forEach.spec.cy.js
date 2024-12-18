@@ -60,8 +60,7 @@ describe('Start and complete Smile self service', () =>{
 
 
   const file1 = [
-
-    ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"]
+    ["W0L0XCR975E026845", "Cabrio", "01.01.2009", "OPE Tigra Cabrio"]
 ]
 
   file1.forEach($car => {
@@ -73,7 +72,7 @@ describe('Start and complete Smile self service', () =>{
       const intS41 = getRandomInt(1000,9999).toString()
       const intS42 = getRandomInt(1000,9999).toString()
       const $equipment_2_loading_doors = true
-      const claimNumber =`${intS41}-${intS42}A`
+      const claimNumber =`${intS41}-${intS42}SMI` //A
 
       let  first_registration_date = $car[2]
       //const f_first_registration_date = '2017-06-14'

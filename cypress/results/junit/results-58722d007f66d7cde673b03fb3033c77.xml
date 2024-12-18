@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="16.714" tests="1" failures="0">
+  <testsuite name="Root Suite" timestamp="2024-12-12T08:27:00" tests="0" file="cypress\e2e\Huk_comprehensive_self_service_clickable_car-allParts.spec.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="Huk_comprehensive_self_service_clickable_car" timestamp="2024-12-12T08:27:00" tests="1" time="16.707" failures="0">
+    <testcase name="Huk_comprehensive_self_service_clickable_car Huk-comprehensive-self-service-clickable-car vin :  VF7RDRFJF9L510253" time="9.156" classname="Huk-comprehensive-self-service-clickable-car vin :  VF7RDRFJF9L510253">
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -1,17 +1,17 @@
 {
   "qas": [
     {
-      "answer": "SM 8139",
+      "answer": "SM 5539",
       "questionId": "client-vehicle-license-plate"
     },
     {
-      "answer": "2011-01-01",
+      "answer": "2009-01-01",
       "questionId": "vehicle-first-registration-date"
     }
   ],
   "supportInformation": {
-    "claimNumber": "4016-2003A",
-    "vin": "WVWZZZ7NZDV041367",
+    "claimNumber": "9404-6303SMI",
+    "vin": "W0L0XCR975E026845",
     "additionalProp3": {}
   }
 }

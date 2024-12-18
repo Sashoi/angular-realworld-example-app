@@ -38,7 +38,12 @@ describe('Start and complete vlv standalone questionnaire', () => {
   const loss_causeArray1 = ["Unfall"]
 
   const file1 = [
-    ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"]
+    [
+      "WVWZZZ6RZGY304402",
+      "Hatch5",
+      "01.01.2017",
+      "Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
+    ]
   ]
 
   loss_causeArray1.forEach(loss_cause => {
@@ -70,7 +75,7 @@ describe('Start and complete vlv standalone questionnaire', () => {
         console.log(`claimNumber: ${claimNumber}`)
 
         console.log(`vin: ${$vin}, bodyType: ${$car[1]}, description: ${$car[3]}`)
-        const licenseplate = `SOF ${getRandomInt(1,9)}-${getRandomInt(100,999)}`
+        const licenseplate = `VLV ${getRandomInt(1,9)}-${getRandomInt(100,999)}`
         console.log(`licenseplate: ${licenseplate}`);
         console.log(`loss_cause: ${loss_cause}`);
 
@@ -167,42 +172,15 @@ describe('Start and complete vlv standalone questionnaire', () => {
               expect(xhr.response.statusCode).to.equal(200)
               console.log(`Comming SVG with clickableCar`)
               const SVGbody = xhr.response.body;
-              if (loss_cause == 'Glasbruch'){
-                cy.selectSVG('windshield')
-                cy.selectSingleList('windshield-equipment-windshield-electric',0)
-                cy.selectMultipleList('windshield-damage-type',0)
-                cy.selectMultipleList('windshield-damage-type',1)
-                cy.selectSVG('zone-d')
-                cy.selectSingleList('windshield-damage-size-stone-chips-bigger-2cm',0)
-                cy.selectSingleList('windshield-damage-size-scratch-bigger-5cm',0)
-              } else {
-                cy.selectSingleList('vehicle-safe-to-drive',1)
-                cy.selectSingleList('vehicle-ready-to-drive',1)
-                cy.selectSingleList('unrepaired-pre-damages',0)
-                cy.selectSingleList('vehicle-damage-repaired',1)
-                cy.selectSingleList('cash-on-hand-settlement-preferred',1)
-                cy.selectSingleList('repair-network-preferred',1)
-                //hood
-                cy.selectSVG('hood')
-                cy.selectMultipleList('hood-damage-type',1)
-                cy.selectSingleList('hood-damage-size',2)
-
-                cy.selectSVG('exhaust') // Welche Art von Beschädigung sehen Sie? - selected
-
-                cy.selectSVG(`right-taillight`)
-                cy.selectSingleList('right-taillight-equipment-led-rear-lights', 0)
-
-                cy.selectSVG(`left-sill`)
-                cy.selectMultipleList('left-sill-damage-type', 1)
-                cy.selectSingleList('left-sill-damage-size', 3)
-
-                cy.get('@bodyType').then(function (bodyType) {
-                  if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
-                    cy.selectSingleList('loading-floor-area-bend',0)
-                  }
-                })
-              }
+              cy.get('@goingPageElements').then(function (elements) {
+                const areas = elements.find(x => x.id === 'selected-parts').areas
+                cy.selectAllSVGs(areas,SVGbody,['underbody'])
+              })
             })
+            cy.selectAllSingleLists(0,false)
+            cy.selectAllMultipleList(0,false)
+            cy.selectSingleList('windshield-damage-size-scratch-bigger-5cm',0)
+
             cy.wait(2000)
             nextBtn()
           }

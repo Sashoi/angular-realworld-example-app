@@ -28,7 +28,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
   const $requestTimeout = 60000;
-  const executePost = false
+  const executePost = true
 
   function selectCropImage(selectorId,cropSelectorId,fileName){
     cy.intercept('GET', `/questionnaire/*/attachment/answer/${selectorId}/index-*`,{ log: false }).as(`cropOrigin-${selectorId}`)
@@ -72,15 +72,11 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   const loss_causes = ["collision", "vandalism", "storm", "glass", "animal"]
-  const loss_cause = loss_causes[0]
+  const loss_cause = loss_causes[3]
 
   const file1 = [
-    [
-      "TMBJB7NS4K8027658",
-      "SUV",
-      "01.09.2018",
-      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
-    ]
+
+  ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
 
 ]
   file1.forEach($car => {
@@ -226,8 +222,8 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-06"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-06'){
-                  cy.selectSingleList('airbag-deployed',1)
-                  cy.selectSingleList('underbody-damage-type2',0)
+                  cy.selectSingleList('airbag-deployed',0)
+                  cy.selectSingleList('underbody-damage-type2',1)
                   nextBtn()
                 }
               })

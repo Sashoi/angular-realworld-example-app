@@ -1,0 +1,104 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 1,
+    "passes": 1,
+    "pending": 0,
+    "failures": 0,
+    "start": "2024-12-12T08:27:00.202Z",
+    "end": "2024-12-12T08:27:16.916Z",
+    "duration": 16714,
+    "testsRegistered": 1,
+    "passPercent": 100,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "a7402d2c-4c9a-4825-9479-b5b55c7925bd",
+      "title": "",
+      "fullFile": "cypress\\e2e\\Huk_comprehensive_self_service_clickable_car-allParts.spec.cy.js",
+      "file": "cypress\\e2e\\Huk_comprehensive_self_service_clickable_car-allParts.spec.cy.js",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "abc26abf-8a3a-4e87-8191-eec9f3aa7172",
+          "title": "Huk_comprehensive_self_service_clickable_car",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Huk-comprehensive-self-service-clickable-car vin :  VF7RDRFJF9L510253",
+              "fullTitle": "Huk_comprehensive_self_service_clickable_car Huk-comprehensive-self-service-clickable-car vin :  VF7RDRFJF9L510253",
+              "timedOut": null,
+              "duration": 9156,
+              "state": "passed",
+              "speed": "medium",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "const vin = $car[0];\nlet ran1 = (0, _common.getRandomInt)(10, 99);\nlet ran2 = (0, _common.getRandomInt)(100, 999);\nlet ran3 = (0, _common.getRandomInt)(100000, 999999);\nlet claimNumber = ran1 + \"-33-\" + ran2 + \"/\" + ran3 + \"-S\";\nlet licenseplate = `HSS ${(0, _common.getRandomInt)(1, 9)}-${(0, _common.getRandomInt)(100, 999)}`;\nconsole.log(`vin:${vin}`);\ncy.authenticate().then(function (authorization) {\n  cy.then(function () {\n    _common.questionnaire.authorization = authorization;\n  });\n  _b2bBody.default.qas.find(q => {\n    return q.questionId === \"client-insurance-claim-number\";\n  }).answer = claimNumber;\n  _b2bBody.default.qas.find(q => {\n    return q.questionId === \"vehicle-vin\";\n  }).answer = vin;\n  _b2bBody.default.qas.find(q => {\n    return q.questionId === \"client-vehicle-license-plate\";\n  }).answer = licenseplate;\n  _b2bBody.default.qas.find(q => {\n    return q.questionId === \"part-selection-type\";\n  }).answer = 'clickable-car'; //'vehicle-zones'\n  _b2bBody.default.qas.find(q => {\n    return q.questionId === \"client-mobile-phone-number\";\n  }).answer = newPhoneNumber;\n  _b2bBody.default.qas.find(q => {\n    return q.questionId === \"client-phone-number\";\n  }).answer = newPhoneNumber;\n  _b2bBody.default.qas.find(q => {\n    return q.questionId === \"loss-cause\";\n  }).answer = loss_cause;\n  Cypress._.merge(_header.default, {\n    'authorization': authorization\n  });\n  const options = {\n    method: 'POST',\n    url: `${baseUrl_lp}b2b/integration/huk/huk-comprehensive-self-service-init`,\n    body: _b2bBody.default,\n    headers: _header.default\n  };\n  cy.request(options).then(response => {\n    // response.body is automatically serialized into JSON\n    expect(response.status).to.eq(200); // true\n    const questionnaireId = response.body.questionnaireId;\n    console.log(`self-service-init questionnaireId: ${questionnaireId}`);\n    cy.writeFile(b2bBodySave, _b2bBody.default);\n    const options2 = {\n      method: 'GET',\n      url: `${baseUrl_lp}questionnaire/${questionnaireId}`,\n      headers: _header.default\n    };\n    cy.wait(5000); // time to create DN and send link via e-mail\n    cy.request(options2).then(response2 => {\n      expect(response2.status).to.eq(200); // true\n      console.log('supportInformation: ' + JSON.stringify(response2.body.supportInformation));\n      const damageNotificationId = response2.body.supportInformation.damageNotificationId;\n      cy.then(function () {\n        _common.questionnaire.notificationId = damageNotificationId;\n      });\n      Cypress.env('notificationId', damageNotificationId);\n      if (!initOnly) {\n        const options3 = {\n          method: 'GET',\n          url: `${baseUrl_lp}damage/notification/${damageNotificationId}`,\n          headers: _header.default\n        };\n        cy.request(options3).then(response3 => {\n          expect(response3.status).to.eq(200); // true\n          const requestUrl = response3.body.body.requestedInformation[0].requestUrl;\n          const questionnaireId2 = response3.body.body.requestedInformation[0].questionnaireId;\n          console.log(`Real questionnaireId: ${questionnaireId2}`);\n          cy.then(function () {\n            _common.questionnaire.Id = questionnaireId2;\n          });\n          console.log(`requestUrl : ${requestUrl}`);\n          executeQuestionnaire(requestUrl, $car, false);\n        });\n      }\n    });\n  });\n});",
+              "err": {},
+              "uuid": "8e0cbbd1-25e4-4665-99a6-977f17d79e5f",
+              "parentUUID": "abc26abf-8a3a-4e87-8191-eec9f3aa7172",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": ["8e0cbbd1-25e4-4665-99a6-977f17d79e5f"],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 9156,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.0.1"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": false,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.3"
+    },
+    "marge": {
+      "options": {
+        "id": "default",
+        "reportDir": "cypress/results/mochawesome",
+        "overwrite": false,
+        "html": false,
+        "json": true
+      },
+      "version": "6.2.0"
+    }
+  }
+}

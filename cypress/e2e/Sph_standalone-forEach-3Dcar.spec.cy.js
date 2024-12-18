@@ -10,27 +10,29 @@ import { getPageTitle } from "../support/utils/common.js";
 import { questionnaire } from "../support/utils/common.js";
 import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
-import b2bBody from '../fixtures/templates/b2bBodyZurich.json'
+import b2bBody from '../fixtures/templates/b2bBodySph.json'
 
 
-const logFilename = 'cypress/fixtures/logs/zurichStandalone.log'
+const logFilename = 'cypress/fixtures/logs/sphStandalone.log'
 
-describe('Start and complete zurich standalone questionnaire - urichz_call_center', () =>{
+describe('Start and complete Sph standalone questionnaire 3D car - axa_de_comprehensive_call_center', () =>{
 
   before('clear log file', () => {
     cy.writeFile(logFilename, '')
   })
 
   beforeEach('Setting up integrations and common variables', () =>{
-    cy.intercept('POST', `/b2b/integration/zurich/zurichStandalone`).as('zurichStandalone')
+    cy.intercept('POST', `b2b/integration/sph/sphLiabilityCallCenter?identifyVehicleAsync=false`).as('sphStandalone')
+    cy.intercept({ resourceType: /fetch/ }, { log: false })
     cy.commanBeforeEach(goingPage,questionnaire)
+    //cy.clock()
   })
 
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
   const executePost = false
-  const interceptZurichStandalone = false
+  const interceptSphStandalone = false
 
   function printUiBlocks(uiBlocks){
     uiBlocks.forEach((uiBlock, index1) => {
@@ -49,16 +51,33 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
     cy.waitingFor('@currentPage',goingPage,questionnaire)
   }
 
+  function dragStartDrop(element){
+    cy.get('div.clickMaskContainer').find('svg',{timeout: 10000}).find('g').first().find(`path#${element}`)
+    .trigger('dragstart','left', { force: true })
+    cy.wait(2000)
+
+    cy.get('div.clickMaskContainer').find('svg',{timeout: 10000}).find('g').first().find(`path#${element}`)
+    .trigger('drop','right', { force: true })
+  }
+
+  function mouseDownMoveUp(element){
+    cy.get('div.clickMaskContainer').find('svg',{timeout: 10000}).find('g').first().find(`path#${element}`)
+    .trigger('mousedown', 'left', { button: 1, force : true, timeout: 2000}) //topRight
+    .wait(1000)
+    .trigger('mousemove', 'right', {force : true, animationDistanceThreshold : 5, waitForAnimations : true})
+    .trigger('mouseup', { force: true })
+}
+
   const file1 = [
-    ["VF7RDRFJF9L510253", "Station", "01.01.2010", "Citroen C5 Limousine 4 türig"]
+    ["YV4A22PK5N1849833", "SUV", "01.01.2020", "Volvo XC90 2022"]
   ]
   file1.forEach($car => {
-    it.only(`zurich standalone questionnaire all parts - zurich_call_center vin ${$car[0]}`, () => {
+    it.only(`Sph standalone questionnaire - axa_de_comprehensive_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
 
       //Login()
-      cy.standaloneLogin('zurich').then(function (authorization) {
+      cy.standaloneLogin('sph').then(function (authorization) {
         cy.then(function () {
           questionnaire.authorization = authorization
         })
@@ -66,15 +85,11 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
 
       cy.wait(500)
 
-      const intS2 = getRandomInt(10,99).toString()
-      const intS7 = getRandomInt(1000000,9999999).toString()
-      const intS4 = getRandomInt(1000,9999).toString()
-      const intS1 = getRandomInt(1,9).toString()
-      const $equipment_2_loading_doors = true
-      const claimTypeArray = ["VK","TK","KH"]
-      const claimTypeRandom = getRandomInt(0,3)
-      const claimType = claimTypeArray[claimTypeRandom].toLocaleLowerCase() // Check if app makes them upper case.
 
+      const intS4 = getRandomInt(1000,9999).toString()
+      const intS18 = getRandomInt(100000000000000000,999999999999999999).toString()
+
+      const $equipment_2_loading_doors = true
 
       const first_registration_date = "2024-02-01";
       const f_first_registration_date = '01.02.2024';
@@ -82,21 +97,20 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
       console.log(`first_registration_date: ${first_registration_date}`)
       const nextButtonLabel ='Weiter'
       const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
-      const claimNumber = `${intS2}-${intS7}-${claimType}${intS1}`
-      const licensePlate = `ZUR ${intS4}`
+      const claimNumber = `${intS18}`
+      const licensePlate = `SPH ${intS4}`
       console.log(`claimNumber: ${claimNumber}`)
 
       // Fulfill standalone form
-      //cy.get('ng-select[data-test="standalone_company"]').find('input').type('D',{force: true}) //D or Z
+      cy.get('select[name="processGroup"]').select(1)
       cy.get('input[name="claimNumber"]').type(claimNumber);
       cy.get('input[data-test="standalone_vin"]').type($vin)
       cy.get('input[formcontrolname="firstRegistrationDate"]').type(f_first_registration_date)
-      //cy.get('input[formcontrolname="mileage"]').type('123.456')
-      cy.get('[data-test="standalone_licensePlate"]').type(licensePlate)
-      if (interceptZurichStandalone){
+
+      if (interceptSphStandalone){
        // with this intercept I'm replacing the body of standalone
        // adding 'roof' as selected SVG
-        cy.intercept('POST', `/b2b/integration/zurich/zurichStandalone`, (req) => {
+        cy.intercept('POST', `b2b/integration/sph/sphLiabilityCallCenter`, (req) => {
 
           b2bBody.qas.find(q => {return q.questionId === "license-plate"}).answer = licensePlate
           b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licensePlate
@@ -114,7 +128,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
       })
       cy.get('button[data-test="standalone_submit"]').click()
 
-      cy.wait('@zurichStandalone',{requestTimeout : $requestTimeout}).then(xhr => {
+      cy.wait('@sphStandalone',{requestTimeout : $requestTimeout}).then(xhr => {
         expect(xhr.response.statusCode).to.equal(200)
         const questionnaireId = xhr.response.body.questionnaireId
         console.log(`b2b questionnaireId: ${questionnaireId}`);
@@ -123,7 +137,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
         })
         const uiUrl = xhr.response.body.uiUrl
         console.log(`b2b uiUrl: ${uiUrl}`);
-      }) //wait('@zurichStandalone',
+      }) //wait('@sphStandalone',
 
       cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
 
@@ -156,93 +170,83 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
           cy.wait(2000)
           cy.fillInvalidDropDown('select_buildPeriod')
           cy.wait(2000)
-          cy.selectSingleList('mileage-from-zurich-table',1)
+          cy.get('#client-vehicle-license-plate-input').clear().type(licensePlate)
           cy.get('#vehicle-mileage-input').clear().type('123456')
-          // cy.selectorHasAttrClass('select#select_buildPeriod','field-invalid').then(res =>{
-          //   if (res){
-          //     //cy.selectDropDown('select_buildPeriod',1)
-          //     const selectorId = 'select_buildPeriod'
-          //     const option = [1]
-          //     cy.get(`select#${selectorId}`).invoke('attr', 'class').then($classNames => {
-          //       console.log(`class Names :  ${$classNames}.`)
-          //       if ($classNames.includes('field-invalid')) {
-          //         cy.get(`select#${selectorId}`).select(option,{force: true})//.should('have.value', '200501')
-          //         cy.wait(2000)
-          //         cy.get(`select#${selectorId}`).invoke('val').then($val => {
-          //           console.log(`selected for ${selectorId} :  ${$val}.`)
-          //           cy.get(`select#${selectorId}`).should('have.value', $val)
-          //         })
-          //       }
-          //     })
-          //     cy.wait(2000)
-          //     cy.get('input#vehicle-first-registration-date-input').focus()
-          //     cy.wait(2000)
-          //   }
-          // })
+          cy.get('#accident-date-input').type('01.11.2024')
+          cy.selectSingleList('loss-circumstances-details',0)
+          cy.selectSingleList('cash-on-hand-settlement-preferred',0)
+          cy.selectSingleList('repair-cost-estimate-available',1)
+          cy.get('#repair-location-zip-code-input').clear().type('10115')
+          cy.selectSingleList('switch-to-self-service-workflow', 0)
+          cy.intercept('POST', '/questionnaire/*/page/page-01?navigateTo=next&offset=120&locale=de').as('page01')
           nextBtn()
+          //cy.tick(1001)
+          cy.wait('@page01').its('response').should('have.property', 'statusCode', 200)
         }
       })
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-02'){
-          cy.wait('@clickableCar',{requestTimeout : $requestTimeout, log : false}).then(xhr => {
-            expect(xhr.response.statusCode).to.equal(200)
-            console.log(`Comming SVG with clickableCar`)
-            const SVGbody = xhr.response.body;
-            cy.get('@bodyType').then(function (bodyType) {
-              if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
-                if ($equipment_2_loading_doors){
-                  if (SVGbody.search('g id="right-load-door"') > 0 ){
-                  }
-                }
-                if (!$equipment_2_loading_doors){
-                  if (SVGbody.search('g id="tailgate"') > 0 ){
-                  }
-                }
-              }
-              if (bodyType == 'MPV' || bodyType == 'Hatch3' || bodyType == 'Hatch5' || bodyType == 'Sedan' ||
-                  bodyType == 'Coupe' || bodyType == 'Cabrio' || bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine' ||
-                  bodyType == 'SUV')
-              {
-                const regex = /g .*id="tailgate"/;
-                if (SVGbody.search(regex) > 0 ){
-                }
-              }
-            }) //get('@bodyType'
+          console.log(`Comming SVG with 3D car`)
+          cy.get('@bodyType').then(function (bodyType) {
+            console.log(`bodyType: ${bodyType}`);
+          }) //get('@bodyType'
+          cy.wait(10000)
+
+          const dragElement = 'windshield' //'hood'
+
+          if (false){
+            mouseDownMoveUp(dragElement)
+          }
 
 
+          dragStartDrop(dragElement)
 
-            cy.get('#repair-location-zip-code-input').clear().type('22222')
+          if (false) { //search by alternativeId
             cy.get('@goingPageElements').then(function (elements) {
-              const areas = elements.find(x => x.id === 'selected-parts').areas
-              cy.selectAllSVGs(areas,SVGbody,['underbody'])
+            const areas = elements.find(x => x.id === 'selected-parts').areas
+            areas.forEach(area =>{
+              if (area.visible && area.enabled && area.alternativeIds != null && area.alternativeIds.length > 0 && area.alternativeIds[0] != null) {
+                const alternativeId = area.alternativeIds[0].toString()
+                if (!alternativeId.startsWith('rim') && !alternativeId.startsWith('tyre') && !alternativeId.startsWith('door') &&
+                    !alternativeId.startsWith('windowdoor') && !alternativeId.startsWith('sideskirt') && !alternativeId.startsWith('sideframe') &&
+                    !alternativeId.startsWith('rearwindow')){
+                  console.log(alternativeId)
+                  //cy.selectSVG(area.id)
+                  cy.get(`path#${alternativeId}`).click({ force: true })
+                }
+              }
             })
-            cy.selectAllSingleLists(0)
-            cy.selectAllMultipleList(0)
-            cy.selectSingleList('windshield-damage-size-scratch-bigger-5cm',0)
-            nextBtn()
-          }) //wait('@clickableCar'
+            })
+          }
+          if (true) { //path#Id
+              cy.get('div.clickMaskContainer').find('svg',{timeout: 10000}).find('path').then($path => {
+                console.log(`$path length: ${$path.length}`);
+                //const Id = $path.id
+                cy.wrap($path).click({ force: true, multiple: true, timeout : 4000 })
+              }
+            )
+          }
+
+          dragStartDrop(dragElement)
+
+          //cy.get('path#hood').click()
+          nextBtn()
         } //'page-02'
       }) //get('@goingPageId'
 
 
       // Schadenbilder und Dokumente - page-03
       cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-03'){
-          cy.selectSingleList('fictious-billing',0)
-          cy.get('input#client-email-input').clear().type('sivanchevski@soft2run.com');
-          cy.selectSingleList('company',0)
-
-          //cy.selectSingleList('send-report-per-email-to-client',1)
-          cy.selectSingleList('send-report-per-email-to-agent',1)
-          cy.selectSingleList('assign-or-archive-claim',0)
+        if (aliasValue == 'page-033'){
+          cy.selectSingleList('photos-available',1)
           nextBtn()
         }
       })
 
       //Zusammenfassung, post questionnaire - summary-page
       cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'summary-page'){
+        if (aliasValue == 'summary-page3'){
           cy.get('@questionnaireId').then(function (Id) {
             console.log(`from summary-page, saved questionnaireId: ${Id}`);
           })

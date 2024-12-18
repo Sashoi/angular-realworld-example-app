@@ -1,0 +1,104 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 1,
+    "passes": 1,
+    "pending": 0,
+    "failures": 0,
+    "start": "2024-12-12T08:23:16.583Z",
+    "end": "2024-12-12T08:23:43.278Z",
+    "duration": 26695,
+    "testsRegistered": 1,
+    "passPercent": 100,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "12b65675-8724-46ea-924b-a7d15e6ca31c",
+      "title": "",
+      "fullFile": "cypress\\e2e\\Allianz_standalone-comprehensive-forEach.spec.cy.js",
+      "file": "cypress\\e2e\\Allianz_standalone-comprehensive-forEach.spec.cy.js",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "a1173c89-918a-43b6-914f-62c0253faa74",
+          "title": "Start and complete Allianz standalone questionnaire - Allianz_comprehensive_call_center",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "allianz standalone - allianz_comprehensive_call_center vin 6FPPXXMJ2PCD55635",
+              "fullTitle": "Start and complete Allianz standalone questionnaire - Allianz_comprehensive_call_center allianz standalone - allianz_comprehensive_call_center vin 6FPPXXMJ2PCD55635",
+              "timedOut": null,
+              "duration": 24740,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "const $vin = $car[0];\n//Login()\ncy.standaloneLogin('allianz').then(function (authorization) {\n  cy.then(function () {\n    _common.questionnaire.authorization = authorization;\n  });\n});\nconst intS3 = (0, _common.getRandomInt)(100, 999).toString();\nconst intS4 = (0, _common.getRandomInt)(1000, 9999).toString();\nconst intS7 = (0, _common.getRandomInt)(1000000, 9999999).toString();\nconst $equipment_2_loading_doors = true;\nconst claimNumber = `${intS4} ${intS7}`;\nconst first_registration_date = $car[2];\nCypress.env('claimNumber', claimNumber);\nconsole.log(`claimNumber: ${claimNumber}`);\nconsole.log(`vin: ${$vin}`);\nconsole.log(`first registration date: ${first_registration_date}`);\nconst licensePlate = `ACC ${intS3}`;\n//Cypress.env('licensePlate', licensePlate)\nconsole.log(`license plate: ${licensePlate}`);\n// Fulfill standalone form\ncy.get('[name=\"claimNumber\"]').type(claimNumber);\ncy.get('[data-test=\"standalone_vin\"]').type($vin);\ncy.get('[data-test=\"standalone_licensePlate\"]').type(licensePlate);\ncy.get('input#zipCode').clear().type('2222');\ncy.get('[class=\"btn btn-primary btn-submit\"]').click();\ncy.wait('@allianzStandaloneCC').then(xhr => {\n  expect(xhr.response.statusCode).to.equal(200);\n  console.log(`questionnaireId: ${xhr.response.body.questionnaireId}`);\n  cy.then(function () {\n    _common.questionnaire.Id = xhr.response.body.questionnaireId;\n  });\n  console.log(`uiUrl: ${xhr.response.body.uiUrl}`);\n});\ncy.wait(1000);\ncurrentPage();\nconst nextButtonLabel = 'Weiter';\nconst selectorNextButton = 'button[type=\"submit\"][data-test=\"questionnaire-next-button\"]';\ncy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn');\n// Fahrzeugbeschreibung und Schadenhergang - page-01\ncy.get('@goingPageId').then(function (aliasValue) {\n  if (aliasValue == 'page-01') {\n    cy.get('#accident-date-input').type('01.11.2023');\n    cy.get('#vehicle-first-registration-date-input').type(first_registration_date);\n    cy.get('#vehicle-mileage-input').clear().type('123456');\n    cy.selectSingleList('odometer-reading-source-display', 0);\n    cy.selectorHasAttrClass('select#select_specialModel', 'field-invalid').then(res => {\n      if (res) {\n        cy.selectDropDown('select_specialModel', 1);\n        cy.wait(2000);\n      }\n    });\n    cy.selectorHasAttrClass('select#select_bodyType', 'field-invalid').then(res => {\n      if (res) {\n        cy.selectDropDown('select_bodyType', 1);\n        cy.wait(2000);\n      }\n    });\n    cy.selectorHasAttrClass('select#select_buildPeriod', 'field-invalid').then(res => {\n      if (res) {\n        cy.selectDropDown('select_buildPeriod', 2);\n        cy.wait(2000);\n      }\n    });\n    cy.selectSingleList('loss-cause', 0);\n    cy.selectSingleList('loss-circumstances-details', 0);\n    cy.getBodyType($car, logFilename).then(function (bodyType) {\n      cy.then(function () {\n        _common.questionnaire.bodyType = bodyType;\n      });\n    });\n    cy.get('@bodyType').then(function (bodyType) {\n      if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel') {\n        //cy.selectSingleList('loading-floor-area-bend', 0)\n        cy.wait(2000);\n        cy.selectSingleList('equipment-slide-door', 1);\n        cy.selectSingleList('equipment-2-loading-doors', Number($equipment_2_loading_doors));\n        cy.selectSingleList('equipment-length', 0);\n        cy.selectSingleList('equipment-height', 0);\n        cy.selectSingleList('equipment-vehicle-rear-glassed', 0);\n        cy.selectSingleList('vehicle-customized-interior', 0);\n      }\n      if (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine') {\n        cy.wait(2000);\n        cy.selectSingleList('equipment-loading-area-cover-type', 1);\n      }\n    });\n    nextBtn();\n  }\n});\n// Schadenbeschreibung - page-02\ncy.get('@goingPageId').then(function (aliasValue) {\n  if (aliasValue == 'page-02') {\n    cy.wait('@clickableCar', {\n      requestTimeout: $requestTimeout\n    }).then(xhr => {\n      expect(xhr.response.statusCode).to.equal(200);\n      console.log(`Comming SVG with clickableCar`);\n      if (xhr.response.body.search('g id=\"right-load-door\"') > 0) {\n        //cy.selectSVG('right-load-door')\n      }\n      if (xhr.response.body.search('g id=\"left-load-door\"') > 0) {\n        //cy.selectSVG('left-load-door')\n      }\n      if (xhr.response.body.search('g id=\"tailgate\"') > 0) {\n        //cy.selectSVG('tailgate')\n      }\n      if (xhr.response.body.search('g id=\"hood\"') > 0) {\n        cy.selectSVG('hood');\n        //cy.selectMultipleList('hood-DT2',0)\n        cy.selectSingleList('hood-still-open-close-easily', 1);\n        cy.selectMultipleList('hood-damage-type', 1);\n        cy.selectSingleList('hood-damage-size', 2);\n      }\n      if (xhr.response.body.search('g id=\"right-headlight\"') > 0) {\n        cy.selectSVG('right-headlight');\n        cy.selectSingleList('right-headlight-equipment-enhanced-headlight-system', 0);\n        cy.selectSingleList('right-headlight-loose-shifted-by-hand', 0);\n      }\n      if (xhr.response.body.search('g id=\"left-headlight\"') > 0) {\n        cy.selectSVG('left-headlight');\n        cy.selectSingleList('left-headlight-equipment-enhanced-headlight-system', 0);\n        cy.selectSingleList('left-headlight-loose-shifted-by-hand', 0);\n      }\n      //cy.selectSingleList('vehicle-safe-to-drive',0)\n      //cy.selectSingleList('vehicle-ready-to-drive',0)\n      //cy.selectSingleList('unrepaired-pre-damages',1)\n      cy.selectSingleList('vehicle-damage-repaired', 0);\n      //cy.get('textarea#unrepaired-pre-damages-description-textarea').clear().type('Bitte beschreiben Sie die unreparierten Vorschäden')\n      //cy.get('#repair-location-zip-code-input').clear().type('22222')\n      if (xhr.response.body.search('g id=\"rightFrontWheelRim\"') > 0) {\n        cy.selectSVG('rightFrontWheelRim');\n        cy.wait(2000);\n        cy.selectSingleList('rightFrontWheelRim-FRW2\\\\.1', 0);\n        cy.selectMultipleList('rightFrontWheelRim-DT2', 1);\n      }\n      if (xhr.response.body.search('g id=\"rightRearWheelRim\"') > 0) {\n        cy.selectSVG('rightRearWheelRim');\n        cy.selectSingleList('rightRearWheelRim-FRW2\\\\.1', 0);\n        cy.selectMultipleList('rightRearWheelRim-DT2', 0);\n        cy.selectMultipleList('rightRearWheelRim-DT2', 1);\n      }\n      if (xhr.response.body.search('g id=\"rightFrontTire\"') > 0) {\n        cy.selectSVG('rightFrontTire');\n      }\n      if (xhr.response.body.search('g id=\"rightRearTire\"') > 0) {\n        cy.selectSVG('rightRearTire');\n      }\n      if (xhr.response.body.search('g id=\"leftFrontWheelRim\"') > 0) {\n        cy.selectSVG('leftFrontWheelRim');\n        cy.selectSingleList('leftFrontWheelRim-FRW2\\\\.1', 0);\n        cy.selectMultipleList('leftFrontWheelRim-DT2', 1);\n      }\n      if (xhr.response.body.search('g id=\"leftRearWheelRim\"') > 0) {\n        cy.selectSVG('leftRearWheelRim');\n        cy.selectSingleList('leftRearWheelRim-FRW2\\\\.1', 0);\n        cy.selectMultipleList('leftRearWheelRim-DT2', 0);\n        cy.selectMultipleList('leftRearWheelRim-DT2', 1);\n      }\n      if (xhr.response.body.search('g id=\"right-front-wheel\"') > 0) {\n        cy.selectSVG('right-front-wheel');\n        cy.selectSingleList('right-front-wheel-equipment-rims-type', 0);\n        cy.selectMultipleList('right-front-wheel-damage-type', 0);\n      }\n      if (xhr.response.body.search('g id=\"left-front-wheel\"') > 0) {\n        cy.selectSVG('left-front-wheel');\n        cy.selectSingleList('left-front-wheel-equipment-rims-type', 0);\n        cy.selectMultipleList('left-front-wheel-damage-type', 0);\n      }\n      if (xhr.response.body.search('g id=\"airbag\"') > 0) {\n        cy.selectSVG('airbag');\n        cy.selectSingleList('airbag-deployed', 0);\n      }\n      if (selectUnderbody && xhr.response.body.search('g id=\"underbody\"') > 0) {\n        cy.selectSVG('underbody');\n        cy.selectSingleList('underbody-damage-type2', 0);\n      }\n      cy.get('@bodyType').then(function (bodyType) {\n        if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel') {\n          cy.selectSingleList('loading-floor-area-bend', 0);\n          cy.getQuestionAnswer('loss-cause').then(function (answer) {\n            console.log(`loss-cause : ${answer}`);\n          });\n          cy.wait(1000);\n        }\n      });\n      cy.get('textarea#vehicle-damage-internal-note-textarea').type('Hinweis:Dieses Freitext-Eingabefeld ist für Muster Versicherungs AG interne Anmerkungen vorgesehen.');\n      nextBtn();\n    });\n  }\n});\n// Regulierungsempfehlung - page-03\ncy.get('@goingPageId').then(function (aliasValue) {\n  if (aliasValue == 'page-03') {\n    cy.selectSingleList('triage-recommendation', 0);\n    nextBtn();\n  }\n});\n// Schadenbilder und Dokumente - page-04\ncy.get('@goingPageId').then(function (aliasValue) {\n  if (aliasValue == 'page-04') {\n    if (photos_available) {\n      cy.selectSingleList('photos-available', 0);\n      if (sendSMS) {\n        cy.selectSingleList('receive-upload-link-by-2', 1);\n        cy.get('q-country-selection-options').click();\n        cy.wait(1000);\n        cy.get('ul.dropdown-menu.show').contains('Bulgarien').click();\n        cy.get('input#client-mobile-phone-number-for-upload-link-2-input').clear().type('888795023');\n      } else {\n        cy.selectSingleList('receive-upload-link-by-2', 0);\n        cy.get('input#client-email-for-upload-link-2-input').clear().type('sivanchevski@soft2run.com');\n      }\n    } else {\n      cy.selectSingleList('photos-available', 1);\n      cy.selectSingleList('photos-not-available-because', 2);\n    }\n    nextBtn();\n  }\n});\n//cy.then(() => this.skip())    // stop here\n//Zusammenfassung, post questionnaire - summary-page\ncy.get('@goingPageId').then(function (aliasValue) {\n  if (aliasValue == 'summary-page') {\n    cy.get('@questionnaireId').then(function (Id) {\n      console.log(`from summary-page, questionnaireId:${Id}`);\n    });\n    if (executePost) {\n      cy.get('button[type=\"submit\"]').contains('Schadenanlage beenden').click();\n      cy.wait('@postPost').then(xhr => {\n        cy.postPost(xhr);\n      });\n    }\n  }\n});",
+              "err": {},
+              "uuid": "246b2400-6a1b-4799-b71d-daa1066fb621",
+              "parentUUID": "a1173c89-918a-43b6-914f-62c0253faa74",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": ["246b2400-6a1b-4799-b71d-daa1066fb621"],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 24740,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.0.1"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": false,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.3"
+    },
+    "marge": {
+      "options": {
+        "id": "default",
+        "reportDir": "cypress/results/mochawesome",
+        "overwrite": false,
+        "html": false,
+        "json": true
+      },
+      "version": "6.2.0"
+    }
+  }
+}

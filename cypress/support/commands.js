@@ -76,7 +76,7 @@ Cypress.Commands.add('selectAllSVGs', (areas,SVGbody,excludeAreas) =>{
   areas.forEach(area =>{
     const regex = `g id="${area.id}"`;
     if (area.visible && area.enabled && !excludeAreas.includes(area.id) && SVGbody.search(regex) > 0){
-      console.log(area.id)
+      //console.log(area.id)
       cy.selectSVG(area.id)
     }
   })
@@ -135,7 +135,7 @@ Cypress.Commands.add('selectSingleList', (selectorId, option) =>{
 //     });
 //   });
 // }
-function selectAllFromLists(containerClass,option){
+function selectAllFromLists(containerClass,option, log){
   cy.get(`div.${containerClass}`).should("have.length.gte", 0).then($containerClass => {
     if ($containerClass.length > 0){
           cy.get(`div.${containerClass}`)
@@ -146,7 +146,9 @@ function selectAllFromLists(containerClass,option){
             .find('label.form-check-label').then(labels =>{
               //cy.wrap(labels).first().click({ force: true })
               cy.wrap(labels).first().invoke('attr','for').then($for => {
-                console.log(`${containerClass} : ${$for.slice(0, -2)}`)
+                if (log){
+                  console.log(`${containerClass} : ${$for.slice(0, -2)}`)
+                }
                 if ( containerClass == 'single-list-container'){
                   cy.selectSingleList($for.slice(0, -2),option)
                 } else {
@@ -160,12 +162,12 @@ function selectAllFromLists(containerClass,option){
   )
 }
 
-Cypress.Commands.add('selectAllMultipleList', (option) =>{
-  selectAllFromLists('multiple-list-container',option)
+Cypress.Commands.add('selectAllMultipleList', (option,log = true) =>{
+  selectAllFromLists('multiple-list-container',option, log)
 })
 
-Cypress.Commands.add('selectAllSingleLists', (option) =>{
-    selectAllFromLists('single-list-container',option)
+Cypress.Commands.add('selectAllSingleLists', (option,log = true) =>{
+    selectAllFromLists('single-list-container',option, log)
 })
 
 
@@ -677,6 +679,7 @@ Cypress.Commands.add('commanBeforeEach',(goingPage,questionnaire) =>{
   cy.wrap(questionnaire).its('authorization').as('authorization')
   cy.wrap(questionnaire).its('bodyType').as('bodyType')
   cy.wrap(questionnaire).its('notificationId').as('notificationId')
+  cy.wrap(questionnaire).its('is3Dcar').as('is3Dcar')
 })
 
 Cypress.Commands.add('fulfilInputIfEmpty', function ($div, $input, $newValue) {

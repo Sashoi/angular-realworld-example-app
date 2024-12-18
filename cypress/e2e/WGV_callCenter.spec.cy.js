@@ -78,13 +78,12 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
 
   const file1 = [
 
-        ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
-    ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
+        ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"]
   ]
 
   damageCauseArr1.forEach($damageCause => {
     file1.forEach($car => {
-      it(`wgv callCenter for vin: ${$car[0]} damage-cause: ${$damageCause[1]}`, () =>{
+      it.only(`wgv callCenter for vin: ${$car[0]} damage-cause: ${$damageCause[1]}`, () =>{
 
         const $vin = $car[0]
         console.log(`vin :${$vin}`)

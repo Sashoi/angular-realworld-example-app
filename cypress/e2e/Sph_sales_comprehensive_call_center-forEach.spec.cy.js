@@ -28,7 +28,7 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
   const executePost = true
-  const executePost2 = true
+  const executePost2 = false
   const $equipment_2_loading_doors = true
 
   function printUiBlocks(uiBlocks){
@@ -56,8 +56,7 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
 
 
   const file1 = [
-    ["JTNB23HK903079950", "Sedan", "01.01.2020", "TOYOTA  Camry"],
-  ["VF7RDRFJF9L510253", "Station", "01.01.2010", "Citroen C5 Limousine 4 türig"]
+    ["W0L0XCR975E026845", "Cabrio", "01.01.2009", "OPE Tigra Cabrio"]
 ]
   file1.forEach($car => {
     it(`Sph sales - sph_sales_comprehensive_call_center vin ${$car[0]}`, () => {

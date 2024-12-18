@@ -50,30 +50,15 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
     ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"]
   ]
   file1.forEach($car => {
-    it.only(`wuestenrot-comprehensive-call-center for vin: ${$car[0]}`, () => {
+    it(`wuestenrot-comprehensive-call-center for vin: ${$car[0]}`, () => {
 
       const $vin = $car[0]
 
-      // cy.visit(`${baseUrl_lp}ui/questionnaire/zurich/#/login?theme=wuestenrot`,{ log : false })
-      // cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
-      // cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
-      // cy.get('form').submit()
-      // cy.wait('@token',{requestTimeout : $requestTimeout, log: false}).then(xhr => {
-      //   expect(xhr.response.statusCode).to.equal(200)
-      //   const access_token = xhr.response.body.access_token
-      //   cy.then(function () {
-      //     questionnaire.authorization = `Bearer ${access_token}`
-      //   })
-      // })  //wait @token
-
-      //Login()
       cy.standaloneLogin('wuestenrot').then(function (authorization) {
         cy.then(function () {
           questionnaire.authorization = authorization
         })
       })
-
-
 
       const intS1 = getRandomInt(1000, 9999).toString()
       const intS2 = getRandomInt(1000, 9999).toString()

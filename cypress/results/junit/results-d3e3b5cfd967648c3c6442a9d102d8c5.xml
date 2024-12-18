@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="6920.125" tests="1" failures="1">
+  <testsuite name="Root Suite" timestamp="2024-12-12T08:28:01" tests="0" file="cypress\e2e\Huk_comprehensive_self_service_clickable_car-allParts.spec.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="Huk_comprehensive_self_service_clickable_car" timestamp="2024-12-12T08:28:01" tests="1" time="6920.112" failures="1">
+    <testcase name="Huk_comprehensive_self_service_clickable_car Huk-comprehensive-self-service-clickable-car vin :  VF7RDRFJF9L510253" time="2250.080" classname="Huk-comprehensive-self-service-clickable-car vin :  VF7RDRFJF9L510253">
+      <failure message="Timed out retrying after 999999ms: `cy.wait()` timed out waiting `999999ms` for the 9th request to the route: `nextPage`. No request ever occurred.
+
+https://on.cypress.io/wait" type="CypressError"><![CDATA[CypressError: Timed out retrying after 999999ms: `cy.wait()` timed out waiting `999999ms` for the 9th request to the route: `nextPage`. No request ever occurred.
+
+https://on.cypress.io/wait
+    at cypressErr (https://dev02.spearhead-ag.ch/__cypress/runner/cypress_runner.js:75921:18)
+    at Object.errByPath (https://dev02.spearhead-ag.ch/__cypress/runner/cypress_runner.js:75975:10)
+    at checkForXhr (https://dev02.spearhead-ag.ch/__cypress/runner/cypress_runner.js:135214:84)
+    at <unknown> (https://dev02.spearhead-ag.ch/__cypress/runner/cypress_runner.js:135240:28)
+    at tryCatcher (https://dev02.spearhead-ag.ch/__cypress/runner/cypress_runner.js:1830:23)
+    at Promise.attempt.Promise.try (https://dev02.spearhead-ag.ch/__cypress/runner/cypress_runner.js:4338:29)
+    at whenStable (https://dev02.spearhead-ag.ch/__cypress/runner/cypress_runner.js:143616:68)
+    at <unknown> (https://dev02.spearhead-ag.ch/__cypress/runner/cypress_runner.js:143557:14)
+    at tryCatcher (https://dev02.spearhead-ag.ch/__cypress/runner/cypress_runner.js:1830:23)
+    at Promise._settlePromiseFromHandler (https://dev02.spearhead-ag.ch/__cypress/runner/cypress_runner.js:1542:31)
+    at Promise._settlePromise (https://dev02.spearhead-ag.ch/__cypress/runner/cypress_runner.js:1599:18)
+    at Promise._settlePromise0 (https://dev02.spearhead-ag.ch/__cypress/runner/cypress_runner.js:1644:10)
+    at Promise._settlePromises (https://dev02.spearhead-ag.ch/__cypress/runner/cypress_runner.js:1724:18)
+    at Promise._fulfill (https://dev02.spearhead-ag.ch/__cypress/runner/cypress_runner.js:1668:18)
+    at <unknown> (https://dev02.spearhead-ag.ch/__cypress/runner/cypress_runner.js:5473:46)
+From Your Spec Code:
+    at Context.eval (webpack://angular-realworld/./cypress/support/commands.js:710:5)]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

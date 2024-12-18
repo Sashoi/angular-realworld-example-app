@@ -66,10 +66,7 @@ describe('Ergo Self Service init', () =>{
 
 
   const file1 = [
-    ["W1V44760313930767", "Van", "01.01.2019", "Mercedes Vito 09/2021"],
-  ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"],
-  ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
-
+    ["VF7RDRFJF9L510253", "Station", "01.01.2010", "Citroen C5 Limousine 4 türig"]
   ]
   file1.forEach($car => {
     it.only(`Execute /questionnaire/ergo_self_service_init with vin:${$car[0]}`, () =>{
@@ -341,6 +338,10 @@ describe('Ergo Self Service init', () =>{
                     cy.selectSingleList('damaged-vehicle-area-left-hail-damage-intensity',2)
                     cy.selectSingleList('damaged-vehicle-area-top-hail-damage-intensity',2)
                     cy.selectSingleList('damaged-vehicle-area-right-hail-damage-intensity',2)
+                    cy.get('div#damaged-vehicle-area-left-hail-damage-intensity').find('span.info-icon').click()
+                    cy.wait(3000)
+                    cy.get('span.info-block-close').first().click()
+
                     //cy.getQuestionnaireInfo()
                     nextBtn()
                   }

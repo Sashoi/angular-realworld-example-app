@@ -10,7 +10,7 @@
     },
     {
       "questionId": "loss-cause",
-      "answer": "animal"
+      "answer": "vandalism"
     },
     {
       "questionId": "loss-circumstances",
@@ -18,7 +18,7 @@
     },
     {
       "questionId": "client-insurance-claim-number",
-      "answer": "19-33-771/184540-S"
+      "answer": "60-33-760/232792-S"
     },
     {
       "questionId": "animal-species",
@@ -50,7 +50,7 @@
     },
     {
       "questionId": "vehicle-vin",
-      "answer": "6FPPXXMJ2PCD55635"
+      "answer": "W0L0XCR975E026845"
     },
     {
       "questionId": "vehicle-first-registration-date",
@@ -58,7 +58,7 @@
     },
     {
       "questionId": "client-vehicle-license-plate",
-      "answer": "HSS 4-271"
+      "answer": "HSS 8-975"
     },
     {
       "questionId": "client-email",

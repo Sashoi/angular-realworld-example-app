@@ -43,12 +43,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   const file1 = [
-    [
-      "TMBJB7NS4K8027658",
-      "SUV",
-      "01.09.2018",
-      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
-    ]
+    ["VF7RDRFJF9L510253", "Station", "01.01.2010", "Citroen C5 Limousine 4 türig"]
   ]
   file1.forEach($car => {
     it.only(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
@@ -295,7 +290,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                     cy.get('q-image-analytics-popup').find('div.popup-damage-types').find('input[type="checkbox"]').contains('Kratzer ').click({ force: true });
                   }
                   //cy.uploadImage('damage-photo-upload-detail-roof',PathToImages,`roof-d.jpg`)
-                  cy.uploadAllImagesOnPage(PathToImages,6000)
+                  cy.uploadAllImagesOnPage(PathToImages,4000)
                   //cy.get('textarea#damage-photo-upload-remarks-windshield-textarea').type('Anmerkungen zu Windschutzscheibe - 1.<br>Anmerkungen zu Windschutzscheibe - 2.<br>Anmerkungen zu Windschutzscheibe - 3.')
                   //cy.get('textarea#damage-photo-upload-remarks-roof-textarea').type('Anmerkungen zu Nahaufnahme der Beschädigung - 1.<br>Anmerkungen zu Nahaufnahme der Beschädigung - 2.<br>Anmerkungen zu Nahaufnahme der Beschädigung - 3.')
 
@@ -342,6 +337,14 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-18"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-18'){
+                  cy.selectSingleList('vehicle-location-equals-home-address',0)
+                  nextBtn()
+                }
+              })
+
+              //"page-19"
+              cy.get('@goingPageId').then(function (aliasValue) {
+                if (aliasValue == 'page-19'){
                   cy.get('textarea#additional-remarks-textarea').type('Weitere Anmerkungen  - 1.<br>Weitere Anmerkungen  - 2.<br>Weitere Anmerkungen  - 3.')
                   nextBtn()
                 }

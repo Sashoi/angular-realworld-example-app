@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="26.695" tests="1" failures="0">
+  <testsuite name="Root Suite" timestamp="2024-12-12T08:23:16" tests="0" file="cypress\e2e\Allianz_standalone-comprehensive-forEach.spec.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="Start and complete Allianz standalone questionnaire - Allianz_comprehensive_call_center" timestamp="2024-12-12T08:23:16" tests="1" time="26.687" failures="0">
+    <testcase name="Start and complete Allianz standalone questionnaire - Allianz_comprehensive_call_center allianz standalone - allianz_comprehensive_call_center vin 6FPPXXMJ2PCD55635" time="24.740" classname="allianz standalone - allianz_comprehensive_call_center vin 6FPPXXMJ2PCD55635">
+    </testcase>
+  </testsuite>
+</testsuites>
