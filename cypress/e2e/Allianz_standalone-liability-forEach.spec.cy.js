@@ -28,10 +28,10 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = false
+  const executePost = true
   const executePostR = true
   const executePost2 = false
-  const sendSMS = true
+  const sendSMS = false
   const photos_available = true
 
 
@@ -81,10 +81,17 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
       "PickUpDoubleCabine",
       "01.01.2012",
       "Ford Ranger double cabine, Pick-up"
-    ]
+    ],
+    [
+      "6FPGXXMJ2GEL59891",
+      "PickUpSingleCabine",
+      "01.01.2012",
+      "Ford Ranger single cabine, Pick-up"
+    ],
+    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"]
 ]
   file1.forEach($car => {
-    it.only(`allianz standalone - allianz_liability_call_center vin ${$car[0]}`, () => {
+    it(`allianz standalone - allianz_liability_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
       //Login()
@@ -349,7 +356,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
       })
     })
 
-    it.skip(`allianz standalone - allianz_liability_call_center - reoprn vin ${$car[0]}`, () => {
+    it(`allianz standalone - allianz_liability_call_center - reoprn vin ${$car[0]}`, () => {
       const claimNumber  = Cypress.env('claimNumber')
       //const licensePlate = Cypress.env('licensePlate')
 
@@ -434,7 +441,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
       })
     })
 
-    it.skip(`allianz_liability_self_service vin ${$car[0]}`, () => {
+    it(`allianz_liability_self_service vin ${$car[0]}`, () => {
       cy.viewport('samsung-note9')
       const notificationId = Cypress.env('notificationId') //`wlA4icU77W6LjzUFyrGzy`
       cy.authenticate().then(function (authorization) {
@@ -572,7 +579,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_liabilit
       })
     })
 
-    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    it(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['allianz_abschlussbericht'])
     }) //it PDF from commands
   })

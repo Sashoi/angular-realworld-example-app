@@ -31,8 +31,9 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
   const executePost = false
   const executePostR = true  // reopen
   const executePostSS = true // self_service
-  const sendSMS = true
+  const sendSMS = false
   const photos_available = true
+  const selectUnderbody = false
 
   function printUiBlocks(uiBlocks){
     uiBlocks.forEach((uiBlock, index1) => {
@@ -60,7 +61,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
       "6FPPXXMJ2PCD55635",
       "PickUpDoubleCabine",
       "01.01.2012",
-      "Ford Ranger double cabine, Pick-up"
+      "Ford Ranger double cabine, Pick-up "
     ]
 ]
   file1.forEach($car => {
@@ -259,7 +260,7 @@ describe('Start and complete Allianz standalone questionnaire - Allianz_comprehe
               cy.selectSVG('airbag')
               cy.selectSingleList('airbag-deployed',0)
             }
-            if (xhr.response.body.search('g id="underbody"') > 0){
+            if (selectUnderbody && xhr.response.body.search('g id="underbody"') > 0){
               cy.selectSVG('underbody')
               cy.selectSingleList('underbody-damage-type2',0)
             }

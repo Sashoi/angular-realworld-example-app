@@ -58,7 +58,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
   }
 
   const coverage_type_Array = ["liability","full-comprehensive","partial-comprehensive"]
-  const coverage_type = 2
+  const coverage_type = 1
   // only for coverage-type": "values": ["full-comprehensive", "partial-comprehensive"]
   const loss_cause_Array = [
     ["full-comprehensive", "collision"], //1, 0
@@ -71,7 +71,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
     ["partial-comprehensive","marten-animal-bite"] //2, 5
   ]
 
-  const loss_cause = 0
+  const loss_cause = 1
 
   const file1 = [
     [
