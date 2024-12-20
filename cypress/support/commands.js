@@ -305,7 +305,12 @@ Cypress.Commands.add('uploadAllImagesOnPage', (PathToImages, delay = 2000) =>{
         cy.uploadImage(id,PathToImages,'door-2.jpg')
       }  else if (id.includes('grill')){
         cy.uploadImage(id,PathToImages,'grill-2.jpg')  //15mbmb.jpg grill-2.jpg
-      } else {
+      } else if (id.includes('left-taillight')){
+        cy.uploadImage(id,PathToImages,'right-taillight-o.jpg')
+      } else if (id.includes('right-taillight')){
+        cy.uploadImage(id,PathToImages,'right-taillight-d.jpg')
+      }
+      else {
         cy.uploadImage(id,PathToImages,'airbag.jpg')
       }
 

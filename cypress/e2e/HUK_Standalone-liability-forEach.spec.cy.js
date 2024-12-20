@@ -58,7 +58,7 @@ describe('Start and complete huk standalone questionnaire - huk_liability_call_c
   // }
 
   const file1 = [
-    ["JTNB23HK903079950", "Sedan", "01.01.2020", "TOYOTA  Camry"]
+    ["U5YPH816HML010002", "", "01.09.2020", "3D Kia Sportage"]
   ]
 
   file1.forEach($car => {

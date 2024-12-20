@@ -16,6 +16,7 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
   })
 
   beforeEach('Setting up integrations and common variables', () => {
+    cy.intercept({ resourceType: /fetch/ }, { log: false })
     cy.intercept('POST', `/b2b/integration/huk/huk-comprehensive-call-center?identifyVehicleAsync=false`).as('hukStandaloneCC')
     cy.intercept('GET', `/b2b/integration/huk/huk-comprehensive-call-center/*`).as('hukStandaloneCcGET')
     cy.intercept('GET',  `/questionnaire/*/page/page-*?locale=de`).as('currentPageR')
@@ -67,10 +68,11 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
   // }
 
   const file1 = [
-    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"]
+
+    ["YV4A22PK5N1849833", "", "01.09.2022", "3D Volvo XC90 2022"]
 ]
   file1.forEach($car => {
-    it(`huk standalone - huk_comprehensive_call_center vin ${$car[0]}`, () => {
+    it.only(`huk standalone - huk_comprehensive_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
       ///Login()
@@ -163,75 +165,105 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
       })
 
       // Schadenbeschreibung - page-02
-      cy.get('@goingPageId').then(function (aliasValue) {
+      cy.get('@goingPageId',{timeout : 6000}).then(function (aliasValue) {
         if (aliasValue == 'page-02'){
-          cy.wait('@clickableCar',{requestTimeout : $requestTimeout}).then(xhr => {
-            expect(xhr.response.statusCode).to.equal(200)
-            console.log(`Comming SVG with clickableCar`)
+          cy.get('@goingPageElements',{includeShadowDom:true, timeout : 6000}).then(function (elements) {
+            const threeSixtyOptions = elements.find(x => x.id === 'selected-parts').threeSixtyOptions
+            if (threeSixtyOptions != null && threeSixtyOptions.vehicleFolderPath != null && threeSixtyOptions.vehicleFolderPath.length > 0){
+              //clickableCar 3D
+              cy.then(function () {
+                questionnaire.is3Dcar = true
+              })
+              cy.get('div.clickMaskContainer').find('svg',{timeout: 10000}).find('path').then($path => {
+                console.log(`paths count: ${$path.length}`);
+                if ($path.length > 0) {
+                  //const Id = $path.id
+                  //cy.wrap($path).click({ force: true, multiple: true, timeout : 4000 })  // select all
+                  cy.get('div.clickMaskContainer').find('svg',{timeout: 10000}).find('path#hood').click({ force: true, timeout : 4000 })
+                  cy.selectMultipleList('hood-damage-type',0)
+                }
+              })
+            } else {
+              cy.wait('@clickableCar',{requestTimeout : $requestTimeout}).then(xhr => {
+                expect(xhr.response.statusCode).to.equal(200)
+                console.log(`Comming SVG with clickableCar`)
 
-            if (xhr.response.body.search('g id="right-load-door"') > 0){
-              //cy.selectSVG('right-load-door')
-            }
-            if (xhr.response.body.search('g id="left-load-door"') > 0){
-              //cy.selectSVG('left-load-door')
-            }
-            if (xhr.response.body.search('g id="tailgate"') > 0){
-              //cy.selectSVG('tailgate')
-            }
-            if (xhr.response.body.search('g id="hood"') > 0){
-              cy.selectSVG('hood')
-              cy.selectMultipleList('hood-DT2',0)
-            }
+                if (xhr.response.body.search('g id="right-load-door"') > 0){
+                  //cy.selectSVG('right-load-door')
+                }
+                if (xhr.response.body.search('g id="left-load-door"') > 0){
+                  //cy.selectSVG('left-load-door')
+                }
+                if (xhr.response.body.search('g id="tailgate"') > 0){
+                  //cy.selectSVG('tailgate')
+                }
+                if (xhr.response.body.search('g id="hood"') > 0){
+                  cy.selectSVG('hood')
+                  cy.selectMultipleList('hood-damage-type',0)
+                }
 
+                if (xhr.response.body.search('g id="right-front-wheel"') > 0){
+                  cy.selectSVG('right-front-wheel')
+                  cy.wait(2000)
+                  cy.selectSingleList('right-front-wheel-equipment-rims-type',0)
+                  cy.selectMultipleList('right-front-wheel-damage-type',1)
+                }
+
+                if (xhr.response.body.search('g id="left-front-wheel"') > 0){
+                  cy.selectSVG('left-front-wheel')
+                  cy.wait(2000)
+                  cy.selectSingleList('left-front-wheel-equipment-rims-type',0)
+                  cy.selectMultipleList('left-front-wheel-damage-type',1)
+                }
+
+                if (xhr.response.body.search('g id="right-rear-wheel"') > 0){
+                  cy.selectSVG('right-rear-wheel')
+                  cy.wait(2000)
+                  cy.selectSingleList('right-rear-wheel-equipment-rims-type',0)
+                  cy.selectMultipleList('right-rear-wheel-damage-type',1)
+                }
+
+                if (xhr.response.body.search('g id="left-rear-wheel"') > 0){
+                  cy.selectSVG('left-rear-wheel')
+                  cy.wait(2000)
+                  cy.selectSingleList('left-rear-wheel-equipment-rims-type',0)
+                  cy.selectMultipleList('left-rear-wheel-damage-type',1)
+                }
+
+
+                if (xhr.response.body.search('g id="right-front-wheel-tire"') > 0){
+                  cy.selectSVG('right-front-wheel-tire')
+                }
+
+                if (xhr.response.body.search('g id="right-rear-wheel-tire"') > 0){
+                  cy.selectSVG('right-rear-wheel-tire')
+                }
+
+                if (xhr.response.body.search('g id="left-front-wheel-tire"') > 0){
+                  cy.selectSVG('left-front-wheel-tire')
+                }
+
+                if (xhr.response.body.search('g id="left-rear-wheel-tire"') > 0){
+                  cy.selectSVG('left-rear-wheel-tire')
+                }
+
+
+
+                cy.get('@bodyType').then(function (bodyType) {
+                  if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
+                    cy.selectSingleList('loading-floor-area-bend',1)
+                  }
+                })
+
+              })
+
+            }
             cy.selectSingleList('vehicle-safe-to-drive',0)
             cy.selectSingleList('vehicle-ready-to-drive',0)
             cy.selectSingleList('unrepaired-pre-damages',1)
             cy.selectSingleList('vehicle-damage-repaired',0)
             cy.get('textarea#unrepaired-pre-damages-description-textarea').clear().type('Bitte beschreiben Sie die unreparierten Vorschäden')
-            cy.get('#repair-location-zip-code-input').clear().type('04158') //04158  22222
-
-            if (xhr.response.body.search('g id="rightFrontWheelRim"') > 0){
-              cy.selectSVG('rightFrontWheelRim')
-              cy.wait(2000)
-              cy.selectSingleList('rightFrontWheelRim-FRW2\\.1',0)
-              cy.selectMultipleList('rightFrontWheelRim-DT2',1)
-            }
-
-            if (xhr.response.body.search('g id="rightRearWheelRim"') > 0){
-              cy.selectSVG('rightRearWheelRim')
-              cy.selectSingleList('rightRearWheelRim-FRW2\\.1',0)
-              cy.selectMultipleList('rightRearWheelRim-DT2',0)
-              cy.selectMultipleList('rightRearWheelRim-DT2',1)
-            }
-            if (xhr.response.body.search('g id="rightFrontTire"') > 0){
-              cy.selectSVG('rightFrontTire')
-            }
-            if (xhr.response.body.search('g id="rightRearTire"') > 0){
-              cy.selectSVG('rightRearTire')
-            }
-            if (xhr.response.body.search('g id="leftFrontWheelRim"') > 0){
-              cy.selectSVG('leftFrontWheelRim')
-              cy.selectSingleList('leftFrontWheelRim-FRW2\\.1',0)
-              cy.selectMultipleList('leftFrontWheelRim-DT2',1)
-            }
-            if (xhr.response.body.search('g id="leftRearWheelRim"') > 0){
-              cy.selectSVG('leftRearWheelRim')
-              cy.selectSingleList('leftRearWheelRim-FRW2\\.1',0)
-              cy.selectMultipleList('leftRearWheelRim-DT2',0)
-              cy.selectMultipleList('leftRearWheelRim-DT2',1)
-            }
-            if (xhr.response.body.search('g id="leftFrontTire"') > 0){
-              cy.selectSVG('leftFrontTire')
-            }
-            if (xhr.response.body.search('g id="leftRearTire"') > 0){
-              cy.selectSVG('leftRearTire')
-            }
-
-            cy.get('@bodyType').then(function (bodyType) {
-              if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
-                cy.selectSingleList('vehicleStatus-VS34',1)
-              }
-            })
+            cy.get('#repair-location-zip-code-input').clear().type('14158') //04158  22222
             nextBtn()
           })
         }

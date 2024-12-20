@@ -62,12 +62,12 @@
     "Citroen C5 Limousine 4 türig"
   ],
 
-  ["U5YPH816HML010002", "", "01.09.2020", "3D Kia Sportage"],
-  ["WDD2130431A601626", "", "01.09.2020", "3D Mercedes E Class sedan"],
-  ["WBA31EF0605X11023", "", "01.09.2022", "3D BMW X1 2022"],
-  ["TMBLJ9NP7H7030085", "", "01.09.2015", "3D Skoda Superb 2015"],
-  ["VF1RJA00767465108", "", "01.09.2019", "3D Renault Clio 2019"],
-  ["TMAD351CAHJ363943", "", "01.09.2011", "3D Hyundai i30 2011"],
-  ["VF3MRHNSUNS096834", "", "01.09.2017", "3D Peugeot 5008 2017"],
-  ["YV4A22PK5N1849833", "", "01.09.2022", "3D Volvo XC90 2022"]
+  ["U5YPH816HML010002", "SUV", "01.09.2020", "3D Kia Sportage"],
+  ["WDD2130431A601626", "Sedan", "01.01.2020", "3D Mercedes E Class sedan"],
+  ["WBA31EF0605X11023", "SUV", "01.09.2022", "3D BMW X1 2022"],
+  ["TMBLJ9NP7H7030085", "Station", "01.09.2015", "3D Skoda Superb 2015"],
+  ["VF1RJA00767465108", "Hatch5", "01.09.2020", "3D Renault Clio 2019"],
+  ["TMAD351CAHJ363943", "Hatch5", "01.09.2014", "3D Hyundai i30 2011"],
+  ["VF3MRHNSUNS096834", "MPV", "01.09.2018", "3D Peugeot 5008 2017"],
+  ["YV4A22PK5N1849833", "SUV", "01.09.2018", "3D Volvo XC90 2022"]
 ]

@@ -29,7 +29,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
-  const executePost = true
+  const executePost = false
   const generatePdfCondition = executePost && true
   const newPhoneNumber = `+3598887950`
   const $equipment_2_loading_doors = true
@@ -217,13 +217,6 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
       }
     })
 
-    //"page-09"
-    // cy.get('@goingPageId').then(function (aliasValue) {
-    //   if (aliasValue == 'page-09'){
-    //     cy.selectSingleList('unrepaired-pre-damages',0)
-    //     nextBtn()
-    //   }
-    // })
 
     //"page-10"
     cy.get('@goingPageId').then(function (aliasValue) {
@@ -391,7 +384,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   const loss_causes = ["collision", "vandalism", "storm", "glass", "animal"]
 
   const file1 = [
-    ["W0L0XCR975E026845", "Cabrio", "01.01.2009", "OPE Tigra Cabrio"]
+    ["WBA31EF0605X11023", "", "01.09.2022", "3D BMW X1 2022"]
   ]
 
   file1.forEach($car => {
