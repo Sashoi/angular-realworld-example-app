@@ -23,7 +23,6 @@ describe('Start and complete Sph standalone questionnaire 3D car - axa_de_compre
 
   beforeEach('Setting up integrations and common variables', () =>{
     cy.intercept('POST', `b2b/integration/sph/sphLiabilityCallCenter?identifyVehicleAsync=false`).as('sphStandalone')
-    cy.intercept({ resourceType: /fetch/ }, { log: false })
     cy.commanBeforeEach(goingPage,questionnaire)
     //cy.clock()
   })

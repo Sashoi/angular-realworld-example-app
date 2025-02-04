@@ -28,7 +28,7 @@ describe('Start and complete Smile self service', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = true
+  const executePost = false
   const sendButtonText = 'Vorschadenmeldung senden'
 
 
@@ -60,7 +60,7 @@ describe('Start and complete Smile self service', () =>{
 
 
   const file1 = [
-    ["W0L0XCR975E026845", "Cabrio", "01.01.2009", "OPE Tigra Cabrio"]
+    ["U5YPH816HML010002", "SUV", "01.09.2020", "3D Kia Sportage"]
 ]
 
   file1.forEach($car => {
@@ -277,12 +277,12 @@ describe('Start and complete Smile self service', () =>{
       })
       //cy.then(() => this.skip())    // stop here
 
-      // cy.get('@goingPageId').then(function (aliasValue) {
-      //   if (aliasValue == 'page-05'){
-      //     EmptyError, no questions
-      //     nextBtn()
-      //   }
-      // })
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-05'){
+          cy.uploadAllImagesOnPage(PathToImages)
+          nextBtn()
+        }
+      })
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-06'){

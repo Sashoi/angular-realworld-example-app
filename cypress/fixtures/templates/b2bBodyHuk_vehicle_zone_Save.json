@@ -10,7 +10,7 @@
     },
     {
       "questionId": "loss-cause",
-      "answer": ["animal"]
+      "answer": "vandalism"
     },
     {
       "questionId": "loss-circumstances",
@@ -18,7 +18,7 @@
     },
     {
       "questionId": "client-insurance-claim-number",
-      "answer": "43-13-664/523512-Z"
+      "answer": "21-33-874/492174-Z"
     },
     {
       "questionId": "animal-species",
@@ -26,11 +26,11 @@
     },
     {
       "questionId": "insurance-name",
-      "answer": ["huk-coburg"]
+      "answer": "huk-coburg"
     },
     {
       "questionId": "huk-coburg-triage-category",
-      "answer": ["total-loss"]
+      "answer": "fictitious"
     },
     {
       "questionId": "client-insurance-policy-number",
@@ -58,7 +58,7 @@
     },
     {
       "questionId": "client-vehicle-license-plate",
-      "answer": "SOF 1818"
+      "answer": "SOF 1766"
     },
     {
       "questionId": "client-email",
@@ -99,6 +99,14 @@
     {
       "questionId": "client-last-name",
       "answer": ["org clientLastName"]
+    },
+    {
+      "questionId": "event-abroad",
+      "answer": ""
+    },
+    {
+      "questionId": "coverage-type-test",
+      "answer": "comprehensive"
     }
   ],
   "supportInformation": null,

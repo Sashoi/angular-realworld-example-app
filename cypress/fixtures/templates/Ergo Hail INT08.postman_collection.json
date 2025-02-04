@@ -1,0 +1,187 @@
+{
+  "info": {
+    "_postman_id": "559a2eb2-9bcb-4578-a970-6a8a3aea0f06",
+    "name": "Ergo Hail INT08",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "4953174",
+    "_collection_link": "https://cloudy-astronaut-807862.postman.co/workspace/Team-Workspace~b2277845-390c-4b81-88ef-0fade6e3f761/collection/4953174-559a2eb2-9bcb-4578-a970-6a8a3aea0f06?action=share&source=collection_link&creator=4953174"
+  },
+  "item": [
+    {
+      "name": "Authenticate",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.environment.set(\"accessToken\", jsonData.accessToken)"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"userName\": \"vivanov@soft2run.com\",\n\t\"password\": \"VIvanov123!\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/member/authenticate",
+          "host": ["{{baseUrl}}"],
+          "path": ["member", "authenticate"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Authenticate int08",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.environment.set(\"accessToken\", jsonData.accessToken);"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"password\": \"b5dDcqUq$8^rxD=\",\n  \"userName\": \"dekra-integration@spearhead-ag.ch\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://int08.spearhead-ag.ch/member/authenticate",
+          "protocol": "https",
+          "host": ["int08", "spearhead-ag", "ch"],
+          "path": ["member", "authenticate"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Start Ergo Self Service Hail",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/xml;charset=UTF-8",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<messages>\r\n    <message type=\"text\">\r\n        <headers>\r\n            <header>\r\n                <name>Version</name>\r\n                <value>1.0</value>\r\n            </header>\r\n            <header>\r\n                <name>MsgFuncTarget</name>\r\n                <value>StoreOrderFromDXC</value>\r\n            </header>\r\n            <header>\r\n                <name>MsgContentType</name>\r\n                <value>Auftragsposition</value>\r\n            </header>\r\n            <header>\r\n                <name>SVID</name>\r\n                <value/>\r\n            </header>\r\n            <header>\r\n                <name>XITID</name>\r\n                <value/>\r\n            </header>\r\n            <header>\r\n                <name>CurrentMessageNo</name>\r\n                <value>2</value>\r\n            </header>\r\n            <header>\r\n                <name>TotalMessageCount</name>\r\n                <value>2</value>\r\n            </header>\r\n            <header>\r\n                <name>DXCID</name>\r\n                <value>GDV5472-2</value>\r\n            </header>\r\n            <header>\r\n                <name>DXCNummer</name>\r\n                <value>KF3C0910KR073</value>\r\n            </header>\r\n            <header>\r\n                <name>DXCSequence</name>\r\n                <value>1</value>\r\n            </header>\r\n            <header>\r\n                <name>PositionNumber</name>\r\n                <value>100</value>\r\n            </header>\r\n            <header>\r\n                <name>SyncID</name>\r\n                <value>1</value>\r\n            </header>\r\n            <header>\r\n                <name>RequestID</name>\r\n                <value>547210020231205133214734</value>\r\n            </header>\r\n        </headers>\r\n        <body>\r\n            <Auftragsposition>\r\n                <DxID>GDV5472-2</DxID>\r\n                <DxNumber>KF3C0910KR073</DxNumber>\r\n                <DxSequence>1</DxSequence>\r\n                <BemerkungAnnahme2>Es wurde ein unverbindlicher Termin vereinbart am 07.12.2023</BemerkungAnnahme2>\r\n                <DienstleistungsMenge>1</DienstleistungsMenge>\r\n                <DienstleistungsMengenEinheit>ST</DienstleistungsMengenEinheit>\r\n                <DienstleistungsNummer>703472</DienstleistungsNummer>\r\n                <Dienstleistung>Fz-Schadengutachten</Dienstleistung>\r\n                <ErfassSystem>DXC</ErfassSystem>\r\n                <PositionsNummer>100</PositionsNummer>\r\n                <PositionsTyp>ZAGY</PositionsTyp>\r\n                <AktuellerStatus>\r\n                    <StatusAnfang/>\r\n                    <StatusBezeichnung>ANGELEGT</StatusBezeichnung>\r\n                    <StatusCode>01</StatusCode>\r\n                    <StatusEnde/>\r\n                    <SubStatus/>\r\n                </AktuellerStatus>\r\n                <SVDienstleistung>\r\n                    <Dienstleistungsobjekt>\r\n                        <Feststellung>\r\n                            <SchadenUnfallDatumCbx>Schadentag</SchadenUnfallDatumCbx>\r\n                            <SchadenUnfallDatum>20230622</SchadenUnfallDatum>\r\n                            <SchadenStrasse/>\r\n                            <SchadenOrt/>\r\n                            <VorgangsCbx>Referenznummer</VorgangsCbx>\r\n                            <VorgangsCbxCode>12</VorgangsCbxCode>\r\n                            <VorgangsNummer>001-0000002</VorgangsNummer>\r\n                            <SchadenArt>\r\n                                <SchadenartCbxCode>3</SchadenartCbxCode>\r\n                                <SchadenerweiterungCbxCode>5</SchadenerweiterungCbxCode>\r\n                                <VertragsGrundlagenCbx>AKB</VertragsGrundlagenCbx>\r\n                                <VertragsGrundlagenCbxCode>1</VertragsGrundlagenCbxCode>\r\n                                <SchadenNummer>KS73550463-0004</SchadenNummer>\r\n                                <VersicherungsNummer>KR073550463.0</VersicherungsNummer>\r\n                            </SchadenArt>\r\n                        </Feststellung>\r\n                        <Fahrzeug XSIType=\"\">\r\n                            <AmtlichesKennzeichen>KS BN340</AmtlichesKennzeichen>\r\n                            <Fzgbrief>\r\n                                <ErstzulassungsDatum>20201112</ErstzulassungsDatum>\r\n                                <FahrzeugHerstellerText>VOLKSWAGEN-VW</FahrzeugHerstellerText>\r\n                                <FahrzeugTypText>PASSAT VARIANT 1.4</FahrzeugTypText>\r\n                                <Farbe/>\r\n                                <Fin>WVWZZZ3CZME020680</Fin>\r\n                                <Hubraum>0</Hubraum>\r\n                                <KbaNr1Art/>\r\n                                <KbaNr2Hersteller>0603</KbaNr2Hersteller>\r\n                                <KbaNr3Typ>BRZ</KbaNr3Typ>\r\n                            </Fzgbrief>\r\n                            <FzgErweiterung>\r\n                                <LackierungFarbeHersteller2/>\r\n                            </FzgErweiterung>\r\n                        </Fahrzeug>\r\n                    </Dienstleistungsobjekt>\r\n                    <GdvWagnisKennziffer>112</GdvWagnisKennziffer>\r\n                </SVDienstleistung>\r\n                <AuftragspositionsPartner XSIType=\"Person\">\r\n                    <Adresse>\r\n                        <Ort>Kassel</Ort>\r\n                        <Land>DE</Land>\r\n                        <Plz>34117</Plz>\r\n                        <Postfach/>\r\n                        <StrasseUndHausNr>Test Str. 81</StrasseUndHausNr>\r\n                        <Telefon1>0561/00000000</Telefon1>\r\n                        <Telefax/>\r\n                    </Adresse>\r\n                    <Anrede/>\r\n                    <Name>ver.di Bezirk Nordhessen</Name>\r\n                    <RollenTyp>ZH</RollenTyp>\r\n                    <Titel1/>\r\n                    <Name2>Name2</Name2>\r\n                    <Name3>Test-Name3</Name3>\r\n                    <Name4/>\r\n                </AuftragspositionsPartner>\r\n                <AuftragspositionsPartner XSIType=\"Person\">\r\n                    <Adresse>\r\n                        <Ort>Kassel</Ort>\r\n                        <Land>DE</Land>\r\n                        <Plz>34123</Plz>\r\n                        <Postfach/>\r\n                        <StrasseUndHausNr>Test Straße 37 - 39</StrasseUndHausNr>\r\n                        <Telefon1>0561/00000000</Telefon1>\r\n                        <Telefax/>\r\n                    </Adresse>\r\n                    <Anrede/>\r\n                    <Name>Hr. Stucki</Name>\r\n                    <RollenTyp>ZX</RollenTyp>\r\n                    <Titel1/>\r\n                    <Name2>Name2</Name2>\r\n                    <Name3>Test Großkunden Leistungsz</Name3>\r\n                    <Name4/>\r\n                </AuftragspositionsPartner>\r\n                <AuftragspositionsPartner XSIType=\"Person\">\r\n                    <Adresse>\r\n                        <Ort>Kassel</Ort>\r\n                        <Land>DE</Land>\r\n                        <Plz>34123</Plz>\r\n                        <Postfach/>\r\n                        <StrasseUndHausNr>Test Straße 37 - 39</StrasseUndHausNr>\r\n                        <Telefon1>0561/00000000</Telefon1>\r\n                        <Telefax/>\r\n                        <Email><Bezeichnung>sivanchevski@soft2run.com</Bezeichnung></Email>\r\n                    </Adresse>\r\n                    <Anrede/>\r\n                    <Name>Stucki</Name>\r\n                    <RollenTyp>ZN</RollenTyp>\r\n                    <Titel1/>\r\n                    <Name2>Name2</Name2>\r\n                    <Name3>Test Großkunden Leistungsz</Name3>\r\n                    <Name4/>\r\n                </AuftragspositionsPartner>\r\n                <DispositionsDaten>\r\n                    <GewBesichtigungsDatum>2023-12-07</GewBesichtigungsDatum>\r\n                </DispositionsDaten>\r\n            </Auftragsposition>\r\n        </body>\r\n    </message>\r\n    <message type=\"text\">\r\n        <headers>\r\n            <header>\r\n                <name>Version</name>\r\n                <value>1.0</value>\r\n            </header>\r\n            <header>\r\n                <name>MsgFuncTarget</name>\r\n                <value>StoreOrderFromDXC</value>\r\n            </header>\r\n            <header>\r\n                <name>MsgContentType</name>\r\n                <value>Auftrag</value>\r\n            </header>\r\n            <header>\r\n                <name>SVID</name>\r\n                <value/>\r\n            </header>\r\n            <header>\r\n                <name>XITID</name>\r\n                <value/>\r\n            </header>\r\n            <header>\r\n                <name>CurrentMessageNo</name>\r\n                <value>1</value>\r\n            </header>\r\n            <header>\r\n                <name>TotalMessageCount</name>\r\n                <value>2</value>\r\n            </header>\r\n            <header>\r\n                <name>DXCID</name>\r\n                <value>GDV5472-2</value>\r\n            </header>\r\n            <header>\r\n                <name>DXCNummer</name>\r\n                <value>KF3C0910KR073</value>\r\n            </header>\r\n            <header>\r\n                <name>DXCSequence</name>\r\n                <value>1</value>\r\n            </header>\r\n            <header>\r\n                <name>PositionNumber</name>\r\n                <value>100</value>\r\n            </header>\r\n            <header>\r\n                <name>SyncID</name>\r\n                <value>1</value>\r\n            </header>\r\n            <header>\r\n                <name>RequestID</name>\r\n                <value>547210020231205133214734</value>\r\n            </header>\r\n        </headers>\r\n        <body>\r\n            <Auftrag>\r\n                <DxID>GDV5472-2</DxID>\r\n                <DxNumber>KF3C0910KR073</DxNumber>\r\n                <DxSequence>1</DxSequence>\r\n                <Anrede/>\r\n                <AuftragErteiltDatum>2023-12-05T13:24:58</AuftragErteiltDatum>\r\n                <AuftragErteiltart>elektronisch</AuftragErteiltart>\r\n                <AuftragErteiltartCode>EXTE</AuftragErteiltartCode>\r\n                <AuftragsInformation/>\r\n                <AuftragsInformationCode/>\r\n                <AuftragsArt>ZAGA</AuftragsArt>\r\n                <Auftragsnummer/>\r\n                <AussenstellenNr/>\r\n                <BemerkungAuftragsAnnahme/>\r\n                <BemerkungSv/>\r\n                <EingangAmDatum>20231205</EingangAmDatum>\r\n                <ErfasstVon/>\r\n                <ErfasstVonDatum>2023-12-05T13:32:14</ErfasstVonDatum>\r\n                <ErteiltDurch>ERGO Versicherung AG</ErteiltDurch>\r\n                <ErteiltDurchAnrede>Firma</ErteiltDurchAnrede>\r\n                <ErteiltDurchAnredeCode>03</ErteiltDurchAnredeCode>\r\n                <Sparte>01</Sparte>\r\n                <VerkaufsOrganisation>0101</VerkaufsOrganisation>\r\n                <Vertriebsweg>01</Vertriebsweg>\r\n                <AuftragsPartner XSIType=\"Organisation\">\r\n                    <Kontengruppe>VERS</Kontengruppe>\r\n                    <Kundengruppe>20</Kundengruppe>\r\n                    <Name>ERGO Versicherung AG</Name>\r\n                    <Partnernummer>0000202224</Partnernummer>\r\n                    <RollenTyp>AG</RollenTyp>\r\n                    <Name2>ERGO Versicherung AG Name2</Name2>\r\n                    <Name3/>\r\n                    <Name4/>\r\n                </AuftragsPartner>\r\n            </Auftrag>\r\n        </body>\r\n    </message>\r\n</messages>",
+          "options": {
+            "raw": {
+              "language": "xml"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/b2b/integration/dekra/ergo-self-service-init",
+          "host": ["{{baseUrl}}"],
+          "path": ["b2b", "integration", "dekra", "ergo-self-service-init"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Search dekra_number",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [""],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.environment.set(\"damageNotificationId\", pm.response.json().id)"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "SOAPAction",
+            "value": "",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\"dekra_number\": \"KF3C0910KR7990820637743+642584\"\n}",
+          "options": {
+            "raw": {
+              "language": "xml"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/damage/notifications/search-by-extra-information",
+          "host": ["{{baseUrl}}"],
+          "path": ["damage", "notifications", "search-by-extra-information"]
+        }
+      },
+      "response": []
+    }
+  ]
+}

@@ -18,7 +18,7 @@
     },
     {
       "questionId": "client-insurance-claim-number",
-      "answer": "47-33-308/878013-S"
+      "answer": "75-33-491/429539-S"
     },
     {
       "questionId": "animal-species",
@@ -26,11 +26,11 @@
     },
     {
       "questionId": "insurance-name",
-      "answer": ["huk-coburg"]
+      "answer": "default"
     },
     {
       "questionId": "huk-coburg-triage-category",
-      "answer": ["total-loss"]
+      "answer": "concrete"
     },
     {
       "questionId": "client-insurance-policy-number",
@@ -50,7 +50,7 @@
     },
     {
       "questionId": "vehicle-vin",
-      "answer": "WBA31EF0605X11023"
+      "answer": "U5YPH816HML010002"
     },
     {
       "questionId": "vehicle-first-registration-date",
@@ -58,7 +58,7 @@
     },
     {
       "questionId": "client-vehicle-license-plate",
-      "answer": "HSS 1-538"
+      "answer": "HSS 2-383"
     },
     {
       "questionId": "client-email",
@@ -99,6 +99,14 @@
     {
       "questionId": "client-last-name",
       "answer": ["org clientLastName"]
+    },
+    {
+      "questionId": "event-abroad",
+      "answer": ""
+    },
+    {
+      "questionId": "coverage-type",
+      "answer": "comprehensive"
     }
   ],
   "supportInformation": null,

@@ -6,6 +6,8 @@
   "vin": "vin",
   "firstRegistrationDate": "2012-04-20",
   "licensePlate": "EHclaimBT",
+  "repairLocationZipCode": "17080",
+  "supplementaryRequest": "self-service",
   "notificationDetails1": {
     "equipmentList": [{}],
     "gearType": "manual",

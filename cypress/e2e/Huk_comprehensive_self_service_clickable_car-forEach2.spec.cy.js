@@ -29,11 +29,13 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
-  const executePost = false
+  const executePost = true
   const generatePdfCondition = executePost && true
   const newPhoneNumber = `+3598887950`
   const $equipment_2_loading_doors = true
   const initOnly = false
+  const triage_category = "concrete" // "total-loss" , "concrete", "fictitious"
+  const insurance_name = "default"// "huk-coburg", "huk24", "default"
 
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
@@ -55,7 +57,16 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
 
     cy.get('@goingPageId').then(function (aliasValue) {
       if (aliasValue == 'page-01'){
-        cy.selectSingleList('terms-of-service-acknowledgement-huk-coburg',0)
+        if (insurance_name == "huk-coburg"){
+          cy.selectSingleList('terms-of-service-acknowledgement-huk-coburg',0)
+        }
+        if (insurance_name == "huk24"){
+          cy.selectSingleList('terms-of-service-acknowledgement-huk24',0)
+        }
+        if (insurance_name != "huk24" && insurance_name != "huk-coburg" ){
+          cy.selectSingleList('terms-of-service-acknowledgement-default',0)
+        }
+
         cy.getBodyType($car,logFilename).then(function (bodyType) {
           cy.then(function () {
             questionnaire.bodyType = bodyType
@@ -68,6 +79,20 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
     //pageId: "page-02"
     cy.get('@goingPageId').then(function (aliasValue) {
       if (aliasValue == 'page-02'){
+        cy.get('@goingPageElements').then(function (elements) {
+          console.log(`triage category: ${triage_category}`)
+          console.log(`insurance name: ${insurance_name}`)
+
+          elements.forEach(element => {
+            let visible = element.visibleExpression
+            if (visible == undefined){
+              visible = true
+            } else {
+              visible = eval(element.visibleExpression)
+            }
+            console.log(`id: ${element.id.padEnd(50, " ")}, visible: ${visible.toString().padEnd(5, " ")}, content: ${element.label.content}`)
+          })
+        })
         nextBtn()
       }
     })
@@ -125,6 +150,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
                 //cy.wrap($path).click({ force: true, multiple: true, timeout : 4000 }) select all
                 //cy.wrap($path).find('#hood').click({ force: true, timeout : 4000 }) does not work ??
                 cy.get('div.clickMaskContainer').find('svg',{timeout: 10000}).find('path#hood').click({ force: true, timeout : 4000 })
+                cy.wait(4000)
               }
             })
           } else {
@@ -359,7 +385,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
     //"page-16"
     cy.get('@goingPageId').then(function (aliasValue) {
       if (aliasValue == 'page-16'){
-        cy.get('textarea#additional-remarks-textarea').type('Weitere Anmerkungen  - 1.<br>Weitere Anmerkungen  - 2.<br>Weitere Anmerkungen  - 3.')
+        cy.get('textarea#additional-remarks-textarea').type('Weitere Anmerkungen  - 1./nWeitere Anmerkungen  - 2./nWeitere Anmerkungen  - 3.')
         nextBtn()
       }
     })
@@ -384,24 +410,25 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   const loss_causes = ["collision", "vandalism", "storm", "glass", "animal"]
 
   const file1 = [
-    ["WBA31EF0605X11023", "", "01.09.2022", "3D BMW X1 2022"]
+    ["U5YPH816HML010002", "SUV", "01.09.2020", "3D Kia Sportage"]
   ]
 
   file1.forEach($car => {
-    it(`Huk-comprehensive-self-service-clickable-car vin :  ${$car[0]}`, function () {
+    it.only(`Huk-comprehensive-self-service-clickable-car vin :  ${$car[0]}`, function () {
 
       const vin = $car[0]
-      const loss_cause = loss_causes[1]
+      const loss_cause = loss_causes[0]
 
-      let ran1 =  getRandomInt(10,99)
-      let ran2 =  getRandomInt(100,999)
-      let ran3 =  getRandomInt(100000,999999)
+      let ran2 =  getRandomInt(10,99)
+      let ran3 =  getRandomInt(100,999)
+      let ran6 =  getRandomInt(100000,999999)
 
-      let claimNumber = ran1 + "-33-"+ ran2 + "/" + ran3 + "-S";
+      let claimNumber = ran2 + "-33-"+ ran3 + "/" + ran6 + "-S";
 
       let licenseplate = `HSS ${getRandomInt(1,9)}-${getRandomInt(100,999)}`
 
       console.log(`vin:${vin}`)
+      console.log(`loss cause:${loss_cause}`)
 
       cy.authenticate().then(function (authorization) {
 
@@ -416,6 +443,8 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
         b2bBody.qas.find(q => {return q.questionId === "client-mobile-phone-number"}).answer = newPhoneNumber
         b2bBody.qas.find(q => {return q.questionId === "client-phone-number"}).answer = newPhoneNumber
         b2bBody.qas.find(q => {return q.questionId === "loss-cause"}).answer = loss_cause
+        b2bBody.qas.find(q => {return q.questionId === "insurance-name"}).answer = insurance_name
+        b2bBody.qas.find(q => {return q.questionId === "huk-coburg-triage-category"}).answer = triage_category
 
 
         Cypress._.merge(header, {'authorization' : authorization});
@@ -558,7 +587,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
       //huk_request_information_reminder_completion
       cy.GenerateEmails(['huk_request_information', 'huk_request_information_reminder_16h', 'huk_request_information_reminder_32h', 'huk_request_information_reminder_cancellation',
         'huk_request_information_reminder_completion'],'huk_comprehensive_self_service_clickable_car')
-    }) //it PDF from commands
+    })
 
 
 

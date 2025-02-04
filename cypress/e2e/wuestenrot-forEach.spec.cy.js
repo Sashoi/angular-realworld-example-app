@@ -27,7 +27,7 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
   const executePost = true
   const executePost2 = false
 
-  const sectionError = true
+  const sectionError = false
   const photos_available = true
   const client_email_for_upload = 'sivanchevski@soft2run.com'
 
@@ -47,7 +47,7 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
 
   const file1 = [
 
-    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"]
+    ["W1V44760313930767", "Van", "01.01.2019", "Mercedes Vito 09/2021"]
   ]
   file1.forEach($car => {
     it(`wuestenrot-comprehensive-call-center for vin: ${$car[0]}`, () => {
@@ -398,8 +398,8 @@ describe('Start and complete wuestenrot standalone questionnaire', () => {
     })
 
 
-    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
-      cy.GeneratePDFs(['wuestenrot_abschlussbericht'])
-    }) //it PDF from commands
+    // it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    //   cy.GeneratePDFs(['wuestenrot_abschlussbericht'])
+    // }) //it PDF from commands
   })  //forEach
 })

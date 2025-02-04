@@ -27,7 +27,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = true
+  const executePost = false
   const executePost2 = true
   const createNewQuestionnaires = executePost && true
   const newQuestionnaire = 2 //1 - wgv_comprehensive_self_service_app, 2 - wgv_liability_self_service_app
@@ -78,7 +78,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
 
   const file1 = [
 
-        ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"]
+        ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV "]
   ]
 
   damageCauseArr1.forEach($damageCause => {
@@ -106,7 +106,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
             // see "fixtures/damage_cause_mapping.json"
 
             b2bBody.claimNumber = claimNumber
-            b2bBody.claimType = "01"  //01, 02, 03, 53IV
+            b2bBody.claimType = "53IV"  //01, 02, 03, 53IV
             b2bBody.damageCause =  "storm"//"glass" // see "fixtures/damage_cause_mapping.json"
             b2bBody.vin =  $vin
             b2bBody.licensePlate = `WGV${claim2}BT` //"EH1234BT"
@@ -127,12 +127,16 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
                 expect(response.status).to.eq(200) // true
                 cy.writeFile(b2bBodySave, b2bBody)
 
+                const supplementaryQuestionnaireId = response.body.supplementaryQuestionnaireId
+                const supplementaryQuestionnaireUrl = response.body.supplementaryQuestionnaireUrl
                 const callCenterQuestionnaireId = response.body.callCenterQuestionnaireId
                 const callCenterQuestionnaireUrl = response.body.callCenterQuestionnaireUrl
+
                 console.log(`questionnaireId: ${callCenterQuestionnaireId}`)
                 cy.then(function () {
                   questionnaire.Id = callCenterQuestionnaireId
                 })
+                console.log(`supplementaryQuestionnaireUrl: ${supplementaryQuestionnaireUrl}`)
                 console.log(`uiUrl: ${callCenterQuestionnaireUrl}`)
 
                 cy.visit(callCenterQuestionnaireUrl,{ log : false })
@@ -354,7 +358,7 @@ describe('Execute b2b/integration/wgv/callCenter', () =>{
         cy.GeneratePDFs(['wgv_default','wgv_pilot','wgv_pilot_2023'])
       }) //it PDF from commands
 
-      it(`Start new questionnaire.`, function () {
+      it(`Start new wgv_liability_self_service_app questionnaire.`, function () {
         cy.viewport('samsung-note9')
         console.log(`Start ${Cypress.env('templateId')} from url: ${Cypress.env('requestUrl')}.`)
 

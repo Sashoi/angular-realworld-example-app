@@ -86,11 +86,11 @@
     },
     {
       "questionId": "client-vehicle-license-plate",
-      "answer": "HDI 7-155"
+      "answer": "HDI 6-356"
     },
     {
       "questionId": "licensePlate-vehicle-insurance-client",
-      "answer": "HDI 7-155"
+      "answer": "HDI 6-356"
     },
     {
       "questionId": "incident-reporter-first-name",
@@ -126,8 +126,8 @@
     }
   ],
   "supportInformation": {
-    "vin": "6FPGXXMJ2GEL59891",
-    "claimNumber": "HDIXY8n79190",
+    "vin": "6FPPXXMJ2PCD55635",
+    "claimNumber": "HDIkYpN62423",
     "workflowType": "hdiLiabilityCallCenter"
   }
 }

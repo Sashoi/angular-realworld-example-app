@@ -16,7 +16,6 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
   })
 
   beforeEach('Setting up integrations and common variables', () => {
-    cy.intercept({ resourceType: /fetch/ }, { log: false })
     cy.intercept('POST', `/b2b/integration/huk/huk-comprehensive-call-center?identifyVehicleAsync=false`).as('hukStandaloneCC')
     cy.intercept('GET', `/b2b/integration/huk/huk-comprehensive-call-center/*`).as('hukStandaloneCcGET')
     cy.intercept('GET',  `/questionnaire/*/page/page-*?locale=de`).as('currentPageR')
@@ -50,26 +49,23 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
     cy.waitingFor('@currentPageR',goingPage,questionnaire)
   }
 
-  // function Login(){
-  //   cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/zurich/#/login?theme=huk`,{ log : false })
-  //     // login
-  //     cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
-  //     cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
-  //     cy.get('form').submit()
-
-  //     cy.wait('@token',{requestTimeout : $requestTimeout}).then(xhr => {
-  //       expect(xhr.response.statusCode).to.equal(200)
-  //       const access_token = xhr.response.body.access_token
-  //       cy.then(function () {
-  //         questionnaire.authorization = `Bearer ${access_token}`
-  //       })
-  //     })
-  //     cy.wait(500)
-  // }
+  function shiftDateByMonths(sdate, months){
+    //console.log(sdate); expect dd.mm.yyyy
+    var parts = sdate.split('.');
+    // Please pay attention to the month (parts[1]); JavaScript counts months from 0:
+    // January - 0, February - 1, etc.
+    var mydate = new Date(parts[2], parts[1] - 1, parts[0]);
+    //console.log(mydate.toDateString());
+    var newDate = new Date(new Date(mydate).setMonth(mydate.getMonth() + months));
+    //console.log(newDate.toDateString());
+    //  if you need it to be padded with zeros:
+    var datestring = ("0" + newDate.getDate()).slice(-2) + "." + ("0"+(newDate.getMonth()+1)).slice(-2) + "." + newDate.getFullYear();
+    //console.log(datestring);
+    return datestring  // return dd.mm.yyyy
+  }
 
   const file1 = [
-
-    ["YV4A22PK5N1849833", "", "01.09.2022", "3D Volvo XC90 2022"]
+    ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan  "]
 ]
   file1.forEach($car => {
     it.only(`huk standalone - huk_comprehensive_call_center vin ${$car[0]}`, () => {
@@ -91,7 +87,7 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
       const claimType_random = getRandomInt(0,$claimTypes.length);
       const $claimType = $claimTypes[claimType_random];
       const claimNumber = `${intS1}-${$claimType}-${intS2}/${intS3}-C`
-      const first_registration_date = '01.11.2003';
+      const first_registration_date = shiftDateByMonths($car[2], 1) //$car[2] //'01.11.2003'
 
       Cypress.env('claimNumber', claimNumber)
       console.log(`claimNumber: ${claimNumber}`)
@@ -181,6 +177,8 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
                   //cy.wrap($path).click({ force: true, multiple: true, timeout : 4000 })  // select all
                   cy.get('div.clickMaskContainer').find('svg',{timeout: 10000}).find('path#hood').click({ force: true, timeout : 4000 })
                   cy.selectMultipleList('hood-damage-type',0)
+                  //cy.selectMultipleList('hood-DT2',0)
+
                 }
               })
             } else {
@@ -200,6 +198,7 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
                 if (xhr.response.body.search('g id="hood"') > 0){
                   cy.selectSVG('hood')
                   cy.selectMultipleList('hood-damage-type',0)
+                  //cy.selectMultipleList('hood-DT2',0)
                 }
 
                 if (xhr.response.body.search('g id="right-front-wheel"') > 0){
@@ -263,7 +262,7 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
             cy.selectSingleList('unrepaired-pre-damages',1)
             cy.selectSingleList('vehicle-damage-repaired',0)
             cy.get('textarea#unrepaired-pre-damages-description-textarea').clear().type('Bitte beschreiben Sie die unreparierten Vorschäden')
-            cy.get('#repair-location-zip-code-input').clear().type('14158') //04158  22222
+            cy.get('#repair-location-zip-code-input').clear().type('01001') //04158  22222
             nextBtn()
           })
         }

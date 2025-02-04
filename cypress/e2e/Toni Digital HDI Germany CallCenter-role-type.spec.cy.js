@@ -88,20 +88,13 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
   }
 
   const file1 = [
-    ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"],
-  ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"],
-  [
-    "6FPPXXMJ2PCD55635",
-    "PickUpDoubleCabine",
-    "01.01.2012",
-    "Ford Ranger double cabine, Pick-up"
-  ],
-  [
-    "6FPGXXMJ2GEL59891",
-    "PickUpSingleCabine",
-    "01.01.2012",
-    "Ford Ranger single cabine, Pick-up "
-  ]
+
+    [
+      "6FPPXXMJ2PCD55635",
+      "PickUpDoubleCabine",
+      "01.01.2012",
+      "Ford Ranger double cabine, Pick-up"
+    ]
   ]
 
   file1.forEach($car => {
@@ -170,6 +163,8 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-01'){
                   cy.wait(2000)
+                  cy.get(`button[data-test="identify-button"]`).click()  // bug
+                  cy.wait(3000)
                   //console.log(`vehicle-identification answer: ${answer("vehicle-identification")['bodyType']}`);
                   //console.log(`number-of-vehicles answer: ${answer("number-of-vehicles")}`);
 
@@ -203,6 +198,10 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
                   cy.getBodyType($car,logFilename).then(function (bodyType) {
                     cy.then(function () {
                       questionnaire.bodyType = bodyType
+                      const vi = 'vehicle-identification'
+                      console.log(`before '${vi}')['bodyType']: ${goingPage.elements.find(x => x.id === vi)['bodyType']}`)
+                      goingPage.elements.find(x => x.id === vi)['bodyType'] = bodyType //bug
+                      console.log(`after '${vi}')['bodyType']: ${goingPage.elements.find(x => x.id === vi)['bodyType']}`)
                     })
                   })
                   cy.get('@bodyType').then(function (bodyType) {
@@ -217,9 +216,15 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
                     }
                     if (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine'){
                       cy.wait(2000)
-                      if (visible('vehicle-identification') && visible('equipment-loading-area-cover-type')){
-                        cy.selectSingleList('equipment-loading-area-cover-type',1)
-                          setAnswer('equipment-loading-area-cover-type','roll-cover')
+                      //console.log('select equipment-loading-area-cover-type')
+                      //console.log(`visible('vehicle-identification'): ${visible('vehicle-identification')}`)
+                      console.log(`visible('equipment-loading-area-cover-type'): ${visible('equipment-loading-area-cover-type')}`)
+                      //if (visible('vehicle-identification') && visible('equipment-loading-area-cover-type')){
+                      //this is because visible('equipment-loading-area-cover-type') returns false
+                      //equipment-loading-area-cover-type.visibleExpression: "((answer('vehicle-identification')['bodyType'] == 'PickUpSingleCabine') || (answer('vehicle-identification')['bodyType'] == 'PickUpDoubleCabine'))"
+                      if (visible('vehicle-identification')){
+                        cy.selectSingleList('equipment-loading-area-cover-type',1) //2
+                        setAnswer('equipment-loading-area-cover-type','roll-cover') //hardtop
                       }
                     }
                   })

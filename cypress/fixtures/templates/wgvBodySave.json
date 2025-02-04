@@ -1,11 +1,13 @@
 {
-  "claimNumber": "bqmJQ55578",
-  "claimType": "01",
+  "claimNumber": "MRDbu53430",
+  "claimType": "53IV",
   "damageCause": "storm",
   "countryVehicleIdentification": "HSN/TSN",
   "vin": "WVWZZZ7NZDV041367",
   "firstRegistrationDate": "2012-04-20",
-  "licensePlate": "WGV55578BT",
+  "licensePlate": "WGV53430BT",
+  "repairLocationZipCode": "1234",
+  "supplementaryRequest": "self-service",
   "notificationDetails1": {
     "equipmentList": [{}],
     "gearType": "manual",
@@ -16,7 +18,6 @@
     "vehicleManufacturer": "BMW",
     "vehicleModel": "3 Kombi"
   },
-  "repairLocationZipCode": "1234",
   "responsibleClerk": {
     "firstName": "John",
     "lastName": "Wick",

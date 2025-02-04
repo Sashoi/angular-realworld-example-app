@@ -9,7 +9,7 @@ import header from '../fixtures/headerXML.json'
 
 const logFilename = 'cypress/fixtures/logs/ErgoSelfServiceInit.log'
 const PathToImages ='cypress/fixtures/images/'
-const b2bBody = 'cypress/fixtures/templates/ergoBodyNoVin.xml' // or ergoBodyL where <PLZ>04158</PLZ> Leipzig
+const b2bBody = 'cypress/fixtures/templates/ergoBodyNoVin.xml' // or ergoBodyL where <PLZ>04158</PLZ> Leipzig // or ergoBodyNoVinNoPhone
 const b2bBodySave = 'cypress/fixtures/templates/ergoBodySave.xml'
 
 describe('Ergo Self Service init', () =>{
@@ -66,7 +66,12 @@ describe('Ergo Self Service init', () =>{
 
 
   const file1 = [
-    ["VF7RDRFJF9L510253", "Station", "01.01.2010", "Citroen C5 Limousine 4 türig"]
+    [
+      "6FPPXXMJ2PCD55635",
+      "PickUpDoubleCabine",
+      "01.01.2012",
+      "Ford Ranger double cabine, Pick-up"
+    ]
   ]
   file1.forEach($car => {
     it.only(`Execute /questionnaire/ergo_self_service_init with vin:${$car[0]}`, () =>{

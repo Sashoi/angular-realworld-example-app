@@ -30,6 +30,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
   const $requestTimeout = 60000;
   const executePost = false
+  const selectAllZones = false
   const typeTextAreasPage13 = false
   //const generatePdfCondition = true
 
@@ -43,16 +44,16 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
   }
 
   const file1 = [
-    ["VF7RDRFJF9L510253", "Station", "01.01.2010", "Citroen C5 Limousine 4 türig"]
+    ["W1V44760313930767", "Van", "01.01.2019", "Mercedes Vito 09/2021"]
   ]
   file1.forEach($car => {
     it.only(`Huk-comprehensive-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
 
       const $vin = $car[0]
 
-      let ran1 =  getRandomInt(10,99)
-      let ran2 =  getRandomInt(100,999)
-      let ran3 =  getRandomInt(100000,999999)
+      let ran2 =  getRandomInt(10,99)
+      let ran3 =  getRandomInt(100,999)
+      let ran6 =  getRandomInt(100000,999999)
 
       console.log(`vin: ${$vin}`);
       const licenseplate = `SOF ${getRandomInt(1000,9999)}`
@@ -64,7 +65,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
         cy.then(function () {
           questionnaire.authorization =authorization
         })
-        const claimNumber = ran1 + "-13-"+ ran2 + "/" + ran3 + "-Z";
+        const claimNumber = ran2 + "-31-"+ ran3 + "/" + ran6 + "-Z"; //13
         console.log(`claimNumber: ${claimNumber}`);
 
         b2bBody.qas.find(q => {return q.questionId === "client-insurance-claim-number"}).answer = claimNumber
@@ -89,7 +90,10 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
           (response) => {
           expect(response.status).to.eq(200)
           const questionnaireId = response.body.questionnaireId;
+          const uiUrl_init = response.body.uiUrl;
+
           //console.log(questionnaireId);
+          console.log(`uiUrl init: ${uiUrl_init}`);
           const options1 = {
             method: 'GET',
             url: `${baseUrl_lp}questionnaire/${questionnaireId}`,
@@ -182,17 +186,21 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                 if (aliasValue == 'page-05'){
                   cy.wait('@vehicleZones',{requestTimeout : $requestTimeout}).then(xhr => {
                     expect(xhr.response.statusCode).to.equal(200)
-                    cy.selectSVG_VZ('front-center')
-                    cy.selectSVG_VZ('front-left')
-                    cy.selectSVG_VZ('front-right')
-                    cy.selectSVG_VZ('side-left')
-                    cy.selectSVG_VZ('side-right')
-                    cy.selectSVG_VZ('rear-left')
-                    cy.selectSVG_VZ('rear-right')
-                    cy.selectSVG_VZ('rear-center')
+                      cy.selectSVG_VZ('roof')
+                      cy.selectSVG_VZ('windshield')
 
-                    cy.selectSVG_VZ('roof')
-                    cy.selectSVG_VZ('windshield')
+                    if (selectAllZones){
+                      cy.selectSVG_VZ('front-center')
+                      cy.selectSVG_VZ('front-left')
+                      cy.selectSVG_VZ('front-right')
+                      cy.selectSVG_VZ('side-left')
+                      cy.selectSVG_VZ('side-right')
+                      cy.selectSVG_VZ('rear-left')
+                      cy.selectSVG_VZ('rear-right')
+                      cy.selectSVG_VZ('rear-center')
+
+
+                    }
                     nextBtn()
                   })
                 }
@@ -213,6 +221,9 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                   // cy.get('div.svg-selection-container[title="Windschutzscheibe"]').click('center');
                   // cy.get('div.svg-selection-container[title="Dach"]').click('center');
                   //select all
+                  cy.get('div.svg-selection-container').its('length').then((len) => {
+                    console.log(`Number of svg-selections :${len}.`)
+                  })
                   cy.get('div.svg-selection-container').click('center',{ multiple: true });
                   cy.wait(1000);
                   nextBtn()
@@ -233,10 +244,11 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
                   cy.selectSingleList('unrepaired-pre-damages',0)
                   cy.wait('@vehicleZones',{requestTimeout : $requestTimeout}).then(xhr => {
                     expect(xhr.response.statusCode).to.equal(200)
-                    //cy.get('svg').find('g#front-left').children('path').eq(1).click({force: true });
                     cy.selectSVG_VZ('front-left')
                     cy.selectSVG_VZ('front-center')
                     cy.selectSVG_VZ('front-right')
+                    cy.selectSVG_VZ('roof')
+                    cy.selectSVG_VZ('windshield')
                     nextBtn()
                   })
                 }
@@ -279,7 +291,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-13'){
                   if (typeTextAreasPage13){
-                    cy.typeIntoAllTextArea('Anmerkungen zu Nahaufnahme der Beschädigung - 1.<br>Anmerkungen zu Nahaufnahme der Beschädigung - 2.<br>Anmerkungen zu Nahaufnahme der Beschädigung - 3.')
+                    cy.typeIntoAllTextArea('Anmerkungen zu Nahaufnahme der Beschädigung - 1.{enter}Anmerkungen zu Nahaufnahme der Beschädigung - 2.{enter}Anmerkungen zu Nahaufnahme der Beschädigung - 3.')
                   }
                   //cy.get('textarea#damage-photo-upload-remarks-*').type()
                   //cy.uploadImage('damage-photo-upload-overview-windshield',PathToImages,`broken front window_2.jpg`)
@@ -345,7 +357,7 @@ describe('Huk-comprehensive-self-service-Vehicle_Zone', () =>{
               //"page-19"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-19'){
-                  cy.get('textarea#additional-remarks-textarea').type('Weitere Anmerkungen  - 1.<br>Weitere Anmerkungen  - 2.<br>Weitere Anmerkungen  - 3.')
+                  cy.get('textarea#additional-remarks-textarea').type('Weitere Anmerkungen  - 1.{enter}Weitere Anmerkungen  - 2.{enter}Weitere Anmerkungen  - 3.')
                   nextBtn()
                 }
               })

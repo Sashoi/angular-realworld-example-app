@@ -99,6 +99,14 @@
     {
       "questionId": "client-last-name",
       "answer": ["org clientLastName"]
+    },
+    {
+      "questionId": "event-abroad",
+      "answer": ""
+    },
+    {
+      "questionId": "coverage-type-test",
+      "answer": "comprehensive"
     }
   ],
   "supportInformation": null,

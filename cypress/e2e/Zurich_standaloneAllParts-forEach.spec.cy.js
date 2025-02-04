@@ -50,7 +50,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
   }
 
   const file1 = [
-    ["VF7RDRFJF9L510253", "Station", "01.01.2010", "Citroen C5 Limousine 4 türig"]
+    ["WBA31EF0605X11023", "SUV", "01.09.2022", "3D BMW X1 2022"]
   ]
   file1.forEach($car => {
     it.only(`zurich standalone questionnaire all parts - zurich_call_center vin ${$car[0]}`, () => {

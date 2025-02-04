@@ -641,11 +641,13 @@ Cypress.Commands.add('printRequestedInformation', function (requestedInformation
 Cypress.Commands.add('authenticate', function (bearer = true) {
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
+  const username = Cypress.env("usernameHukS")
+  console.log(`username : ${username}`);
   const userCredentials =  {
     "password": Cypress.env("passwordHukS"),
     "remoteUser": "",
     "sessionLanguage": "en",
-    "userName": Cypress.env("usernameHukS")
+    "userName": username
   }
   const options = {
     method: 'POST',
@@ -664,6 +666,7 @@ Cypress.Commands.add('authenticate', function (bearer = true) {
 
 Cypress.Commands.add('commanBeforeEach',(goingPage,questionnaire) =>{
   console.clear()
+  cy.intercept({ resourceType: /fetch/ }, { log: false })
   cy.intercept('POST', `/questionnaire/*/attachment/answer/*/index-*?locale=de`).as('attachmentAnswer')
   cy.intercept('POST', `/questionnaire/*/post?locale=de`,{ log: false }).as('postPost')
   cy.intercept('POST', `/questionnaire/*/complete`,{ log: false }).as('completePost')
@@ -776,8 +779,10 @@ Cypress.Commands.add('getQuestionAnswer', function ($questionId) {
 Cypress.Commands.add('standaloneLogin', function (theme, bearer = true) {
   const $dev = Cypress.env("dev");
   //const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
+  const username = Cypress.env("usernameHukS")
+  console.log(`username : ${username}`);
   cy.visit(`https://${$dev}.spearhead-ag.ch/ui/questionnaire/zurich/#/login?theme=${theme}`,{ log : false })
-  cy.get('[placeholder="Email"]').type(Cypress.env("usernameHukS"))
+  cy.get('[placeholder="Email"]').type(username)
   cy.get('[placeholder="Passwort"]').type(Cypress.env("passwordHukS"))
   cy.get('form').submit()
   cy.wait(500)

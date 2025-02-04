@@ -58,7 +58,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
   }
 
   const coverage_type_Array = ["liability","full-comprehensive","partial-comprehensive"]
-  const coverage_type = 1
+  const coverage_type = 2
   // only for coverage-type": "values": ["full-comprehensive", "partial-comprehensive"]
   const loss_cause_Array = [
     ["full-comprehensive", "collision"], //1, 0
@@ -74,27 +74,10 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
   const loss_cause = 1
 
   const file1 = [
-    [
-      "TMBJB7NS4K8027658",
-      "SUV",
-      "01.09.2018",
-      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
-    ],
-    [
-      "WVWZZZ3CZME020680",
-      "Station",
-      "01.09.2020",
-      "Passat Variant 1.4 TSI Plug-In-Hybrid DSG GTE"
-    ],
-    [
-      "VF3VEAHXKLZ080921",
-      "MiniBusMidPanel",
-      "01.01.2017",
-      "Peugeot Expert 09/2020"
-    ]
-
-
+    
+    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"]
   ]
+
   file1.forEach($car => {
     it(`beresa_call_center standalone questionnaire, vin ${$car[0]}`, () => {
 
@@ -365,7 +348,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-05'){
-          cy.selectSingleList('vehicle-body-type',0) //0..10["Sedan", "SUV", "Station", "Hatch5", "Hatch3", "Coupe", "Cabrio", "Van", "MiniBus", "PickUpDoubleCabine", "PickUpSingleCabine"]
+          cy.selectSingleList('vehicle-body-type',7) //0..10["Sedan", "SUV", "Station", "Hatch5", "Hatch3", "Coupe", "Cabrio", "Van", "MiniBus", "PickUpDoubleCabine", "PickUpSingleCabine"]
           nextBtn()
         }
       })
