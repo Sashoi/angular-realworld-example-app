@@ -62,7 +62,7 @@ describe('Execute b2b/integration/wgv/callCenter', () => {
           //"claimType": "03", - "partialCoverage"    templateId: "wgv_comprehensive_call_center"
 
           b2bBody.claimNumber = claimNumber
-          b2bBody.claimType = "03"  //01, 02, 03, 53IV
+          b2bBody.claimType = "01"  //01, 02, 03, 53IV
           b2bBody.damageCause =  "glass" // see "fixtures/damage_cause_mapping.json"
           b2bBody.vin =  vin
           b2bBody.licensePlate = `EH${claim2}BT` //"EH1234BT"

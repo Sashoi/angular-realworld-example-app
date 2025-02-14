@@ -84,7 +84,7 @@ const coverage_type_info_clientArr =
  "PartiallyComprehensiveVandalism 8","VehicleLiabilityNotCustomer 9","OptionalAssistance 10","OptionalLegalAssistance 11",
 ]
 
-const coverage_type_info_clien = 2  // ok all 12
+//const coverage_type_info_clien = 2  // ok all 12
 
 const vehicle_body_type_array = [
   "Hatch3", "Station", "Coupe", "Sedan", "Van", "MiniBus", "PickUpSingleCabine", "Cabrio", "Other"
@@ -94,16 +94,26 @@ const vehicle_body_type_value = 0;
 
 
   const file1 = [
-  
-    ["W1V44760313930767", "Van", "01.01.2019", "Mercedes Vito 09/2021"]
+    [
+      "6FPPXXMJ2PCD55635",
+      "PickUpDoubleCabine",
+      "01.01.2012",
+      "Ford Ranger double cabine, Pick-up"
+    ]
 ]
+
+const coverage_type_info_clientArray= [5]
+
+coverage_type_info_clientArray.forEach(coverage_type_info_clien => {
   file1.forEach($car => {
-    it(`Toni automotive - toni_automotive_call_center vin ${$car[0]}`, () => {
+
+    const intS3 = getRandomInt(100,999).toString()
+    const $equipment_2_loading_doors = true
+    const licensePlate = `TONI ${intS3}9`
+
+    it(`Toni automotive - toni_automotive_call_center vin ${$car[0]}, coverage type info clien - ${coverage_type_info_clientArr[coverage_type_info_clien]}`, () => {
 
       const $vin = $car[0]
-
-      const intS3 = getRandomInt(100,999).toString()
-      const $equipment_2_loading_doors = true
 
       let  first_registration_date = $car[2]
       //const f_first_registration_date = '2017-06-14'
@@ -112,7 +122,7 @@ const vehicle_body_type_value = 0;
 
       console.log(`vin: ${$vin}`)
       console.log(`first registration date: ${first_registration_date}`)
-      const licensePlate = `TONI ${intS3}9`
+
       //Cypress.env('licensePlate', licensePlate)
       console.log(`license plate: ${licensePlate}`)
 
@@ -122,7 +132,7 @@ const vehicle_body_type_value = 0;
           questionnaire.authorization = authorization
         })
         b2bBody.supportInformation.vin  = $vin
-        //b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licensePlate
+        b2bBody.qas.find(q => {return q.questionId === "perpetrator-vehicle-license-plate"}).answer = licensePlate
         //b2bBody.qas.find(q => {return q.questionId === "vehicle-first-registration-date"}).answer = first_registration_date
 
 
@@ -579,6 +589,12 @@ const vehicle_body_type_value = 0;
             const templateId = requestedInformation.templateId
             console.log(`templateId : ${templateId}`);
             Cypress.env('templateId', templateId)
+            const questionnaireId = requestedInformation.questionnaireId
+            console.log(`questionnaireId : ${questionnaireId}`);
+            Cypress.env('questionnaireId', questionnaireId)
+            cy.then(function () {
+              questionnaire.Id = questionnaireId
+            })
             //cy.printRequestedInformation(response.body.requestedInformation);
         })
       })
@@ -588,11 +604,17 @@ const vehicle_body_type_value = 0;
     it(`toni_automotive_claim_handler execute vin ${$car[0]}`, () => {
       cy.wait(2000)
       let requestUrl = Cypress.env('requestUrl')
+      //requestUrl = 'https://dev03.spearhead-ag.ch:443/p/r/cyXdGLmaW1EEoMS4CODdQ'
       if(requestUrl == undefined || requestUrl == null || !requestUrl.length > 0){
         throw new Error(`test fails : requestUrl = ${requestUrl}`)
       }
-      //requestUrl = 'https://dev02.spearhead-ag.ch:443/p/r/T9AxhE834hVZc2fVzB3aY'
       console.log(`Start ${Cypress.env('templateId')} from url: ${requestUrl}.`)
+
+      const questionnaireId = Cypress.env('questionnaireId')
+      console.log(`questionnaireId : ${questionnaireId}`);
+      cy.then(function () {
+        questionnaire.Id = questionnaireId
+      })
 
       cy.wait(4000)
 
@@ -606,11 +628,28 @@ const vehicle_body_type_value = 0;
 
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-01'){
-          cy.get('input#vehicle-license-plate-input').clear().type('toni_automotive_claim_handler')
+          cy.wait(1000)
+          cy.get('input#vehicle-license-plate-input').clear().type(licensePlate,{delay : 200})
           cy.getBodyType($car,logFilename).then(function (bodyType) {
             cy.then(function () {
               questionnaire.bodyType = bodyType
             })
+
+            if (bodyType == 'MiniBus' || bodyType == 'MiniBusMidPanel' || bodyType == 'Van' || bodyType == 'VanMidPanel'){
+              cy.wait(2000)
+              cy.selectSingleList('equipment-slide-door',1)
+              cy.selectSingleList('equipment-2-loading-doors',Number($equipment_2_loading_doors))
+
+              cy.selectSingleList('equipment-length',0)
+              cy.selectSingleList('equipment-height',0)
+              cy.selectSingleList('equipment-vehicle-rear-glassed',0)
+              cy.selectSingleList('vehicle-customized-interior',0)
+            }
+            if (bodyType == 'PickUpSingleCabine' || bodyType == 'PickUpDoubleCabine'){
+              cy.wait(2000)
+              cy.selectSingleList('equipment-loading-area-cover-type',1)
+            }
+
           })
           nextBtn()
         }
@@ -639,6 +678,16 @@ const vehicle_body_type_value = 0;
       })
       cy.get('@goingPageId').then(function (aliasValue) {
         if (aliasValue == 'page-04'){
+          // cy.getQuestionAnswer('triage-recommendation').then(function (answer) {}) does not work
+          cy.get('@goingPageElements').then(function (elements) {
+            const answer = elements.find(x => x.id === 'triage-recommendation')?.answer
+            console.log(`triage-recommendation answer : ${answer}`)
+            if(answer == undefined || answer == null || !answer.length > 0){
+              cy.selectSingleList('triage-recommendation',0)
+            } else {
+              console.log(`triage-recommendation answer.toString() : ${answer.toString()}`)
+            }
+          })
           nextBtn()
         }
       })
@@ -665,4 +714,5 @@ const vehicle_body_type_value = 0;
     }) //it PDF from commands
 
   })
+})
 })

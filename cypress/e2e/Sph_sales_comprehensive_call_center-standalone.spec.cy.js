@@ -8,12 +8,12 @@ import file from '../fixtures/vinsArray.json'
 import emailBody from '../fixtures/templates/emailBodyA.json'
 import b2bBody from '../fixtures/templates/b2bBodySphSales.json'
 import header from '../fixtures/header.json'
-const b2bBodySave = 'cypress/fixtures/templates/sph_sales_comprehensive_call_centerSave.json'
+const b2bBodySave = 'cypress/fixtures/templates/sph_sales_comprehensive_call_centerStandaloneSave.json'
 
-const logFilename = 'cypress/fixtures/logs/SphSalesComprehensiveCallCenter.log'
+const logFilename = 'cypress/fixtures/logs/SphSalesComprehensiveCallCenterStandalone.log'
 const PathToImages ='cypress/fixtures/images/'
 
-describe('Start and complete Sph_sales comprehensive call center - sph_sales_comprehensive_call_center', () =>{
+describe('Start and complete Sph_sales comprehensive call center - sph_sales_comprehensive_call_center Standalone', () =>{
 
   before('clear log file', () => {
     cy.writeFile(logFilename, '')
@@ -59,7 +59,7 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
     ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5"]
 ]
   file1.forEach($car => {
-    it.only(`Sph sales - sph_sales_comprehensive_call_center vin ${$car[0]}`, () => {
+    it.only(`Sph sales - sph_sales_comprehensive_call_center Standalone vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
 
@@ -321,7 +321,7 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
       })
     })
 
-    it(`sph_sales_comprehensive_self_service_app.json execute vin ${$car[0]}`, () => {
+    it(`sph_sales_comprehensive_self_service_app execute vin ${$car[0]}`, () => {
       cy.viewport('samsung-note9')
       console.log(`Start ${Cypress.env('templateId')} from url: ${Cypress.env('requestUrl')}.`)
 

@@ -32,7 +32,7 @@ describe('Huk-self-service-Vehicle_Zone', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443/`
   const $requestTimeout = 60000;
-  const executePost = false
+  const executePost = true
   const triage_categorys = ["total-loss" , "concrete", "fictitious"]
   const triage_category = triage_categorys[2]
   const insurance_names = ["huk-coburg", "huk24", "default"]
@@ -612,7 +612,8 @@ describe('Huk-self-service-Vehicle_Zone', () =>{
     it(`Generate Emails for ${$car[0]}`, function () {
       //huk_request_information, huk_request_information_reminder_16h, huk_request_information_reminder_32h, huk_request_information_reminder_cancellation,
       //huk_request_information_reminder_completion
-      cy.GenerateEmails(['huk_request_information_reminder_32h'],'huk_self_service')
+      cy.GenerateEmails(['huk_request_information', 'huk_request_information_reminder_16h', 'huk_request_information_reminder_32h', 'huk_request_information_reminder_cancellation',
+        'huk_request_information_reminder_completion'],'huk_comprehensive_self_service_clickable_car')
     })
   }) //forEach
 })  //describe

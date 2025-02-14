@@ -30,7 +30,8 @@ describe('Start and complete Sph standalone questionnaire 3D car - axa_de_compre
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = false
+  const executePost = true
+  const executePost2= false
   const interceptSphStandalone = false
 
   function printUiBlocks(uiBlocks){
@@ -71,7 +72,7 @@ describe('Start and complete Sph standalone questionnaire 3D car - axa_de_compre
     ["YV4A22PK5N1849833", "SUV", "01.01.2020", "Volvo XC90 2022"]
   ]
   file1.forEach($car => {
-    it.only(`Sph standalone questionnaire - axa_de_comprehensive_call_center vin ${$car[0]}`, () => {
+    it(`Sph standalone questionnaire - axa_de_comprehensive_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
 
@@ -237,20 +238,23 @@ describe('Start and complete Sph standalone questionnaire 3D car - axa_de_compre
 
       // Schadenbilder und Dokumente - page-03
       cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'page-033'){
-          cy.selectSingleList('photos-available',1)
+        if (aliasValue == 'page-03'){
+          cy.selectSingleList('photos-available',0)
+          cy.selectSingleList('receive-upload-link-by',0)
+          cy.get('input#client-email-for-upload-link-input').clear().type('sivanchevski@soft2run.com')
+          cy.wait(2000)
           nextBtn()
         }
       })
 
       //Zusammenfassung, post questionnaire - summary-page
       cy.get('@goingPageId').then(function (aliasValue) {
-        if (aliasValue == 'summary-page3'){
+        if (aliasValue == 'summary-page'){
           cy.get('@questionnaireId').then(function (Id) {
             console.log(`from summary-page, saved questionnaireId: ${Id}`);
           })
           if (executePost) {
-            cy.get('button[type="submit"]').contains('Schadenaufnahme beenden').click()
+            cy.get('button[type="submit"]').contains('Schadenanlage beenden').click()
             cy.wait('@postPost').then(xhr => {
               cy.postPost(xhr)
             })
@@ -258,6 +262,123 @@ describe('Start and complete Sph standalone questionnaire 3D car - axa_de_compre
         }
       })
     }) //it
+
+    it(`axa_de_liability_self_service_upload get requestUrl vin ${$car[0]}`, () => {
+      cy.getRequestUrl()
+    })
+
+
+    it(`Execute axa_de_liability_self_service_upload for ${$car[0]}`, function () {
+      cy.viewport('samsung-note9')
+      cy.wait(2000)
+      let requestUrl = Cypress.env('requestUrl')
+      //requestUrl = 'https://dev03.spearhead-ag.ch:443/p/r/cyXdGLmaW1EEoMS4CODdQ'
+      if(requestUrl == undefined || requestUrl == null || !requestUrl.length > 0){
+        throw new Error(`test fails : requestUrl = ${requestUrl}`)
+      }
+      console.log(`Start ${Cypress.env('templateId')} from url: ${requestUrl}.`)
+
+      const questionnaireId = Cypress.env('questionnaireId')
+      console.log(`questionnaireId : ${questionnaireId}`);
+      cy.then(function () {
+        questionnaire.Id = questionnaireId
+      })
+
+      cy.wait(4000)
+
+      cy.visit(requestUrl,{log : false})
+
+      const nextButtonLabel ='Weiter'
+      const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
+      cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
+
+      currentPage()
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-01'){
+          cy.wait(1000)
+          cy.selectMultipleList('terms-of-service-acknowledgement',0)
+          cy.getBodyType($car,logFilename).then(function (bodyType) {
+            cy.then(function () {
+              questionnaire.bodyType = bodyType
+            })
+          })
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-02'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-03'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-04'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-05'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-06'){
+          nextBtn()
+        }
+      })
+
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-07'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-08'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-09'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'page-10'){
+          nextBtn()
+        }
+      })
+
+      cy.get('@goingPageId').then(function (aliasValue) {
+        if (aliasValue == 'summary-page'){
+          cy.selectMultipleList('summary-confirmation-acknowledgement',0)
+          if (executePost2) {
+            cy.get('button[type="submit"]').contains('Senden').click()
+            cy.wait('@postPost',{ log: false }).then(xhr => {
+              cy.postPost(xhr,false).then(function (notificationId) {
+                console.log(`notificationId: ${notificationId}`);
+              })
+            })
+          }
+        }
+      })
+
+
+
+    })
 
     it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['zurich_default','zurich_pg1_schadenbericht','zurich_pg1_schadenprotokoll'])

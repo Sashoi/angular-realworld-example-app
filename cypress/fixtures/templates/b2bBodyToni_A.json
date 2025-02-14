@@ -43,6 +43,10 @@
     {
       "answer": ["22222"],
       "questionId": "repair-shop-zip-code"
+    },
+    {
+      "answer": ["TONI "],
+      "questionId": "perpetrator-vehicle-license-plate"
     }
   ],
   "readOnlyQuestions": ["string"],

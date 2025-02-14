@@ -309,6 +309,10 @@ Cypress.Commands.add('uploadAllImagesOnPage', (PathToImages, delay = 2000) =>{
         cy.uploadImage(id,PathToImages,'right-taillight-o.jpg')
       } else if (id.includes('right-taillight')){
         cy.uploadImage(id,PathToImages,'right-taillight-d.jpg')
+      } else if (id.includes('vehicle-registration-ocr-part-1-photo-upload')){
+        cy.uploadImage(id,PathToImages,'registration-part-1.jpg')
+      } else if (id.includes('vehicle-registration-part-1-photo-upload')){
+        cy.uploadImage(id,PathToImages,'registration-part-1.jpg')
       }
       else {
         cy.uploadImage(id,PathToImages,'airbag.jpg')
@@ -568,11 +572,11 @@ Cypress.Commands.add(`GeneratePDFs`, function (pdf_templates) {
     //console.log(`authorization: ${authorization}`)
 
     Cypress._.merge(header, {'authorization':authorization});
-    const damageNotificationId = Cypress.env('notificationId')
-    if (damageNotificationId != null && damageNotificationId.length > 0){
+    const notificationId = Cypress.env('notificationId')
+    if (notificationId != null && notificationId.length > 0){
       const options = {
         method: 'GET',
-        url: `${baseUrl_lp}damage/notification/${damageNotificationId}`,
+        url: `${baseUrl_lp}damage/notification/${notificationId}`,
         headers: header
       }
       //console.log(`header authorization: ${header.authorization}`)
@@ -587,7 +591,7 @@ Cypress.Commands.add(`GeneratePDFs`, function (pdf_templates) {
         })
       })
     } else {
-      assert.isOk('OK', 'damageNotificationId not exist.')
+      assert.isOk('OK', 'notificationId not exist.')
     }
   })
 })
@@ -600,11 +604,11 @@ Cypress.Commands.add(`GenerateEmails`, function (email_templates,q_template) {
   cy.authenticate().then(function (authorization) {
 
     Cypress._.merge(header, {'authorization':authorization});
-    const damageNotificationId = Cypress.env('notificationId')
-    if (damageNotificationId != null && damageNotificationId.length > 0){
+    const notificationId = Cypress.env('notificationId')
+    if (notificationId != null && notificationId.length > 0){
       const options = {
         method: 'GET',
-        url: `${baseUrl_lp}damage/notification/${damageNotificationId}`,
+        url: `${baseUrl_lp}damage/notification/${notificationId}`,
         headers: header
       }
       cy.request(options).then(
@@ -618,7 +622,7 @@ Cypress.Commands.add(`GenerateEmails`, function (email_templates,q_template) {
         })
       })
     } else {
-      assert.isOk('OK', 'damageNotificationId not exist.')
+      assert.isOk('OK', 'notificationId not exist.')
     }
   })
 })
@@ -634,6 +638,42 @@ Cypress.Commands.add('printRequestedInformation', function (requestedInformation
       Cypress.env('requestUrl', element.requestUrl)
     });
   }
+
+})
+
+Cypress.Commands.add('getRequestUrl', function () {
+  const $dev = Cypress.env("dev");
+  const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
+  const notificationId = Cypress.env('notificationId')
+  if(notificationId == undefined || notificationId == null || !notificationId.length > 0){
+    throw new Error(`test fails : notificationId = ${notificationId}`)
+  }
+  cy.authenticate().then(function (authorization) {
+    Cypress._.merge(header, {'authorization':authorization});
+    const options = {
+      method: 'GET',
+      url: `${baseUrl_lp}damage/notification/${notificationId}`,
+      body: {},
+      headers: header
+    };
+    cy.request(options).then(
+      (response) => {
+        // response.body is automatically serialized into JSON
+        expect(response.status).to.eq(200) // true
+        const arrLength = response.body.body.requestedInformation.length
+        const requestedInformation = response.body.body.requestedInformation[arrLength - 1]
+        const requestUrl = requestedInformation.requestUrl
+        console.log(`requestUrl : ${requestUrl}`);
+        Cypress.env('requestUrl', requestUrl)
+        const templateId = requestedInformation.templateId
+        console.log(`templateId : ${templateId}`);
+        Cypress.env('templateId', templateId)
+        const questionnaireId = requestedInformation.questionnaireId
+        console.log(`questionnaireId : ${questionnaireId}`);
+        Cypress.env('questionnaireId', questionnaireId)
+        //cy.printRequestedInformation(response.body.requestedInformation);
+    })
+  })
 
 })
 
@@ -759,6 +799,7 @@ Cypress.Commands.add('getQuestionnaireAnswers', () =>{
       cy.request(options).then(
         (response) => {
         expect(response.status).to.eq(200) // true
+        //console.log(`getQuestionnaireAnswers body: ${JSON.stringify(response.body)}`);
         cy.wrap(response.body).then((body) => {
           return body
         })

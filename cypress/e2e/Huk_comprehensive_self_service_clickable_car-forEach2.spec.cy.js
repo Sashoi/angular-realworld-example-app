@@ -5,7 +5,7 @@ import { getQuestionnaireIdFromLinks } from "../support/utils/common.js";
 import { questionnaire } from "../support/utils/common.js";
 import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
-import b2bBody from '../fixtures/templates/b2bBody.json'
+import b2bBody from '../fixtures/templates/b2bBody_clickable_car.json'
 import header from '../fixtures/header.json'
 
 const logFilename = 'cypress/fixtures/logs/hukClickableCar.log'
@@ -29,13 +29,15 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
-  const executePost = true
+  const executePost = false
   const generatePdfCondition = executePost && true
   const newPhoneNumber = `+3598887950`
   const $equipment_2_loading_doors = true
   const initOnly = false
-  const triage_category = "concrete" // "total-loss" , "concrete", "fictitious"
-  const insurance_name = "default"// "huk-coburg", "huk24", "default"
+  const triage_category = "fictitious" // "total-loss" , "concrete", "fictitious"
+  const insurance_name = "huk24"// "huk-coburg", "huk24", "default"
+  const check_elements_on_page_02 = false
+  const noVin = true
 
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
@@ -83,15 +85,18 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
           console.log(`triage category: ${triage_category}`)
           console.log(`insurance name: ${insurance_name}`)
 
-          elements.forEach(element => {
-            let visible = element.visibleExpression
-            if (visible == undefined){
-              visible = true
-            } else {
-              visible = eval(element.visibleExpression)
-            }
-            console.log(`id: ${element.id.padEnd(50, " ")}, visible: ${visible.toString().padEnd(5, " ")}, content: ${element.label.content}`)
-          })
+          if (check_elements_on_page_02){
+
+            elements.forEach(element => {
+              let visible = element.visibleExpression
+              if (visible == undefined){
+                visible = true
+              } else {
+                visible = eval(element.visibleExpression)
+              }
+              console.log(`id: ${element.id.padEnd(50, " ")}, visible: ${visible.toString().padEnd(5, " ")}, content: ${element.label.content}`)
+            })
+          }
         })
         nextBtn()
       }
@@ -133,9 +138,20 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
       }
     })
 
-    //pageId:"page-05" SVG
+    //"page-05"
     cy.get('@goingPageId').then(function (aliasValue) {
       if (aliasValue == 'page-05'){
+        cy.uploadAllImagesOnPage(PathToImages,6000)
+        //"vehicle-registration-ocr-part-1-photo-upload",
+        //"vehicle-registration-ocr-part-1-photo-upload-abroad"
+        nextBtn()
+        cy.wait(1000)
+      }
+    })
+
+    //pageId:"page-06" SVG
+    cy.get('@goingPageId').then(function (aliasValue) {
+      if (aliasValue == 'page-06'){
         cy.get('@goingPageElements').then(function (elements) {
           const threeSixtyOptions = elements.find(x => x.id === 'selected-parts').threeSixtyOptions
           if (threeSixtyOptions != null && threeSixtyOptions.vehicleFolderPath != null && threeSixtyOptions.vehicleFolderPath.length > 0){
@@ -149,8 +165,8 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
                 //const Id = $path.id
                 //cy.wrap($path).click({ force: true, multiple: true, timeout : 4000 }) select all
                 //cy.wrap($path).find('#hood').click({ force: true, timeout : 4000 }) does not work ??
-                cy.get('div.clickMaskContainer').find('svg',{timeout: 10000}).find('path#hood').click({ force: true, timeout : 4000 })
-                cy.wait(4000)
+                cy.get('div.clickMaskContainer').find('svg',{timeout: 10000}).find('path#hood').click({ force: true, timeout : 9999 })
+                cy.wait(9999)
               }
             })
           } else {
@@ -206,19 +222,12 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
       }
     })
 
-    //"page-06"
-    cy.get('@goingPageId').then(function (aliasValue) {
-      if (aliasValue == 'page-06'){
-        cy.uploadImage('vehicle-registration-part-1-photo-upload',PathToImages,'registration-part-1.jpg')
-        nextBtn()
-        cy.wait(1000)
-      }
-    })
-
     //"page-07"
     cy.get('@goingPageId').then(function (aliasValue) {
       if (aliasValue == 'page-07'){
-        cy.selectSingleList('unrepaired-pre-damages',0)
+        cy.uploadAllImagesOnPage(PathToImages,6000)
+        //"vehicle-registration-part-1-photo-upload",
+        // "vehicle-registration-part-1-photo-upload-abroad"
         nextBtn()
         cy.wait(1000)
       }
@@ -227,6 +236,16 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
     //"page-08"
     cy.get('@goingPageId').then(function (aliasValue) {
       if (aliasValue == 'page-08'){
+        cy.selectSingleList('unrepaired-pre-damages',0)
+        nextBtn()
+        cy.wait(1000)
+      }
+    })
+
+
+    //"page-09"
+    cy.get('@goingPageId').then(function (aliasValue) {
+      if (aliasValue == 'page-09'){
         cy.uploadImage('vehicle-interior-front-photo-upload',PathToImages,'interior-front.jpg')
         cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathToImages,'image dashboard-odometer.jpg')
         cy.get('div#vehicle-mileage').find('input#vehicle-mileage-input').type('123321')
@@ -234,9 +253,9 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
       }
     })
 
-    //"page-09"
+    //"page-10"
     cy.get('@goingPageId').then(function (aliasValue) {
-      if (aliasValue == 'page-09'){
+      if (aliasValue == 'page-10'){
         cy.uploadImage('vehicle-right-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
         cy.uploadImage('vehicle-left-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
         nextBtn()
@@ -244,9 +263,9 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
     })
 
 
-    //"page-10"
+    //"page-11"
     cy.get('@goingPageId').then(function (aliasValue) {
-      if (aliasValue == 'page-10'){
+      if (aliasValue == 'page-11'){
         if (false){
           cy.uploadImage('damage-photo-upload-overview-hood',PathToImages,'hood.jpg')
           if (hood3){
@@ -295,9 +314,9 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
       }
     })
 
-    //page-11
+    //page-12
     cy.get('@goingPageId').then(function (aliasValue) {
-      if (aliasValue == 'page-11'){
+      if (aliasValue == 'page-12'){
         cy.get('@is3Dcar').then(function (is3Dcar) {
           if (is3Dcar){
             cy.selectAllSingleLists(0)
@@ -335,9 +354,9 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
       }
     })
 
-    //"page-12"
+    //"page-13"
     cy.get('@goingPageId').then(function (aliasValue) {
-      if (aliasValue == 'page-12'){
+      if (aliasValue == 'page-13'){
         cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu1.jpg')
         cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu2.jpg')
         cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu3.jpg')
@@ -345,9 +364,9 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
       }
     })
 
-    //"page-13"
+    //"page-14"
     cy.get('@goingPageId').then(function (aliasValue) {
-      if (aliasValue == 'page-13'){
+      if (aliasValue == 'page-14'){
         cy.getQuestionAnswer('loss-cause').then(function (loss_cause_l) {
           console.log(`loss-cause : ${loss_cause_l}`);
           if(loss_cause_l == 'animal'){
@@ -362,22 +381,27 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
       }
     })
 
-    //"page-14"  "(hasAnswer('huk-coburg-triage-category', 'fictitious') && (hasAnswer('loss-cause','animal') || hasAnswer('loss-cause','collision')))"
-    cy.get('@goingPageId').then(function (aliasValue) {
-      if (aliasValue == 'page-14'){
-        // "collision-with-animal",
-        // "collision-with-animal-description",
-        // "loss-circumstances",
-        // "loss-circumstances-description-other",
-        // "loss-circumstances-description-other-mandatory"
-        nextBtn()
-      }
-    })
-
-    //"page-15"
+    //"page-15"  "(hasAnswer('huk-coburg-triage-category', 'fictitious') && (hasAnswer('loss-cause','animal') || hasAnswer('loss-cause','collision')))"
     cy.get('@goingPageId').then(function (aliasValue) {
       if (aliasValue == 'page-15'){
-        cy.selectSingleList('vehicle-location-equals-home-address',0)
+        cy.getQuestionAnswer('loss-cause').then(function (loss_cause_answer) {
+          if (loss_cause_answer == 'animal'){
+            cy.selectSingleList('collision-with-animal',0)
+            cy.get('textarea#collision-with-animal-description-textarea').type('collision-with-animal-description - 1.\ncollision-with-animal-description - 2.')
+          }
+
+          if (loss_cause_answer == 'collision'){
+            cy.selectSingleList('loss-circumstances',0)
+
+            //"visibleExpression": "(answer('loss-cause') == 'collision' && answer('loss-circumstances') != 'other')",
+            cy.get('textarea#loss-circumstances-description-other-textarea').type('loss circumstances description other')
+
+            //"visibleExpression": "(answer('loss-cause') == 'collision' && answer('loss-circumstances') == 'other')",
+            //"loss-circumstances-description-other-mandatory"
+
+          }
+        })
+
         nextBtn()
       }
     })
@@ -385,6 +409,14 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
     //"page-16"
     cy.get('@goingPageId').then(function (aliasValue) {
       if (aliasValue == 'page-16'){
+        cy.selectSingleList('vehicle-location-equals-home-address',0)
+        nextBtn()
+      }
+    })
+
+    //"page-17"
+    cy.get('@goingPageId').then(function (aliasValue) {
+      if (aliasValue == 'page-17'){
         cy.get('textarea#additional-remarks-textarea').type('Weitere Anmerkungen  - 1./nWeitere Anmerkungen  - 2./nWeitere Anmerkungen  - 3.')
         nextBtn()
       }
@@ -410,13 +442,18 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   const loss_causes = ["collision", "vandalism", "storm", "glass", "animal"]
 
   const file1 = [
-    ["U5YPH816HML010002", "SUV", "01.09.2020", "3D Kia Sportage"]
+    [
+      "VF7RDRFJF9L510253",
+      "Station",
+      "01.01.2010",
+      "Citroen C5 Limousine 4 türig"
+    ]
   ]
 
   file1.forEach($car => {
     it.only(`Huk-comprehensive-self-service-clickable-car vin :  ${$car[0]}`, function () {
 
-      const vin = $car[0]
+      const vin = noVin ? "" : $car[0]
       const loss_cause = loss_causes[0]
 
       let ran2 =  getRandomInt(10,99)

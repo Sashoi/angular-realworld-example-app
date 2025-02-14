@@ -93,7 +93,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilityCallCenter', () =>{
       "6FPPXXMJ2PCD55635",
       "PickUpDoubleCabine",
       "01.01.2012",
-      "Ford Ranger double cabine, Pick-up"
+      "Ford Ranger double cabine, Pick-up "
     ]
   ]
 

@@ -119,16 +119,13 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
   const eMail = Cypress.env("client_email")
 
   const file1 = [
-    [
-      "WDB2083441T069719",
-      "Coupe",
-      "01.01.2009",
-      "MER CLK Coupe (partial identification, build period to be defined manually)"
-    ],
-    ["W0L0XCR975E026845", "Cabrio", "01.01.2009", "OPE Tigra Cabrio"],
-    ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5"],
-    ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
-    ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
+    ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"],
+  [
+    "6FPPXXMJ2PCD55635",
+    "PickUpDoubleCabine",
+    "01.01.2012",
+    "Ford Ranger double cabine, Pick-up"
+  ]
   ]
 
   file1.forEach($car => {
@@ -140,10 +137,11 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
       const claim2 = getRandomInt(10000,99999)
 
 
-      const licensePlate = `HDI ${getRandomInt(100,999)}`
+      const licensePlate = `HDIL ${getRandomInt(100,999)}`
+      console.log(`vin: ${vin}`);
 
       const claimNumber = claim1 + claim2  // "21PFQ017602MR" works for reopen
-      console.log(`vin: ${vin}`);
+      console.log(`License plate: ${licensePlate}`);
 
       cy.authenticate().then(function (authorization) {
 
@@ -157,7 +155,8 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
           b2bBody.qas.find(q => {return q.questionId === "incident-reporter-email"}).answer = eMail
           b2bBody.qas.find(q => {return q.questionId === "number-of-vehicles"}).answer = 'more-than-two'
           b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licensePlate
-          b2bBody.qas.find(q => {return q.questionId === "role-type"}).answer = role_types[1]
+          b2bBody.qas.find(q => {return q.questionId === "licensePlate-vehicle-insurance-client"}).answer = licensePlate
+          b2bBody.qas.find(q => {return q.questionId === "role-type"}).answer = role_types[0]
 
           Cypress._.merge(header, {'authorization' : authorization});
           const options = {

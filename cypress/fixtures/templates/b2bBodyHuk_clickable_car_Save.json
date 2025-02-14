@@ -18,7 +18,7 @@
     },
     {
       "questionId": "client-insurance-claim-number",
-      "answer": "75-33-491/429539-S"
+      "answer": "78-33-497/159734-S"
     },
     {
       "questionId": "animal-species",
@@ -26,11 +26,11 @@
     },
     {
       "questionId": "insurance-name",
-      "answer": "default"
+      "answer": "huk24"
     },
     {
       "questionId": "huk-coburg-triage-category",
-      "answer": "concrete"
+      "answer": "fictitious"
     },
     {
       "questionId": "client-insurance-policy-number",
@@ -50,7 +50,7 @@
     },
     {
       "questionId": "vehicle-vin",
-      "answer": "U5YPH816HML010002"
+      "answer": ""
     },
     {
       "questionId": "vehicle-first-registration-date",
@@ -58,7 +58,7 @@
     },
     {
       "questionId": "client-vehicle-license-plate",
-      "answer": "HSS 2-383"
+      "answer": "HSS 5-941"
     },
     {
       "questionId": "client-email",

@@ -11,9 +11,11 @@ import { questionnaire } from "../support/utils/common.js";
 import { goingPage } from "../support/utils/common.js";
 import file from '../fixtures/vinsArray.json'
 import b2bBody from '../fixtures/templates/b2bBodyZurich.json'
+import header from '../fixtures/header.json'
 
 
 const logFilename = 'cypress/fixtures/logs/zurichStandalone.log'
+const b2bBodySave = 'cypress/fixtures/templates/b2bBodyZurichSave.json'
 
 describe('Start and complete zurich standalone questionnaire - urichz_call_center', () =>{
 
@@ -29,7 +31,7 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = false
+  const executePost = true
   const interceptZurichStandalone = false
 
   function printUiBlocks(uiBlocks){
@@ -49,11 +51,16 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
     cy.waitingFor('@currentPage',goingPage,questionnaire)
   }
 
+  function convertDate(dateString){
+    var p = dateString.split(/\D/g)
+    return [p[2],p[1],p[0] ].join("-")
+  }
+
   const file1 = [
-    ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
+    ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021 "]
   ]
   file1.forEach($car => {
-    it.only(`zurich standalone questionnaire - zurich_call_center vin ${$car[0]}`, () => {
+    it(`zurich standalone questionnaire - zurich_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
 
@@ -325,7 +332,8 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
           if (executePost) {
             cy.get('button[type="submit"]').contains('Schadenaufnahme beenden').click()
             cy.wait('@postPost').then(xhr => {
-              cy.postPost(xhr)
+              const notificationId = cy.postPost(xhr)
+
             })
           }
         }
@@ -335,6 +343,65 @@ describe('Start and complete zurich standalone questionnaire - urichz_call_cente
     it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
       cy.GeneratePDFs(['zurich_default','zurich_pg1_schadenbericht','zurich_pg1_schadenprotokoll'])
     }) //it PDF from commands
+
+    it.skip(`Generate Emails for ${$car[0]}`, function () {
+        cy.GenerateEmails(['zurich_pg1_confirmation_2_agent','zurich_pg1_confirmation_2_da_direkt_customer','zurich_pg1_confirmation_2_zurich_customer',
+          'zurich_pg1_internal_confirmation'],'zurich_call_center_guide_wire')
+    })
+
+    it.only(`zurich_call_center_guide_wire questionnaire, vin ${$car[0]}`, () => {
+
+      const $vin = $car[0]
+      const first_registration_date = convertDate($car[2]) //"2024-02-01";
+      const intS2 = getRandomInt(10,99).toString()
+      const intS6 = getRandomInt(100000,999999).toString()
+      const intS3 = getRandomInt(100,999).toString()
+      const intS4 = getRandomInt(1000,9999).toString()
+
+      console.log(`vin: ${$vin}, bodyType: ${$car[1]}, description: ${$car[3]}`)
+
+      cy.authenticate().then(function (authorization) {
+        cy.then(function () {
+          questionnaire.authorization = authorization
+        })
+
+        const claimNumber = `${intS3}-${intS2}-${intS6}`
+        const licensePlate = `ZRH ${intS4}`
+        console.log(`claimNumber: ${claimNumber}`)
+
+        b2bBody.qas.find(q => {return q.questionId === "client-vehicle-license-plate"}).answer = licensePlate
+        b2bBody.qas.find(q => {return q.questionId === "claimant-vehicle-license-plate"}).answer = licensePlate
+        b2bBody.qas.find(q => {return q.questionId === "license-plate"}).answer = licensePlate
+        b2bBody.qas.find(q => {return q.questionId === "first-registration-date"}).answer = first_registration_date
+        b2bBody.qas.find(q => {return q.questionId === "claim-number"}).answer = claimNumber
+        b2bBody.supportInformation.claimNumber = claimNumber
+        b2bBody.supportInformation.vin = $vin
+
+        Cypress._.merge(header, {'authorization' : authorization});
+
+        const options = {
+          method: 'POST',
+          url: `${baseUrl_lp}questionnaire/zurich_call_center_guide_wire/start`,
+          body: b2bBody,
+          headers: header
+        };
+        cy.request(options).then(
+          (response) => {
+          // response.body is automatically serialized into JSON
+          expect(response.status).to.eq(200) // true
+          const questionnaireId = response.body.questionnaireId;
+          cy.then(function () {
+            questionnaire.Id = questionnaireId
+          })
+          const uiUrl = response.body.uiUrl;
+          console.log(`zurich_call_center_guide_wire questionnaireId: ${questionnaireId}`)
+          console.log(`zurich_call_center_guide_wire uiUrl: ${uiUrl}`)
+          cy.writeFile(b2bBodySave, b2bBody)
+          //cy.visit(uiUrl,{ log : false })
+        })
+      })
+    }) //it
+
 
   })  //forEach
 }) //describe

@@ -1,0 +1,71 @@
+{
+  "qas": [
+    {
+      "questionId": "odometer-unit",
+      "answer": ["km"]
+    },
+    {
+      "questionId": "standalone",
+      "answer": ["yes"]
+    },
+    {
+      "questionId": "loss-cause",
+      "answer": "other"
+    },
+    {
+      "questionId": "coverage-type",
+      "answer": "liability"
+    },
+    {
+      "questionId": "license-plate",
+      "answer": "ZRH 9654"
+    },
+    {
+      "questionId": "client-vehicle-license-plate",
+      "answer": "ZRH 9654"
+    },
+    {
+      "questionId": "claimant-vehicle-license-plate",
+      "answer": "ZRH 9654"
+    },
+    {
+      "questionId": "first-registration-date",
+      "answer": "2020-01-01"
+    },
+    {
+      "questionId": "odometer-reading",
+      "answer": 123498
+    },
+    {
+      "questionId": "company",
+      "answer": "zurich"
+    },
+    {
+      "questionId": "process-type",
+      "answer": "zurichStandalone"
+    },
+    {
+      "questionId": "claim-number",
+      "answer": "174-29-590374"
+    },
+    {
+      "questionId": "roof-damage-type",
+      "answer": ["scratches"]
+    },
+    {
+      "questionId": "roof-equipment-convertible-roof-material",
+      "answer": ["metal"]
+    },
+    {
+      "questionId": "selected-parts",
+      "answer": {
+        "roof": "yes"
+      }
+    }
+  ],
+  "supportInformation": {
+    "claimNumber": "174-29-590374",
+    "countryVehicleIdentification": "",
+    "vin": "WF0KXXTTRKMC81361"
+  }
+}
