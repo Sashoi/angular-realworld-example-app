@@ -94,15 +94,10 @@ const vehicle_body_type_value = 0;
 
 
   const file1 = [
-    [
-      "6FPPXXMJ2PCD55635",
-      "PickUpDoubleCabine",
-      "01.01.2012",
-      "Ford Ranger double cabine, Pick-up"
-    ]
+    ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021 "]
 ]
 
-const coverage_type_info_clientArray= [5]
+const coverage_type_info_clientArray= [0]
 
 coverage_type_info_clientArray.forEach(coverage_type_info_clien => {
   file1.forEach($car => {
@@ -560,7 +555,7 @@ coverage_type_info_clientArray.forEach(coverage_type_info_clien => {
       })
     })
 
-    it(`toni_automotive_claim_handler get requestUrl vin ${$car[0]}`, () => {
+    it.skip(`toni_automotive_claim_handler get requestUrl vin ${$car[0]}`, () => {
       const notificationId = Cypress.env('notificationId') //`wlA4icU77W6LjzUFyrGzy`
       if(notificationId == undefined || notificationId == null || !notificationId.length > 0){
         throw new Error(`test fails : notificationId = ${notificationId}`)
@@ -601,7 +596,7 @@ coverage_type_info_clientArray.forEach(coverage_type_info_clien => {
     })
 
 
-    it(`toni_automotive_claim_handler execute vin ${$car[0]}`, () => {
+    it.skip(`toni_automotive_claim_handler execute vin ${$car[0]}`, () => {
       cy.wait(2000)
       let requestUrl = Cypress.env('requestUrl')
       //requestUrl = 'https://dev03.spearhead-ag.ch:443/p/r/cyXdGLmaW1EEoMS4CODdQ'
@@ -709,9 +704,13 @@ coverage_type_info_clientArray.forEach(coverage_type_info_clien => {
 
     })
 
-    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
-      cy.GeneratePDFs(['toni_default', 'toni_tele_check', 'toni_tele_expert']) // 'toni_hdi_tele_check',
-    }) //it PDF from commands
+    it(`toni_automotive_self_service execute vin ${$car[0]}`, () => {
+      cy.createNewQuestionnaire('toni_automotive_self_service')
+    })
+
+    // it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
+    //   cy.GeneratePDFs(['toni_default', 'toni_tele_check', 'toni_tele_expert']) // 'toni_hdi_tele_check',
+    // }) //it PDF from commands
 
   })
 })

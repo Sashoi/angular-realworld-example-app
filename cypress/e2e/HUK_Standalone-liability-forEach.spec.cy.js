@@ -58,11 +58,31 @@ describe('Start and complete huk standalone questionnaire - huk_liability_call_c
   // }
 
   const file1 = [
-    ["U5YPH816HML010002", "", "01.09.2020", "3D Kia Sportage"]
+    [
+      "WVWZZZ3CZME020680",
+      "Station",
+      "01.09.2020",
+      "Passat Variant 1.4 TSI Plug-In-Hybrid DSG GTE"
+    ],
+    [
+      "VF3VEAHXKLZ080921",
+      "MiniBusMidPanel",
+      "01.01.2017",
+      "Peugeot Expert 09/2020"
+    ],
+    ["W1V44760313930767", "Van", "01.01.2019", "Mercedes Vito 09/2021"],
+    ["WF03XXTTG3MG53806", "Minibus", "01.01.2017", "Ford Tourneo 08/2021"],
+    ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"],
+    [
+      "6FPPXXMJ2PCD55635",
+      "PickUpDoubleCabine",
+      "01.01.2012",
+      "Ford Ranger double cabine, Pick-up"
+    ]
   ]
 
   file1.forEach($car => {
-    it.only(`huk standalone - huk_liability_call_center vin: ${$car[0]}`, () => {
+    it(`huk standalone - huk_liability_call_center vin: ${$car[0]}`, () => {
 
       const $vin = $car[0];
 
@@ -281,7 +301,7 @@ describe('Start and complete huk standalone questionnaire - huk_liability_call_c
       })
     })
 
-    it.skip(`huk standalone - huk_liability_call_center reopen vin: ${$car[0]}`, () => {
+    it(`huk standalone - huk_liability_call_center reopen vin: ${$car[0]}`, () => {
 
       const claimNumber  = Cypress.env('claimNumber')
       const licensePlate = Cypress.env('licensePlate')

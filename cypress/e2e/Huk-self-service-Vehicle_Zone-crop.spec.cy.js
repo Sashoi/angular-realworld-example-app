@@ -38,7 +38,7 @@ describe('Huk-self-service-Vehicle_Zone', () =>{
   const insurance_names = ["huk-coburg", "huk24", "default"]
   const insurance_name = insurance_names[0]
   const loss_causes = ["collision", "vandalism", "storm", "glass", "animal"]
-  const loss_cause = loss_causes[1]
+  const loss_cause = loss_causes[0]
   const coverage_types = ["comprehensive","liability",""]
   const coverage_type = coverage_types[2]
   const vehicle_body_type_options =  [
@@ -135,12 +135,14 @@ describe('Huk-self-service-Vehicle_Zone', () =>{
   }
 
   const file1 = [
-    [
-      "VF7RDRFJF9L510253",
-      "Station",
-      "01.01.2010",
-      "Citroen C5 Limousine 4 türig"
-    ]
+    ["VF7SA5FS0BW550414", "Hatch3", "01.01.2014", "CIT DS3 Hatch3"],
+  ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan"],
+  [
+    "WDB2083441T069719",
+    "Coupe",
+    "01.01.2009",
+    "MER CLK Coupe (partial identification, build period to be defined manually)"
+  ]
 ]
   file1.forEach($car => {
     it(`Huk-self-service-Vehicle_Zone vin : ${$car[0]}`, () =>{
@@ -374,7 +376,7 @@ describe('Huk-self-service-Vehicle_Zone', () =>{
               //"page-07"
               cy.get('@goingPageId').then(function (aliasValue) {
                 if (aliasValue == 'page-07'){
-                  cy.selectSingleList('airbag-deployed',0)
+                  cy.selectSingleList('airbag-deployed',1)
                   cy.selectSingleList('underbody-damage-type2',1)
                   nextBtn()
                 }
@@ -609,7 +611,7 @@ describe('Huk-self-service-Vehicle_Zone', () =>{
       })
     })
 
-    it(`Generate Emails for ${$car[0]}`, function () {
+    it.skip(`Generate Emails for ${$car[0]}`, function () {
       //huk_request_information, huk_request_information_reminder_16h, huk_request_information_reminder_32h, huk_request_information_reminder_cancellation,
       //huk_request_information_reminder_completion
       cy.GenerateEmails(['huk_request_information', 'huk_request_information_reminder_16h', 'huk_request_information_reminder_32h', 'huk_request_information_reminder_cancellation',

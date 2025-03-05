@@ -10,7 +10,7 @@
     },
     {
       "questionId": "loss-cause",
-      "answer": "vandalism"
+      "answer": "collision"
     },
     {
       "questionId": "loss-circumstances",
@@ -18,7 +18,7 @@
     },
     {
       "questionId": "client-insurance-claim-number",
-      "answer": "14-33-573/350687-Z"
+      "answer": "50-33-464/987425-Z"
     },
     {
       "questionId": "animal-species",
@@ -50,7 +50,7 @@
     },
     {
       "questionId": "vehicle-vin",
-      "answer": "VF7RDRFJF9L510253"
+      "answer": "WDB2083441T069719"
     },
     {
       "questionId": "vehicle-first-registration-date",
@@ -58,7 +58,7 @@
     },
     {
       "questionId": "client-vehicle-license-plate",
-      "answer": "SOF 8885"
+      "answer": "SOF 9439"
     },
     {
       "questionId": "client-email",

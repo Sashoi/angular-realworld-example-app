@@ -206,7 +206,6 @@ Cypress.Commands.add('uploadImage', (selectorId,toPath,fileName) =>{
 })
 
 
-
 //does not work
 Cypress.Commands.add('selectAllSVG_VZ', () =>{
   cy.get('svg',{ log : false }).find('g').each(($g_element, index, $list) => {
@@ -641,7 +640,7 @@ Cypress.Commands.add('printRequestedInformation', function (requestedInformation
 
 })
 
-Cypress.Commands.add('getRequestUrl', function () {
+Cypress.Commands.add('getLastRequestUrl', function () {
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const notificationId = Cypress.env('notificationId')
@@ -675,6 +674,59 @@ Cypress.Commands.add('getRequestUrl', function () {
     })
   })
 
+})
+
+Cypress.Commands.add('createNewQuestionnaire', function (templateId,sendSMS = false) {
+  const $dev = Cypress.env("dev");
+  const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
+  const notificationId = Cypress.env('notificationId')
+  if(notificationId == undefined || notificationId == null || !notificationId.length > 0){
+    throw new Error(`test fails : notificationId = ${notificationId}`)
+  }
+  cy.authenticate().then(function (authorization) {
+    Cypress._.merge(header, {'authorization':authorization});
+    const options = {
+      method: 'POST',
+      url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/${templateId}?unknownReceiver=false`,
+      body: emailBody,
+      headers: header
+    };
+    cy.request(options).then(
+      (response) => {
+        // response.body is automatically serialized into JSON
+        expect(response.status).to.eq(200) // true
+        const arrLength = response.body.requestedInformation.length
+        const requestUrl = response.body.requestedInformation[arrLength - 1].requestUrl
+        const templateId = response.body.requestedInformation[arrLength - 1].templateId
+        console.log(`requestUrl : ${requestUrl}`);
+        console.log(`templateId : ${templateId}`);
+        Cypress.env('requestUrl', requestUrl)
+        Cypress.env('templateId', templateId)
+        //cy.printRequestedInformation(response.body.requestedInformation);
+    })
+    if (sendSMS){
+      const options = {
+        method: 'POST',
+        url: `${baseUrl_lp}damage/notification/${notificationId}/requestInformation/${templateId}`,
+        body : smsBody,
+        headers: header
+      };
+      cy.request(options).then(
+        (response) => {
+          // response.body is automatically serialized into JSON
+          expect(response.status).to.eq(200) // true
+          const arrLength = response.body.requestedInformation.length
+          const requestUrl = response.body.requestedInformation[arrLength - 1].requestUrl
+          const templateId = response.body.requestedInformation[arrLength - 1].templateId
+          console.log(`notificationId : ${notificationId}`);
+          console.log(`SMS templateId : ${templateId}`);
+          console.log(`SMS requestUrl : ${requestUrl}`);
+          //Cypress.env('requestUrl', requestUrl)
+          //Cypress.env('templateId', response.body.requestedInformation[arrLength - 1].templateId)
+          //cy.printRequestedInformation(response.body.requestedInformation);
+      })
+    }
+  })
 })
 
 

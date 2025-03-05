@@ -61,6 +61,12 @@
     "01.01.2010",
     "Citroen C5 Limousine 4 türig"
   ],
+  [
+    "W0L000051T2123456",
+    "Station",
+    "01.01.2020",
+    "Opel Astra internalInformation.spearheadVehicle.prodBegin == null"
+  ],
   ["3D cars", "", "", ""],
   ["U5YPH816HML010002", "SUV", "01.09.2020", "3D Kia Sportage"],
   ["WDD2130431A601626", "Sedan", "01.01.2020", "3D Mercedes E Class sedan"],

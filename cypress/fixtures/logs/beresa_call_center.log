@@ -1,1 +1,6 @@
-vin: WDB1704351F077666 expected:             Cabrio real:                    desc: MER SLK Cabrio 
+vin: WBAUB310X0VN69014 expected:             Hatch3 real:                    desc: BMW 1 Series Hatch3 
+vin: WBAUB310X0VN69014 expected:             Hatch3 real:                Van desc: BMW 1 Series Hatch3 
+vin: WVWZZZ6RZGY304402 expected:             Hatch5 real:                    desc: Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list) 
+vin: WVWZZZ6RZGY304402 expected:             Hatch5 real:                Van desc: Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list) 
+vin: VF7SA5FS0BW550414 expected:             Hatch3 real:                    desc: CIT DS3 Hatch3 
+vin: VF7SA5FS0BW550414 expected:             Hatch3 real:                Van desc: CIT DS3 Hatch3 

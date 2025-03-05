@@ -31,7 +31,7 @@ describe('Start and complete Sph standalone questionnaire 3D car - axa_de_compre
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
   const executePost = true
-  const executePost2= false
+  const executePost2= true
   const interceptSphStandalone = false
 
   function printUiBlocks(uiBlocks){
@@ -264,7 +264,7 @@ describe('Start and complete Sph standalone questionnaire 3D car - axa_de_compre
     }) //it
 
     it(`axa_de_liability_self_service_upload get requestUrl vin ${$car[0]}`, () => {
-      cy.getRequestUrl()
+      cy.getLastRequestUrl()
     })
 
 

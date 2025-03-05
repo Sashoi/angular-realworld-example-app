@@ -45,13 +45,13 @@
       "questionId": "repair-shop-zip-code"
     },
     {
-      "answer": "TONI 2989",
+      "answer": "TONI 4379",
       "questionId": "perpetrator-vehicle-license-plate"
     }
   ],
   "readOnlyQuestions": ["string"],
   "supportInformation": {
-    "vin": "6FPPXXMJ2PCD55635",
+    "vin": "WF0KXXTTRKMC81361",
     "additionalProp2": {},
     "additionalProp3": {}
   }

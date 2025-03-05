@@ -27,7 +27,7 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = false
+  const executePost = true
   const executePost2 = false
   const $equipment_2_loading_doors = true
 
@@ -56,10 +56,10 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
 
 
   const file1 = [
-    ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5"]
+    ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5 "]
 ]
   file1.forEach($car => {
-    it.only(`Sph sales - sph_sales_comprehensive_call_center Standalone vin ${$car[0]}`, () => {
+    it(`Sph sales - sph_sales_comprehensive_call_center Standalone vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
 
@@ -295,6 +295,9 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
 
     it(`sph_sales_comprehensive_self_service_app create vin ${$car[0]}`, () => {
       const notificationId = Cypress.env('notificationId')
+      if(notificationId == undefined || notificationId == null || !notificationId.length > 0){
+        throw new Error(`test fails : notificationId = ${notificationId}`)
+      }
       cy.authenticate().then(function (authorization) {
         cy.then(function () {
           questionnaire.authorization = authorization

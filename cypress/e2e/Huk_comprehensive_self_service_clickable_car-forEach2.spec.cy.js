@@ -29,15 +29,15 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
-  const executePost = false
-  const generatePdfCondition = executePost && true
+  const executePost = true
+  const generatePdfCondition = executePost && false
   const newPhoneNumber = `+3598887950`
   const $equipment_2_loading_doors = true
   const initOnly = false
   const triage_category = "fictitious" // "total-loss" , "concrete", "fictitious"
   const insurance_name = "huk24"// "huk-coburg", "huk24", "default"
   const check_elements_on_page_02 = false
-  const noVin = true
+  const noVin = false
 
   function nextBtn() {
     cy.get('@nextBtn').click({ force: true })
@@ -206,8 +206,8 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
                 cy.get('@bodyType').then(function (bodyType) {
                   if (bodyType == 'MiniBusMidPanel' || bodyType == 'VanMidPanel' || bodyType == 'Van' || bodyType == 'MiniBus'){
                     if ($equipment_2_loading_doors){
-                      cy.selectSVG('right-load-door')
-                      cy.selectSVG('left-load-door')
+                      cy.selectSVG('right-middle-side-panel') //right-load-door
+                      cy.selectSVG('left-rear-door') //left-load-door or left-rear-door or left-middle-side-panel
                       //cy.selectSVG('left-rear-door-window')
                       //cy.selectSVG('right-rear-door-window')
                     } else {
@@ -333,13 +333,16 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
               if (bodyType == 'MiniBusMidPanel' || bodyType == 'VanMidPanel' || bodyType == 'Van' || bodyType == 'MiniBus') {
                 cy.selectSingleList('loading-floor-area-bend', 0)
                 if ($equipment_2_loading_doors ){
-                  cy.selectMultipleList('left-load-door-damage-type', 0)
-                  cy.selectMultipleList('left-load-door-damage-type', 1)
-                  cy.selectSingleList('left-load-door-damage-size', 2)
+                  cy.selectMultipleList('left-rear-door-damage-type', 0) //било е left-load-door-damage-type
+                  cy.selectMultipleList('left-rear-door-damage-type', 1) // било е left-load-door-damage-type
+                  cy.selectSingleList('left-rear-door-damage-size', 2) // било е left-load-door-damage-size
+                  cy.selectSingleList('left-rear-door-still-working',0)
 
-                  cy.selectMultipleList('right-load-door-damage-type', 0)
-                  cy.selectMultipleList('right-load-door-damage-type', 1)
-                  cy.selectSingleList('right-load-door-damage-size', 2)
+
+                  cy.selectMultipleList('right-middle-side-panel-damage-type', 0) //right-load-door-damage-type
+                  cy.selectMultipleList('right-middle-side-panel-damage-type', 1) //right-load-door-damage-type
+                  cy.selectSingleList('right-middle-side-panel-damage-size', 2) //right-load-door-damage-size
+                  //cy.selectSingleList('right-middle-side-panel-still-working',0)
                 } else {
                   cy.selectSingleList('tailgate-still-open-close-easily', 0)
                   cy.selectMultipleList('tailgate-damage-type', 1)
@@ -442,12 +445,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   const loss_causes = ["collision", "vandalism", "storm", "glass", "animal"]
 
   const file1 = [
-    [
-      "VF7RDRFJF9L510253",
-      "Station",
-      "01.01.2010",
-      "Citroen C5 Limousine 4 türig"
-    ]
+    ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
   ]
 
   file1.forEach($car => {

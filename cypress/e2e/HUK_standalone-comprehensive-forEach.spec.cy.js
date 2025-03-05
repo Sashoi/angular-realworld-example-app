@@ -65,7 +65,7 @@ describe('Start and complete huk standalone questionnaire - huk_comprehensive_ca
   }
 
   const file1 = [
-    ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan  "]
+    ["WAUZZZ4B73N015435", "Sedan", "01.01.2014", "AUD A6/S6/RS6 Sedan "]
 ]
   file1.forEach($car => {
     it.only(`huk standalone - huk_comprehensive_call_center vin ${$car[0]}`, () => {

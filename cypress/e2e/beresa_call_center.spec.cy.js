@@ -58,7 +58,7 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
   }
 
   const coverage_type_Array = ["liability","full-comprehensive","partial-comprehensive"]
-  const coverage_type = 2
+  const coverage_type = 1
   // only for coverage-type": "values": ["full-comprehensive", "partial-comprehensive"]
   const loss_cause_Array = [
     ["full-comprehensive", "collision"], //1, 0
@@ -74,8 +74,14 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
   const loss_cause = 1
 
   const file1 = [
-    
-    ["WDB1704351F077666", "Cabrio", "01.01.2004", "MER SLK Cabrio"]
+    ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"],
+  [
+    "WVWZZZ6RZGY304402",
+    "Hatch5",
+    "01.01.2017",
+    "Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
+  ],
+  ["VF7SA5FS0BW550414", "Hatch3", "01.01.2014", "CIT DS3 Hatch3"]
   ]
 
   file1.forEach($car => {
@@ -89,10 +95,10 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
         })
       })
 
-      const intS1 = getRandomInt(10,99).toString()
-      const intS2 = getRandomInt(1000000,9999999).toString()
-      const intS3 = getRandomInt(1000,9999).toString()
-      const intS4 = getRandomInt(1,9).toString()
+      const intS2 = getRandomInt(10,99).toString()
+      const intS7 = getRandomInt(1000000,9999999).toString()
+      const intS4 = getRandomInt(1000,9999).toString()
+      const intS1 = getRandomInt(1,9).toString()
 
 
 
@@ -100,8 +106,8 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
       console.log(`vin: ${$vin}, bodyType: ${$car[1]}, description: ${$car[3]}`)
       const nextButtonLabel ='Weiter'
       const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
-      const claimNumber = `${intS2}`
-      const licensePlate = `BER${intS2}`
+      const claimNumber = `${intS7}`
+      const licensePlate = `BER ${intS4}`
       console.log(`claimNumber: ${claimNumber}`)
 
       // Fulfill standalone form
