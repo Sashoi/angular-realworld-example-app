@@ -60,7 +60,12 @@ describe('Start and complete Smile self service', () =>{
 
 
   const file1 = [
-    ["U5YPH816HML010002", "SUV", "01.09.2020", "3D Kia Sportage"]
+    [
+      "TMBJB7NS4K8027658",
+      "SUV",
+      "01.09.2018",
+      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
+    ]
 ]
 
   file1.forEach($car => {
@@ -311,6 +316,17 @@ describe('Start and complete Smile self service', () =>{
             cy.get('button[type="submit"]').contains(sendButtonText).click()
             cy.wait('@postPost').then(xhr => {
               cy.postPost(xhr,false)
+              cy.wait(1000)
+              cy.url({ timeout: 3000 }).should('include', '/questionnaire/smile/#/final') // => true
+              //cy.get('div.content').contains('Digital Service wurde beendet').should('exist')
+              cy.get('div.content').then($labels => {
+                cy.wrap($labels).find('h1').contains('Vielen Dank für Ihre Mithilfe').should('be.visible')
+                cy.wrap($labels).find('b').contains('Wie geht es weiter?')
+                cy.wrap($labels).contains('Unser Service Team wird Ihre hochgeladenen Vorschadenmeldung prüfen und sich in Kürze mit Ihnen in Verbindung setzen.')
+                cy.wrap($labels).contains('Wenn Sie Fragen haben, können Sie uns jederzeit kontaktieren.')
+                cy.wrap($labels).contains('Herzlichen Grüsse')
+                cy.wrap($labels).contains('Ihr smile Service Team')
+              })
             })
           }
         }

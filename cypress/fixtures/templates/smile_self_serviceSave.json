@@ -1,17 +1,17 @@
 {
   "qas": [
     {
-      "answer": "SM 4429",
+      "answer": "SM 1529",
       "questionId": "client-vehicle-license-plate"
     },
     {
-      "answer": "2020-09-01",
+      "answer": "2018-09-01",
       "questionId": "vehicle-first-registration-date"
     }
   ],
   "supportInformation": {
-    "claimNumber": "3137-8669SMI",
-    "vin": "U5YPH816HML010002",
+    "claimNumber": "2942-3321SMI",
+    "vin": "TMBJB7NS4K8027658",
     "additionalProp3": {}
   }
 }
