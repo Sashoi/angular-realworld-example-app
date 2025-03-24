@@ -10,11 +10,11 @@
     },
     {
       "questionId": "license-plate",
-      "answer": "FRI 4155"
+      "answer": "FRI 4740"
     },
     {
       "questionId": "first-registration-date",
-      "answer": "2012-01-01"
+      "answer": "2017-01-01"
     },
     {
       "questionId": "odometer-reading",
@@ -34,11 +34,11 @@
     }
   ],
   "supportInformation": {
-    "vin": "6FPPXXMJ2PCD55635",
+    "vin": "VF3VEAHXKLZ080921",
     "country": "DE",
     "labourRate": 100,
     "paintRate": 100,
-    "claimNumber": "FR-106313-4155",
+    "claimNumber": "FR-211780-4740",
     "countryVehicleIdentification": ""
   }
 }

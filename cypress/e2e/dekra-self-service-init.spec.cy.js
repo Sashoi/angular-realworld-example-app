@@ -7,12 +7,12 @@ import file from '../fixtures/vinsArray.json'
 import header from '../fixtures/headerXML.json'
 
 
-const logFilename = 'cypress/fixtures/logs/ErgoSelfServiceInit.log'
+const logFilename = 'cypress/fixtures/logs/dekraSelfServiceInit.log'
 const PathToImages ='cypress/fixtures/images/'
-const b2bBody = 'cypress/fixtures/templates/ergoBodyNoVin.xml' // or ergoBodyL where <PLZ>04158</PLZ> Leipzig // or ergoBodyNoVinNoPhone
-const b2bBodySave = 'cypress/fixtures/templates/ergoBodySave.xml'
+const b2bBody = 'cypress/fixtures/templates/dekraSelfServiceInitBody.xml'
+const b2bBodySave = 'cypress/fixtures/templates/dekraSelfServiceInitBodySave.xml'
 
-describe('Ergo Self Service init', () =>{
+describe('dekra Self Service Init', () =>{
 
   before('clear log file', () => {
     cy.writeFile(logFilename, '')
@@ -27,7 +27,7 @@ describe('Ergo Self Service init', () =>{
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000
-  const executePost = true
+  const executePost = false
   const noLicensePlate = false
   const changeVin = true
   //const entire_vehicle_damaged_by_hail = true
@@ -74,7 +74,7 @@ describe('Ergo Self Service init', () =>{
     ]
   ]
   file1.forEach($car => {
-    it(`Execute /questionnaire/ergo_self_service_init with vin:${$car[0]}, Accept "terms-of-service-acknowledgement"`, () =>{
+    it(`Execute /questionnaire/dekra_Self_Service_Init with vin:${$car[0]}, Accept "terms-of-service-acknowledgement"`, () =>{
 
       let vin = $car[0]
       let licensePlate = `ER GO${getRandomInt(100,999)}`
@@ -83,50 +83,12 @@ describe('Ergo Self Service init', () =>{
       }
 
       cy.readFile(b2bBody).then(xml => {
-        const xmlDocument = new DOMParser().parseFromString(xml,'text/xml')
-
-        let newDxNumber = `KF3C0910KR${getRandomInt(1000000000000,9999999999999)}+${getRandomInt(100000,999999)}%`
-        Array.from(xmlDocument.getElementsByTagName("DxNumber")).forEach((element, index) => {
-          console.log(`DxNumber ${index}: ${element.childNodes[0].nodeValue}`);
-          element.childNodes[0].nodeValue = newDxNumber
-        })
-
-        let roleTypeElement;
-
-        //let roleTypeElement = xmlDocument.getElementsByTagName("RollenTyp")[0]
-        Array.from(xmlDocument.getElementsByTagName("RollenTyp")).forEach(element => {
-          console.log(`element: ${element.textContent}`);
-          if (element.textContent == rollenTyp){
-          roleTypeElement = element
-          }
-        })
-
-        if (roleTypeElement == undefined || roleTypeElement == null){
-          throw new Error(`test fails : Cannot find in body RollenTyp - ${rollenTyp}`)
-        }
-
-        let parentElement = roleTypeElement.parentElement.parentElement
-        let licensePlateElement = parentElement.getElementsByTagName("AmtlichesKennzeichen")[0]
-        console.log(`licensePlate: ${licensePlateElement.textContent}`);
-        licensePlateElement.textContent = licensePlate
-        console.log(`new licensePlate: ${licensePlateElement.textContent}`);
-
-        if (changeVin){
-          let vinElement = parentElement.getElementsByTagName("Fin")[0]
-          console.log(`vin: ${vinElement.textContent}`);
-          vinElement.textContent = vin
-          console.log(`new vin: ${vinElement.textContent}`);
-        }
-
-        //throw new Error(`test fails`)
-
-        const xmlString = new XMLSerializer().serializeToString(xmlDocument);
 
 
         cy.authenticate().then(function (authorization) {
           cy.then(function () {
             questionnaire.authorization = authorization
-            cy.writeFile(b2bBodySave, xmlString)
+            cy.writeFile(b2bBodySave, xml)
           })
 
           Cypress._.merge(header, {'authorization' : authorization});
@@ -134,8 +96,8 @@ describe('Ergo Self Service init', () =>{
 
           const options = {
             method: 'POST',
-            url: `${baseUrl_lp}b2b/integration/dekra/ergo-self-service-init`,
-            body: xmlString,
+            url: `${baseUrl_lp}b2b/integration/dekra/dekra-self-service-init`,
+            body: xml,
             failOnStatusCode : false,
             headers: header
           };
@@ -337,7 +299,7 @@ describe('Ergo Self Service init', () =>{
                 })
 
 
-                //pageId: "page-14" pageShowCriteria 'glass-parts-damaged-by-hail' == 'yes') || some glass 'selected-parts' == 'yes'
+                //pageId: "page-11"
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-11'){  // was page-14
                     cy.get('@goingPageElements').then(function (elements) {
@@ -371,6 +333,7 @@ describe('Ergo Self Service init', () =>{
                   }
                 })
 
+                //pageId: "page-12"
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-12'){ // was page-14
                     cy.get('@goingPageElements').then(function (elements) {
@@ -407,6 +370,7 @@ describe('Ergo Self Service init', () =>{
                   }
                 })
 
+                //pageId: "page-13"
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-13'){
                     cy.selectSingleList('cash-on-hand-preferred',0)
@@ -415,6 +379,7 @@ describe('Ergo Self Service init', () =>{
                   }
                 })
 
+                //pageId: "page-14"
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-14'){
                     //"type": "label" only
@@ -422,6 +387,7 @@ describe('Ergo Self Service init', () =>{
                   }
                 })
 
+                //pageId: "page-15"
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-15'){
                     //"description": ["Ask for photo of registration paper if not already done to identify vehicle and if total loss ratio >= 1.2 or if total loss ratio < 0.8 and vehicle not safe to drive"]
@@ -429,6 +395,8 @@ describe('Ergo Self Service init', () =>{
                     nextBtn()
                   }
                 })
+
+                //pageId: "page-16"
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-16'){
                     //"description": ["Ask for photos if total loss ratio >= 1.2 or if total loss ratio < 0.8 and vehicle not safe to drive"]
@@ -437,6 +405,7 @@ describe('Ergo Self Service init', () =>{
                   }
                 })
 
+                //pageId: "page-17"
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-17'){
                     //"description": ["Ask for photos if total loss ratio >= 1.2 or if total loss ratio < 0.8 and vehicle not safe to drive"]
@@ -445,6 +414,7 @@ describe('Ergo Self Service init', () =>{
                   }
                 })
 
+                //pageId: "page-18"
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-18'){
                     cy.uploadImage('vehicle-right-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
@@ -455,6 +425,7 @@ describe('Ergo Self Service init', () =>{
                   }
                 })
 
+                //pageId: "page-19"
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-19'){
                     cy.uploadImage('hail-damage-details-photo-upload',PathToImages,'hail-damage-intensity_heavy.jpg')
@@ -464,6 +435,7 @@ describe('Ergo Self Service init', () =>{
                   }
                 })
 
+                //pageId: "page-20"
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-20'){
                     cy.get('@goingPageElements').then(function (elements) {
@@ -486,6 +458,7 @@ describe('Ergo Self Service init', () =>{
                   }
                 })
 
+                //pageId: "page-21"
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-21'){
                     cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu1.jpg')
@@ -495,6 +468,7 @@ describe('Ergo Self Service init', () =>{
                   }
                 })
 
+                //pageId: "page-22"
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-22'){
                     //"type": "label" only
@@ -502,7 +476,7 @@ describe('Ergo Self Service init', () =>{
                   }
                 })
 
-
+                //pageId: "summary-page"
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'summary-page'){
                     //cy.getQuestionnaireInfo()
@@ -547,172 +521,5 @@ describe('Ergo Self Service init', () =>{
       })//readFile xml
     }) //it
 
-    it.only(`Execute /questionnaire/ergo_self_service_init with vin:${$car[0]} Do not accept "terms-of-service-acknowledgement"`, () =>{
-
-      let vin = $car[0]
-      let licensePlate = `ER GO${getRandomInt(100,999)}`
-      if (noLicensePlate){
-        licensePlate = ``;
-      }
-
-      cy.readFile(b2bBody).then(xml => {
-        const xmlDocument = new DOMParser().parseFromString(xml,'text/xml')
-
-        let newDxNumber = `KF3C0910KR${getRandomInt(1000000000000,9999999999999)}+${getRandomInt(100000,999999)}%`
-        Array.from(xmlDocument.getElementsByTagName("DxNumber")).forEach((element, index) => {
-          console.log(`DxNumber ${index}: ${element.childNodes[0].nodeValue}`);
-          element.childNodes[0].nodeValue = newDxNumber
-        })
-
-        let roleTypeElement;
-
-        //let roleTypeElement = xmlDocument.getElementsByTagName("RollenTyp")[0]
-        Array.from(xmlDocument.getElementsByTagName("RollenTyp")).forEach(element => {
-          console.log(`element: ${element.textContent}`);
-          if (element.textContent == rollenTyp){
-          roleTypeElement = element
-          }
-        })
-
-        if (roleTypeElement == undefined || roleTypeElement == null){
-          throw new Error(`test fails : Cannot find in body RollenTyp - ${rollenTyp}`)
-        }
-
-        let parentElement = roleTypeElement.parentElement.parentElement
-        let licensePlateElement = parentElement.getElementsByTagName("AmtlichesKennzeichen")[0]
-        console.log(`licensePlate: ${licensePlateElement.textContent}`);
-        licensePlateElement.textContent = licensePlate
-        console.log(`new licensePlate: ${licensePlateElement.textContent}`);
-
-        if (changeVin){
-          let vinElement = parentElement.getElementsByTagName("Fin")[0]
-          console.log(`vin: ${vinElement.textContent}`);
-          vinElement.textContent = vin
-          console.log(`new vin: ${vinElement.textContent}`);
-        }
-
-        //throw new Error(`test fails`)
-
-        const xmlString = new XMLSerializer().serializeToString(xmlDocument);
-
-
-        cy.authenticate().then(function (authorization) {
-          cy.then(function () {
-            questionnaire.authorization = authorization
-            cy.writeFile(b2bBodySave, xmlString)
-          })
-
-          Cypress._.merge(header, {'authorization' : authorization});
-
-
-          const options = {
-            method: 'POST',
-            url: `${baseUrl_lp}b2b/integration/dekra/ergo-self-service-init`,
-            body: xmlString,
-            failOnStatusCode : false,
-            headers: header
-          };
-          cy.request(options).then(
-            (response) => {
-            // response.body is automatically serialized into JSON
-            if (response.status != 201){
-              console.log(`status: ${response.status}`);
-              console.log(`internalErrorCode: ${response.body.internalErrorCode}`);
-              console.log(`message: ${response.body.message}`);
-              throw new Error(`test fails : ${response.body.message}`)
-            }
-            expect(response.status).to.eq(201) // true
-            const questionnaireId = response.body.questionnaireId
-            console.log(`self-service-init questionnaireId: ${questionnaireId}`)
-            const options2 = {
-              method: 'GET',
-              url: `${baseUrl_lp}questionnaire/${questionnaireId}`,
-              headers: header
-            };
-            cy.wait(1000) // 5000 time to create DN and send link via e-mail
-            cy.request(options2).then(
-              (response2) => {
-              expect(response2.status).to.eq(200) // true
-              //console.log('supportInformation: '+JSON.stringify(response2.body.supportInformation))
-              const damageNotificationId = response2.body.supportInformation.damageNotificationId
-              cy.then(function () {
-                questionnaire.notificationId = damageNotificationId
-              })
-              Cypress.env('notificationId', damageNotificationId)
-              const options3 = {
-                method: 'GET',
-                url: `${baseUrl_lp}damage/notification/${damageNotificationId}`,
-                headers: header
-              }
-              cy.request(options3).then(
-                (response3) => {
-                expect(response3.status).to.eq(200) // true
-                let questionnaireUrl = ''
-                let questionnaireId2 = ''
-                const requestedInformation = response3.body.body.requestedInformation
-                if (requestedInformation != undefined && requestedInformation != null && requestedInformation.length > 0)
-                {
-                  //console.log(`requestedInformation: ${JSON.stringify(response3.body.body.requestedInformation)}`)
-                  questionnaireUrl = response3.body.body.requestedInformation[0].requestUrl;
-                  questionnaireId2 = response3.body.body.requestedInformation[0].questionnaireId;
-                  console.log(`Real questionnaireId: ${questionnaireId2}`)
-                } else {
-                  console.log(`requestedInformation: ${response3.body.body.requestedInformation}`)
-                  console.log(`body: ${JSON.stringify(response3.body.body)}`)
-                  throw new Error("test fails to read requestedInformation")
-                }
-                cy.then(function () {
-                  questionnaire.Id = questionnaireId2
-                })
-                console.log(`questionnaireUrl: ${questionnaireUrl}`)
-
-                cy.visit(questionnaireUrl,{log : false})
-
-                const nextButtonLabel = 'Weiter'
-                const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'
-                cy.get(selectorNextButton).contains(nextButtonLabel).as('nextBtn')
-
-                currentPage()
-                //cy.getQuestionnaireInfo()
-
-                cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-01'){
-                    cy.getBodyType($car,logFilename).then(function (bodyType) {
-                      cy.then(function () {
-                        questionnaire.bodyType = bodyType
-                      })
-                    })
-                    //cy.selectMultipleList('terms-of-service-acknowledgement',0)
-                    cy.selectSingleList('terms-of-service-acknowledgement',1)
-                    //cy.getQuestionnaireInfo()
-                    cy.wait(1000)
-                    const nextButtonLabel = 'Digital Service beenden'
-                    const selectorNextButton = 'button[type="submit"][data-test="questionnaire-complete-button"]'
-                    cy.get(selectorNextButton).contains(nextButtonLabel).as('toFinalBtn')
-                    cy.wait(1000)
-                    cy.get('@toFinalBtn').click({ force: true })
-                    cy.url({ timeout: 3000 }).should('include', '/questionnaire/mdekra/#/final') // => true
-                    //cy.get('div.content').contains('Digital Service wurde beendet').should('exist')
-                    cy.get('div.content').then($labels => {
-                      cy.wrap($labels).find('h1').contains('Digital Service wurde beendet').should('be.visible')
-                      cy.wrap($labels).contains('Sie haben leider den Nutzungsbedingungen des Kfz-Schadenmeldungsportals nicht zugestimmt. Aus diesem Grund werden wir auf alternative manuelle Prozesse zurückgreifen, was zu längeren Abwicklungszeiten führen kann.').should('be.visible')
-                      cy.wrap($labels).contains('Wir werden uns bei Ihnen melden, um einen Besichtigungstermin mit Ihnen abzustimmen.').should('be.visible')
-                      cy.wrap($labels).contains('Vielen Dank für Ihr Verständnis und Ihre Geduld!').should('be.visible')
-                      cy.wrap($labels).contains('Freundliche Grüße').should('be.visible')
-                    })
-                  }
-                })
-              }) //response3
-            }) //response2
-          })  //response
-        }) //authorization
-      })//readFile xml
-    }) //it
-
-    it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
-      //Cypress.env('notificationId','V5z41mYa96xDCRVRcfyXh')
-      cy.wait(2000)
-      cy.GeneratePDFs(['ergo_abschlussbericht','ergo_hagelbericht'])
-    }) //it PDF from commands
   }) //forEach
 })

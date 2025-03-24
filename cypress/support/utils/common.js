@@ -51,6 +51,6 @@ export const getQuestionnaireIdFromLinks = (nextUrl) => {
 }
 
 export const goingPage = { pageId: '', elements: []}
-export const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: '', is3Dcar: false}
+export const questionnaire = { Id:'', authorization : '', bodyType: '', notificationId: '', is3Dcar: false, finalPage : ''}
 
 

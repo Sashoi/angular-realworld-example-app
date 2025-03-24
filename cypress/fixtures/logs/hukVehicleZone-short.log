@@ -1,6 +1,4 @@
-vin: VF7SA5FS0BW550414 expected:             Hatch3 real:             Hatch3 desc: CIT DS3 Hatch3 
-vin: VF7SA5FS0BW550414 expected:             Hatch3 real:             Hatch3 desc: CIT DS3 Hatch3 
-vin: WAUZZZ4B73N015435 expected:              Sedan real:              Sedan desc: AUD A6/S6/RS6 Sedan 
-vin: WAUZZZ4B73N015435 expected:              Sedan real:              Sedan desc: AUD A6/S6/RS6 Sedan 
-vin: WDB2083441T069719 expected:              Coupe real:              Coupe desc: MER CLK Coupe (partial identification, build period to be defined manually) 
-vin: WDB2083441T069719 expected:              Coupe real:              Coupe desc: MER CLK Coupe (partial identification, build period to be defined manually) 
+vin: WDB1704351F077666 expected:             Cabrio real:             Cabrio desc: MER SLK Cabrio 
+vin: WDB1704351F077666 expected:             Cabrio real:             Cabrio desc: MER SLK Cabrio 
+vin: WBAUB310X0VN69014 expected:             Hatch3 real:             Hatch3 desc: BMW 1 Series Hatch3 
+vin: WBAUB310X0VN69014 expected:             Hatch3 real:             Hatch3 desc: BMW 1 Series Hatch3 

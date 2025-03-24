@@ -117,10 +117,22 @@ describe('Start and complete friday_self_service',  () =>{
 
   const file1 = [
     [
-      "6FPPXXMJ2PCD55635",
-      "PickUpDoubleCabine",
-      "01.01.2012",
-      "Ford Ranger double cabine, Pick-up"
+      "TMBJB7NS4K8027658",
+      "SUV",
+      "01.09.2018",
+      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
+    ],
+    [
+      "WVWZZZ3CZME020680",
+      "Station",
+      "01.09.2020",
+      "Passat Variant 1.4 TSI Plug-In-Hybrid DSG GTE"
+    ],
+    [
+      "VF3VEAHXKLZ080921",
+      "MiniBusMidPanel",
+      "01.01.2017",
+      "Peugeot Expert 09/2020"
     ]
   ]
   file1.forEach($car => {

@@ -18,7 +18,7 @@
     },
     {
       "questionId": "client-insurance-claim-number",
-      "answer": "78-33-293/575496-S"
+      "answer": "85-33-245/538205-S"
     },
     {
       "questionId": "animal-species",
@@ -38,7 +38,11 @@
     },
     {
       "questionId": "insurance-policy-type",
-      "answer": [""]
+      "answer": "insurance-policy-type"
+    },
+    {
+      "questionId": "insurance-policy-type-extension",
+      "answer": "insurance-policy-type-extension"
     },
     {
       "questionId": "client-zip-code",
@@ -50,7 +54,7 @@
     },
     {
       "questionId": "vehicle-vin",
-      "answer": "WF0KXXTTRKMC81361"
+      "answer": "TMBJB7NS4K8027658"
     },
     {
       "questionId": "vehicle-first-registration-date",
@@ -58,7 +62,7 @@
     },
     {
       "questionId": "client-vehicle-license-plate",
-      "answer": "HSS 7-983"
+      "answer": "HSS 2-107"
     },
     {
       "questionId": "client-email",

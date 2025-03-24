@@ -41,6 +41,10 @@
       "answer": [""]
     },
     {
+      "questionId": "insurance-policy-type-extension",
+      "answer": [""]
+    },
+    {
       "questionId": "client-zip-code",
       "answer": ["96450"]
     },

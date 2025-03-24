@@ -14,7 +14,7 @@ module.exports = defineConfig({
     username: "artem.bondar166@gmail.com - cypress.env.json is used",
     password: "CypressTest1",
     apiUrl: "https://api.realworld.io",
-    questionnaireId :"33",
+    questionnaireId :"noId",
     requestUrl: "test"
   },
   retries: {

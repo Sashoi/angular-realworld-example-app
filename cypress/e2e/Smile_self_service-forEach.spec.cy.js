@@ -321,11 +321,11 @@ describe('Start and complete Smile self service', () =>{
               //cy.get('div.content').contains('Digital Service wurde beendet').should('exist')
               cy.get('div.content').then($labels => {
                 cy.wrap($labels).find('h1').contains('Vielen Dank für Ihre Mithilfe').should('be.visible')
-                cy.wrap($labels).find('b').contains('Wie geht es weiter?')
-                cy.wrap($labels).contains('Unser Service Team wird Ihre hochgeladenen Vorschadenmeldung prüfen und sich in Kürze mit Ihnen in Verbindung setzen.')
-                cy.wrap($labels).contains('Wenn Sie Fragen haben, können Sie uns jederzeit kontaktieren.')
-                cy.wrap($labels).contains('Herzlichen Grüsse')
-                cy.wrap($labels).contains('Ihr smile Service Team')
+                cy.wrap($labels).find('b').contains('Wie geht es weiter?').should('be.visible')
+                cy.wrap($labels).contains('Unser Service Team wird Ihre hochgeladenen Vorschadenmeldung prüfen und sich in Kürze mit Ihnen in Verbindung setzen.').should('be.visible')
+                cy.wrap($labels).contains('Wenn Sie Fragen haben, können Sie uns jederzeit kontaktieren.').should('be.visible')
+                cy.wrap($labels).contains('Herzlichen Grüsse').should('be.visible')
+                cy.wrap($labels).contains('Ihr smile Service Team').should('be.visible')
               })
             })
           }

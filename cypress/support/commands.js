@@ -445,7 +445,7 @@ Cypress.Commands.add('getInternalInformation', () =>{
   }) //get('@authorization'
 })
 
-Cypress.Commands.add('postPost', (xhr, hasDialog = true) =>{
+Cypress.Commands.add('postPost', (xhr, hasDialog = true, $questionnaire = null) =>{
   if (xhr.response.statusCode != 200){
     console.log(`status: ${xhr.response.statusCode}`);
     console.log(`internalErrorCode: ${xhr.response.body.internalErrorCode}`);
@@ -462,6 +462,24 @@ Cypress.Commands.add('postPost', (xhr, hasDialog = true) =>{
     cy.get(buttonRetry, { timeout: c_requestTimeout }).should('be.visible');
     // close modal-dialog
     cy.get(buttonRetry).click()
+  }
+  const finalPage = xhr.response.body.finalPage;
+  if (finalPage != null && finalPage != undefined){
+    cy.then(function () {
+      $questionnaire.finalPage = finalPage
+    })
+    // const summaries = finalPage.summaries
+    // if (summaries != null && summaries != undefined && summaries.length > 0){
+    //   let i = 0
+    //   summaries.forEach($summary => {
+    //     console.log(`summaryId[${i}]: ${$summary.summaryId}`);
+    //     i++
+    //   })
+    // }else {
+    //   console.log(`summaries: ${summaries}`);
+    // }
+  } else {
+    console.log(`finalPage: ${finalPage}`);
   }
   cy.wrap(notificationId).then((notificationId) => {
     return notificationId
@@ -676,10 +694,10 @@ Cypress.Commands.add('getLastRequestUrl', function () {
 
 })
 
-Cypress.Commands.add('createNewQuestionnaire', function (templateId,sendSMS = false) {
+Cypress.Commands.add('createNewQuestionnaire', function (templateId, $notificationId = '', sendSMS = false) {
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
-  const notificationId = Cypress.env('notificationId')
+  const notificationId = $notificationId.length > 0 ? $notificationId : Cypress.env('notificationId')
   if(notificationId == undefined || notificationId == null || !notificationId.length > 0){
     throw new Error(`test fails : notificationId = ${notificationId}`)
   }
@@ -696,13 +714,17 @@ Cypress.Commands.add('createNewQuestionnaire', function (templateId,sendSMS = fa
         // response.body is automatically serialized into JSON
         expect(response.status).to.eq(200) // true
         const arrLength = response.body.requestedInformation.length
+        const questionnaireId = response.body.requestedInformation[arrLength - 1].questionnaireId
         const requestUrl = response.body.requestedInformation[arrLength - 1].requestUrl
         const templateId = response.body.requestedInformation[arrLength - 1].templateId
+        console.log(`questionnaireId:${questionnaireId}`);
         console.log(`requestUrl : ${requestUrl}`);
         console.log(`templateId : ${templateId}`);
+        Cypress.env('questionnaireId', questionnaireId)
         Cypress.env('requestUrl', requestUrl)
         Cypress.env('templateId', templateId)
-        //cy.printRequestedInformation(response.body.requestedInformation);
+
+        cy.printRequestedInformation(response.body.requestedInformation);
     })
     if (sendSMS){
       const options = {
@@ -780,6 +802,7 @@ Cypress.Commands.add('commanBeforeEach',(goingPage,questionnaire) =>{
   cy.wrap(questionnaire).its('bodyType').as('bodyType')
   cy.wrap(questionnaire).its('notificationId').as('notificationId')
   cy.wrap(questionnaire).its('is3Dcar').as('is3Dcar')
+  cy.wrap(questionnaire).its('finalPage').as('finalPage')
 })
 
 Cypress.Commands.add('fulfilInputIfEmpty', function ($div, $input, $newValue) {

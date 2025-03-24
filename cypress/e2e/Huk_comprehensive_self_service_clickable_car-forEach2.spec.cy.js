@@ -420,7 +420,7 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
     //"page-17"
     cy.get('@goingPageId').then(function (aliasValue) {
       if (aliasValue == 'page-17'){
-        cy.get('textarea#additional-remarks-textarea').type('Weitere Anmerkungen  - 1./nWeitere Anmerkungen  - 2./nWeitere Anmerkungen  - 3.')
+        cy.get('textarea#additional-remarks-textarea').type('Weitere Anmerkungen  - 1.\nWeitere Anmerkungen  - 2.\nWeitere Anmerkungen  - 3.')
         nextBtn()
       }
     })
@@ -445,7 +445,12 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
   const loss_causes = ["collision", "vandalism", "storm", "glass", "animal"]
 
   const file1 = [
-    ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
+    [
+      "TMBJB7NS4K8027658",
+      "SUV",
+      "01.09.2018",
+      "SKODA Kodiaq 1.5 TSI ACT DSG Style"
+    ]
   ]
 
   file1.forEach($car => {
@@ -480,6 +485,8 @@ describe('Huk_comprehensive_self_service_clickable_car', () =>{
         b2bBody.qas.find(q => {return q.questionId === "loss-cause"}).answer = loss_cause
         b2bBody.qas.find(q => {return q.questionId === "insurance-name"}).answer = insurance_name
         b2bBody.qas.find(q => {return q.questionId === "huk-coburg-triage-category"}).answer = triage_category
+        b2bBody.qas.find(q => {return q.questionId === "insurance-policy-type"}).answer = 'insurance-policy-type'
+        b2bBody.qas.find(q => {return q.questionId === "insurance-policy-type-extension"}).answer = 'insurance-policy-type-extension'
 
 
         Cypress._.merge(header, {'authorization' : authorization});

@@ -1,10 +1,10 @@
-import { getRandomInt } from "../support/utils/common.js";
-import { getPageTitle } from "../support/utils/common.js";
-import { getQuestionnaireIdFromLinks } from "../support/utils/common.js";
-import { questionnaire } from "../support/utils/common.js";
-import { goingPage } from "../support/utils/common.js";
-import file from '../fixtures/vinsArray.json'
-import header from '../fixtures/headerXML.json'
+import { getRandomInt } from "../../support/utils/common.js";
+import { getPageTitle } from "../../support/utils/common.js";
+import { getQuestionnaireIdFromLinks } from "../../support/utils/common.js";
+import { questionnaire } from "../../support/utils/common.js";
+import { goingPage } from "../../support/utils/common.js";
+import file from '../../fixtures/vinsArray.json'
+import header from '../../fixtures/headerXML.json'
 
 
 const logFilename = 'cypress/fixtures/logs/ErgoSelfServiceInit.log'
@@ -66,15 +66,10 @@ describe('Ergo Self Service init', () =>{
 
 
   const file1 = [
-    [
-      "6FPPXXMJ2PCD55635",
-      "PickUpDoubleCabine",
-      "01.01.2012",
-      "Ford Ranger double cabine, Pick-up"
-    ]
+    ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
   ]
   file1.forEach($car => {
-    it(`Execute /questionnaire/ergo_self_service_init with vin:${$car[0]}, Accept "terms-of-service-acknowledgement"`, () =>{
+    it.only(`Execute /questionnaire/ergo_self_service_init with vin:${$car[0]}, Accept "terms-of-service-acknowledgement"`, () =>{
 
       let vin = $car[0]
       let licensePlate = `ER GO${getRandomInt(100,999)}`
@@ -337,9 +332,41 @@ describe('Ergo Self Service init', () =>{
                 })
 
 
+                //pageId: "page-11"
+                cy.get('@goingPageId').then(function (aliasValue) {
+                  if (aliasValue == 'page-11'){
+                    cy.selectSingleList('damaged-vehicle-area-left-hail-damage-intensity',2)
+                    cy.selectSingleList('damaged-vehicle-area-top-hail-damage-intensity',2)
+                    cy.selectSingleList('damaged-vehicle-area-right-hail-damage-intensity',2)
+                    cy.get('div#damaged-vehicle-area-left-hail-damage-intensity').find('span.info-icon').click()
+                    cy.wait(3000)
+                    cy.get('span.info-block-close').first().click()
+
+                    //cy.getQuestionnaireInfo()
+                    nextBtn()
+                  }
+                })
+
+                cy.get('@goingPageId').then(function (aliasValue) {
+                  if (aliasValue == 'page-12'){
+                    cy.selectSingleList('glass-parts-damaged-by-hail',Number(glass_parts_not_damaged_by_hail))
+                    //cy.getQuestionnaireInfo()
+                    nextBtn()
+                  }
+                })
+
+                cy.get('@goingPageId').then(function (aliasValue) {  //pageShowCriteria 'glass-parts-damaged-by-hail' = 'yes'
+                  if (aliasValue == 'page-13'){
+                    cy.selectSVG('roof')
+                    cy.selectSVG('windshield')
+                    //cy.getQuestionnaireInfo()
+                    nextBtn()
+                  }
+                })
+
                 //pageId: "page-14" pageShowCriteria 'glass-parts-damaged-by-hail' == 'yes') || some glass 'selected-parts' == 'yes'
                 cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-11'){  // was page-14
+                  if (aliasValue == 'page-14'){
                     cy.get('@goingPageElements').then(function (elements) {
                       elements.forEach(element => {
                         if (element['id'] == 'roof-equipment-panorama-roof' && eval(element['visibleExpression'])){
@@ -372,7 +399,7 @@ describe('Ergo Self Service init', () =>{
                 })
 
                 cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-12'){ // was page-14
+                  if (aliasValue == 'page-15'){
                     cy.get('@goingPageElements').then(function (elements) {
                       elements.forEach(element => {
                         //console.log(`element: ${JSON.stringify(element)}`)
@@ -408,7 +435,7 @@ describe('Ergo Self Service init', () =>{
                 })
 
                 cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-13'){
+                  if (aliasValue == 'page-16'){
                     cy.selectSingleList('cash-on-hand-preferred',0)
                     //cy.getQuestionnaireInfo()
                     nextBtn()
@@ -416,47 +443,49 @@ describe('Ergo Self Service init', () =>{
                 })
 
                 cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-14'){
-                    //"type": "label" only
-                    nextBtn()
-                  }
-                })
-
-                cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-15'){
-                    //"description": ["Ask for photo of registration paper if not already done to identify vehicle and if total loss ratio >= 1.2 or if total loss ratio < 0.8 and vehicle not safe to drive"]
-                    cy.uploadImage('vehicle-registration-part-1-photo-upload-2',PathToImages,'registration-part-1.jpg')
-                    nextBtn()
-                  }
-                })
-                cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-16'){
-                    //"description": ["Ask for photos if total loss ratio >= 1.2 or if total loss ratio < 0.8 and vehicle not safe to drive"]
-                    cy.uploadImage('vehicle-interior-front-photo-upload',PathToImages,'interior-front.jpg')
-                    nextBtn()
-                  }
-                })
-
-                cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-17'){
-                    //"description": ["Ask for photos if total loss ratio >= 1.2 or if total loss ratio < 0.8 and vehicle not safe to drive"]
-                    cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathToImages,'image dashboard-odometer.jpg')
+                    //cy.getQuestionnaireInfo()
                     nextBtn()
                   }
                 })
 
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-18'){
-                    cy.uploadImage('vehicle-right-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
-                    cy.uploadImage('vehicle-left-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
-                    cy.uploadImage('vehicle-left-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
-                    cy.uploadImage('vehicle-right-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
+                    cy.uploadImage('vehicle-registration-part-1-photo-upload-2',PathToImages,'registration-part-1.jpg')
+                    //cy.getQuestionnaireInfo()
                     nextBtn()
                   }
                 })
 
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'page-19'){
+                    cy.uploadImage('vehicle-interior-front-photo-upload',PathToImages,'interior-front.jpg')
+                    //cy.getQuestionnaireInfo()
+                    nextBtn()
+                  }
+                })
+
+                cy.get('@goingPageId').then(function (aliasValue) {
+                  if (aliasValue == 'page-20'){
+                    cy.uploadImage('vehicle-dashboard-odometer-photo-upload',PathToImages,'image dashboard-odometer.jpg')
+                    //cy.getQuestionnaireInfo()
+                    nextBtn()
+                  }
+                })
+
+                cy.get('@goingPageId').then(function (aliasValue) {
+                  if (aliasValue == 'page-21'){
+                    cy.uploadImage('vehicle-right-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
+                    cy.uploadImage('vehicle-left-front-photo-upload',PathToImages,'vehicle-right-front-photo.jpg')
+                    cy.uploadImage('vehicle-left-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
+                    cy.uploadImage('vehicle-right-rear-photo-upload',PathToImages,'vehicle-left-rear-photo1.jpg')
+                    //cy.getQuestionnaireInfo()
+                    nextBtn()
+                  }
+                })
+
+                cy.get('@goingPageId').then(function (aliasValue) {
+                  if (aliasValue == 'page-22'){
                     cy.uploadImage('hail-damage-details-photo-upload',PathToImages,'hail-damage-intensity_heavy.jpg')
                     cy.uploadImage('hail-damage-details-photo-upload',PathToImages,'hail-damage-intensity_heavy.jpg')
                     cy.uploadImage('hail-damage-details-photo-upload',PathToImages,'hail-damage-intensity_moderate.jpg')
@@ -465,7 +494,7 @@ describe('Ergo Self Service init', () =>{
                 })
 
                 cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-20'){
+                  if (aliasValue == 'page-23'){
                     cy.get('@goingPageElements').then(function (elements) {
                       elements.forEach(element => {
                         if (element['id'] == 'damage-photo-upload-overview-windshield' && eval(element['visibleExpression'])){
@@ -482,26 +511,28 @@ describe('Ergo Self Service init', () =>{
                         }
                       })
                     })
+                    //cy.getQuestionnaireInfo()
                     nextBtn()
                   }
                 })
 
-                cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-21'){
+                cy.get('@goingPageId').then(function (aliasValue) { // pageShowCriteria 'unrepaired-pre-damages' = 'yes'
+                  if (aliasValue == 'page-24'){
                     cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu1.jpg')
                     cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu2.jpg')
                     cy.uploadImage('unrepaired-pre-damages-photo-upload',PathToImages,'hood-npu3.jpg')
+                    //cy.getQuestionnaireInfo()
                     nextBtn()
                   }
                 })
 
+                //pageId: "page-25" pageShowCriteria = vehicle-road-safety-potentially-at-risk == true
                 cy.get('@goingPageId').then(function (aliasValue) {
-                  if (aliasValue == 'page-22'){
-                    //"type": "label" only
+                  if (aliasValue == 'page-25'){
+                    cy.getQuestionnaireInfo($car[0], logFilename)
                     nextBtn()
                   }
                 })
-
 
                 cy.get('@goingPageId').then(function (aliasValue) {
                   if (aliasValue == 'summary-page'){
@@ -547,7 +578,7 @@ describe('Ergo Self Service init', () =>{
       })//readFile xml
     }) //it
 
-    it.only(`Execute /questionnaire/ergo_self_service_init with vin:${$car[0]} Do not accept "terms-of-service-acknowledgement"`, () =>{
+    it(`Execute /questionnaire/ergo_self_service_init with vin:${$car[0]} Do not accept "terms-of-service-acknowledgement"`, () =>{
 
       let vin = $car[0]
       let licensePlate = `ER GO${getRandomInt(100,999)}`
@@ -694,11 +725,9 @@ describe('Ergo Self Service init', () =>{
                     cy.url({ timeout: 3000 }).should('include', '/questionnaire/mdekra/#/final') // => true
                     //cy.get('div.content').contains('Digital Service wurde beendet').should('exist')
                     cy.get('div.content').then($labels => {
-                      cy.wrap($labels).find('h1').contains('Digital Service wurde beendet').should('be.visible')
-                      cy.wrap($labels).contains('Sie haben leider den Nutzungsbedingungen des Kfz-Schadenmeldungsportals nicht zugestimmt. Aus diesem Grund werden wir auf alternative manuelle Prozesse zurückgreifen, was zu längeren Abwicklungszeiten führen kann.').should('be.visible')
-                      cy.wrap($labels).contains('Wir werden uns bei Ihnen melden, um einen Besichtigungstermin mit Ihnen abzustimmen.').should('be.visible')
+                      cy.wrap($labels).contains('Digital Service wurde beendet').should('be.visible')
                       cy.wrap($labels).contains('Vielen Dank für Ihr Verständnis und Ihre Geduld!').should('be.visible')
-                      cy.wrap($labels).contains('Freundliche Grüße').should('be.visible')
+                      cy.wrap($labels).contains('Wir werden uns bei Ihnen melden, um einen Besichtigungstermin mit Ihnen abzustimmen.').should('be.visible')
                     })
                   }
                 })

@@ -82,7 +82,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
 	  cy.get(`div#${question}`).find(`input#${question}-vehicle-insurance__--__${instance}-input`).type(`vehicle-insurance ${instance + 1}`)
     if (!lastInstance) {
       cy.get(`div#${question}`).find(`input#${question}-email__--__${instance}-input`).focus()
-    cy.get(`div#${question}`).find('button[type="button"]').click({ force: true })
+      cy.get(`div#${question}`).find('button[type="button"]').click({ force: true })
     }
 }
 
@@ -119,13 +119,7 @@ describe('Execute b2b/integration/toni-digital/hdiLiabilitySelfService', () =>{
   const eMail = Cypress.env("client_email")
 
   const file1 = [
-    ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"],
-  [
-    "6FPPXXMJ2PCD55635",
-    "PickUpDoubleCabine",
-    "01.01.2012",
-    "Ford Ranger double cabine, Pick-up"
-  ]
+    ["WF0KXXTTRKMC81361", "VanMidPanel", "01.01.2020", "Ford Transit 06/2021"]
   ]
 
   file1.forEach($car => {

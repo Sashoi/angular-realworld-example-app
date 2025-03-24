@@ -27,7 +27,7 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
   const $dev = Cypress.env("dev");
   const baseUrl_lp = `https://${$dev}.spearhead-ag.ch:443//`
   const $requestTimeout = 60000;
-  const executePost = false
+  const executePost = true
   const executePost2 = false
   const $equipment_2_loading_doors = true
 
@@ -59,7 +59,7 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
     ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5"]
 ]
   file1.forEach($car => {
-    it.only(`Sph sales - sph_sales_comprehensive_call_center vin ${$car[0]}`, () => {
+    it(`Sph sales - sph_sales_comprehensive_call_center vin ${$car[0]}`, () => {
 
       const $vin = $car[0]
 
@@ -295,6 +295,9 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
 
     it(`sph_sales_comprehensive_self_service_app create vin ${$car[0]}`, () => {
       const notificationId = Cypress.env('notificationId')
+      if (notificationId == null || notificationId == undefined || !(notificationId.length > 0)){
+        throw new Error(`test fails : notificationId = ${notificationId}`)
+      }
       cy.authenticate().then(function (authorization) {
         cy.then(function () {
           questionnaire.authorization = authorization
@@ -310,7 +313,6 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
           (response) => {
             // response.body is automatically serialized into JSON
             expect(response.status).to.eq(200) // true
-            console.log(`allianz_comprehensive_self_service:`);
             const arrLength = response.body.requestedInformation.length
             console.log(response.body.requestedInformation[arrLength - 1].requestUrl);
             Cypress.env('requestUrl', response.body.requestedInformation[arrLength - 1].requestUrl)
@@ -323,9 +325,15 @@ describe('Start and complete Sph_sales comprehensive call center - sph_sales_com
 
     it(`sph_sales_comprehensive_self_service_app.json execute vin ${$car[0]}`, () => {
       cy.viewport('samsung-note9')
-      console.log(`Start ${Cypress.env('templateId')} from url: ${Cypress.env('requestUrl')}.`)
 
-      cy.visit(Cypress.env('requestUrl'),{log : false})
+      const requestUr = Cypress.env('requestUrl')
+
+      if (requestUr == null || requestUr == undefined || !(requestUr.length > 0)){
+        throw new Error(`test fails : requestUr = ${requestUr}`)
+      }
+      console.log(`Start ${Cypress.env('templateId')} from url: ${requestUr}.`)
+
+      cy.visit(requestUr,{log : false})
 
       const nextButtonLabel ='Weiter'
       const selectorNextButton = 'button[type="submit"][data-test="questionnaire-next-button"]'

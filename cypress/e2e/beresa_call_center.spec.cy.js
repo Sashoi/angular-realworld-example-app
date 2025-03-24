@@ -74,14 +74,9 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
   const loss_cause = 1
 
   const file1 = [
-    ["WBAUB310X0VN69014", "Hatch3", "01.01.2012", "BMW 1 Series Hatch3"],
-  [
-    "WVWZZZ6RZGY304402",
-    "Hatch5",
-    "01.01.2017",
-    "Volkswagen Polo Limousine 5 Doors 201404 – 209912, driving/parking help but this vehicle doesn’t have an equipment list (if you check the vin equipment list)"
-  ],
-  ["VF7SA5FS0BW550414", "Hatch3", "01.01.2014", "CIT DS3 Hatch3"]
+    ["WAUZZZ8V3HA101912", "Hatch5", "01.01.2018", "AUD A3/S3/RS3 Hatch5"],
+  ["WVWZZZ7NZDV041367", "MPV", "01.01.2011", "VW Sharan MPV"],
+  ["SALYL2RV8JA741831", "SUV", "01.01.2019", "Land Rover, SUV"]
   ]
 
   file1.forEach($car => {
@@ -500,12 +495,20 @@ describe('Start and complete beresa_call_center standalone questionnaire', () =>
             cy.wait('@postPost',{ log: false }).then(xhr => {
               cy.postPost(xhr,false).then(function (notificationId) {
                 console.log(`notificationId: ${notificationId}`);
+                cy.wait(1000)
+                cy.url({ timeout: 3000 }).should('include', '/questionnaire/mdekra/#/final') // => true
+                //cy.get('div.content').contains('Digital Service wurde beendet').should('exist')
+                cy.get('div.final-page__content').then($labels => {
+                  cy.wrap($labels).find('h1').contains('Vielen Dank für Ihre Mithilfe').should('be.visible')
+                  cy.wrap($labels).contains(' Die von Ihnen hochgeladenen Bilder wurden erfolgreich übermittelt.').should('be.visible')
+                  cy.wrap($labels).contains('Sie erhalten in Kürze eine Bestätigungs-E-Mail. In dieser E-Mail finden Sie weitere Informationen zum weiteren Vorgehen bezüglich der Bearbeitung Ihres Schadenfalls.').should('be.visible')
+                  cy.wrap($labels).contains('Mit freundlichen Grüßen').should('be.visible')
+                })
               })
             })
           }
         }
       })
-
     })
 
     // it.skip(`Generate PDFs (from commands ) for ${$car[0]}`, function () {
